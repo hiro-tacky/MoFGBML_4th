@@ -1,5 +1,13 @@
+/.classpath
+/.project
+/consts.properties
 /data/
 /emo/
 /fgbml/
 /fuzzy/
+/ga/
+/gui/
 /main/
+/method/
+/setting.properties
+/time/
