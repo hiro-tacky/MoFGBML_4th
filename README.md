@@ -2,11 +2,11 @@
 
 ## コミットメッセージのフォーマット
 ~~~
-\<Prefix\>: \<Subject\>  
+<Prefix>: <Subject>  
   
-\<Body\>  
+<Body>  
   
-\<Footer\>  
+<Footer>  
 ~~~
   
 | prefix  | 意味 |  
