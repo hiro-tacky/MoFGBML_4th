@@ -1,13 +1,13 @@
 # MoFGBML_4th
 
 ## コミットメッセージのフォーマット
-'''  
+'''
 \<Prefix\>: \<Subject\>  
   
 \<Body\>  
   
 \<Footer\>  
-'''  
+'''
   
 | prefix  | 意味 |  
 | ---- | ---- |
