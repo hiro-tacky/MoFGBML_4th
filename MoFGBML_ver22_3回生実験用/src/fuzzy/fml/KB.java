@@ -84,7 +84,7 @@ public class KB {
 /********** 重要・必読 **********/
 	/**
 	 * 2-5分割の等分割三角型ファジィ集合 + Don't Careの15種を全attributeに定義<br>
-	 * @param _Ndim
+	 * @param Ndim
 	 */
 	public void homogeneousInit(int Ndim) {
 		this.Ndim = Ndim;

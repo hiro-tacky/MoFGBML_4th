@@ -5,7 +5,8 @@ import jfml.term.FuzzyTermType;
 /**
  * <h1>JFMLのFuzzyTermTypeクラスのWrapperクラス</h1>
  * <p>FuzzyTermTypeを用いて，1つのファジィ集合を定義する</p>
- *
+ * @param name オブジェクト名
+ * @param shapetype 
  */
 public class FuzzySet {
 	// ************************************************************
@@ -23,6 +24,7 @@ public class FuzzySet {
 		this.params = new float[params.length];
 		for(int i = 0; i < params.length; i++) {
 			this.params[i] = params[i];
+			
 		}
 		make();
 	}
