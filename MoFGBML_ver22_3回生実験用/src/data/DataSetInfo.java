@@ -8,6 +8,10 @@ import java.util.stream.Collectors;
 /**
  *
  * @param <T> : Patternクラスを継承したクラス
+ * @param DataSize : datasetのデータ数
+ * @param Ndim : datasetの次元数
+ * @param Cnum : datasetのクラス数
+ * @prama pattrns : dataset
  */
 public abstract class DataSetInfo<T> {
 	// ************************************************************

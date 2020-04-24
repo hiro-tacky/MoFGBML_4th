@@ -12,7 +12,6 @@ import data.Pattern;
 import data.SingleDataSetInfo;
 import fuzzy.fml.KB;
 import main.Consts;
-import main.Setting;
 import method.MersenneTwisterFast;
 
 /**
@@ -34,16 +33,16 @@ public class StaticFuzzyFunc {
 
 	@SuppressWarnings("rawtypes")
 	public static void initfuzzy_takigawa(DataSetInfo Dtra) {
-		kb = new KB();
-
-		if(Setting.shapeType == 0) {
-			kb.triangleInit(Dtra.getNdim());
-		}else if(Setting.shapeType == 1) {
-			kb.gaussianInit(Dtra.getNdim());
-		}else if(Setting.shapeType == 2) {
-			kb.trapezoidInit(Dtra.getNdim());
-		}else if(Setting.shapeType == 3) {
-			kb.rectangleInit(Dtra.getNdim());
+		if(Consts.FUZZY_SET_INITIALIZE == 0) {
+			multiInit(Dtra.getNdim());
+		} else if(Consts.FUZZY_SET_INITIALIZE == 1) {
+			//Input FML file
+			String sep = File.separator;
+			String fileName = System.getProperty("user.dir") + sep + "dataset" + sep + Consts.XML_FILE;
+			initFML(fileName);
+		} else if(Consts.FUZZY_SET_INITIALIZE == 2) {
+			//Inhomogeneous
+			classEntropyInit((SingleDataSetInfo)Dtra, Consts.PARTITION_NUM, Consts.FUZZY_GRADE);
 		}
 	}
 
@@ -82,6 +81,11 @@ public class StaticFuzzyFunc {
 	public static void homogeneousInit(int Ndim) {
 		kb = new KB();
 		kb.homogeneousInit(Ndim);
+	}
+	
+	public static void multiInit(int Ndim) {
+		kb = new KB();
+		kb.multiInit(Ndim);
 	}
 
 	/**

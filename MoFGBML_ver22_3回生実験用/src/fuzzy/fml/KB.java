@@ -20,6 +20,10 @@ import jfml.term.FuzzyTermType;
 /**
  * Fuzzy Markup LanguageのKnowledgeBaseを扱うクラス
  *
+ *
+ * @params Ndim KBの次元数
+ * @params FSs ファジィ集合[次元数][ファジィ集合の個体数]<br>
+ *             FSs[Ndim][FuzzySetNum]
  */
 
 public class KB {
@@ -84,7 +88,7 @@ public class KB {
 /********** 重要・必読 **********/
 	/**
 	 * 2-5分割の等分割三角型ファジィ集合 + Don't Careの15種を全attributeに定義<br>
-	 * @param Ndim
+	 * @param Ndim datasetの次元数
 	 */
 	public void homogeneousInit(int Ndim) {
 		this.Ndim = Ndim;
@@ -107,6 +111,34 @@ public class KB {
 
 	}
 
+	/**
+	 * 三角型，区間型，台形型，ガウシアン型，Don't Care を持つファジィ集合
+	 * @param Ndim
+	 */
+	public void multiInit(int Ndim) {
+		this.Ndim = Ndim;
+
+		FSs = new FuzzySet[Ndim][];
+
+		float[] dontCare = new float[] {0f, 1f};
+		float[][] params_triangle = homotriangle_takigawa.get_parms();
+		float[][] params_gaussian = homogaussian_takigawa.get_parms();
+		float[][] params_trapezoid = homotrapezoid_takigawa.get_parms();
+		float[][] params_rectangle = homorectangle_takigawa.get_parms();
+		int FuzzySetNum = params_triangle.length + params_gaussian.length + params_trapezoid.length + params_rectangle.length;
+
+		for(int i = 0; i < Ndim; i++) {
+			FSs[i] = new FuzzySet[FuzzySetNum + 1];
+			//Don't Care
+			FSs[i][0] = new FuzzySet("0", FuzzyTermType.TYPE_rectangularShape, dontCare);
+
+			//三角形型メンバーシップ関数
+			for(int j = 0; j < params_triangle.length; j++) {
+				FSs[i][j+1] = new FuzzySet(String.valueOf(j+1), FuzzyTermType.TYPE_triangularShape, params_triangle[j]);
+			}
+		}
+
+	}
 	//三角形型メンバーシップ関数
 	public void triangleInit(int Ndim) {
 		this.Ndim = Ndim;
