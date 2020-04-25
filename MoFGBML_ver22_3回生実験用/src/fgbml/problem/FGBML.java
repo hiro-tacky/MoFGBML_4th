@@ -6,6 +6,12 @@ import ga.Individual;
 import ga.Population;
 
 @SuppressWarnings("rawtypes")
+/**
+ * FGBML
+ * @author hirot
+ *
+ * @param appendixNUm FGBMLの付加情報の数
+ */
 public abstract class FGBML<T extends Individual> extends MOP<T>{
 
 	// ************************************************************
@@ -20,7 +26,10 @@ public abstract class FGBML<T extends Individual> extends MOP<T>{
 	// ************************************************************
 
 	public abstract void setAppendix(Population<T> population);
-
+	/**
+	 *
+	 * @return trian(学習データ)
+	 */
 	public DataSetInfo getTrain() {
 		return this.train;
 	}

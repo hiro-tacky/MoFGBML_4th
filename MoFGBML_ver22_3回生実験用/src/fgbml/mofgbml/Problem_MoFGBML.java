@@ -8,6 +8,13 @@ import fgbml.problem.FGBML;
 import ga.Population;
 import main.Setting;
 
+/**
+ * @param objectiveNum 語識別パターンを保持するか否か
+ *
+ * @author hirot
+ *
+ */
+
 public abstract class Problem_MoFGBML extends FGBML<SinglePittsburgh>{
 	// ************************************************************
 	final int traID = 0;

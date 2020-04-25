@@ -66,6 +66,11 @@ public class KB {
 												FuzzyTermType.TYPE_trapezoidShape,
 												points[k]);
 			}
+			for(int k = 0; k < points.length; k++) {
+				FSs[dim_i][k+1] = new FuzzySet( String.valueOf(k+1),
+												FuzzyTermType.TYPE_trapezoidShape,
+												points[k]);
+			}
 		}
 
 	}

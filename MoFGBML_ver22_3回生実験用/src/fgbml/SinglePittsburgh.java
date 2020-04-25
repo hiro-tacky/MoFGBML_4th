@@ -9,6 +9,12 @@ import fuzzy.SingleRuleSet;
 import method.MersenneTwisterFast;
 import method.StaticFunction;
 
+/**
+ * ルール集合個体(ファジィ識別器)
+ *
+ * @author hirot
+ *
+ */
 public class SinglePittsburgh extends Pittsburgh<SingleRuleSet>{
 
 	// ************************************************************

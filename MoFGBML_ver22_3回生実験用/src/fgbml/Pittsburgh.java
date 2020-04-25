@@ -10,7 +10,11 @@ import emo.algorithms.nsga2.Individual_nsga2;
 import fuzzy.Rule;
 import fuzzy.RuleSet;
 import method.MersenneTwisterFast;
-
+/**
+ *
+ * @parame ruleSet ファジィ識別器(if then ルール集合)
+ * @parama michigan (if then ルールの配列)
+ */
 @SuppressWarnings("rawtypes")
 public abstract class Pittsburgh<T extends RuleSet> extends Individual_nsga2<Integer>{
 	// ************************************************************
@@ -19,7 +23,6 @@ public abstract class Pittsburgh<T extends RuleSet> extends Individual_nsga2<Int
 	protected int ruleNum;
 	protected int Ndim;
 
-	/** 0:Dtra, 1:Dtst, 2:Dsubtra, 3:Dvalid */
 	protected double[] appendix;
 
 	// ************************************************************
@@ -36,7 +39,7 @@ public abstract class Pittsburgh<T extends RuleSet> extends Individual_nsga2<Int
 	}
 
 	// ************************************************************
-
+	//クローン生成
 	public abstract Pittsburgh<T> newInstance();
 
 	public abstract Pittsburgh<T> newInstance(int Ndim, int ruleNum, int objectiveNum);
@@ -96,6 +99,7 @@ public abstract class Pittsburgh<T extends RuleSet> extends Individual_nsga2<Int
 	public abstract void initRand(MersenneTwisterFast rnd);
 
 	/**
+	 * 個体初期生成用メソッド．<br>
 	 * Initialize gene with Heuristic Rule Generation Method<br>
 	 * <br>
 	 * 学習用データセット(train)から，非復元抽出でパターンを選択し，
