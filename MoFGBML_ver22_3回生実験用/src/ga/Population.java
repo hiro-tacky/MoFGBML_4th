@@ -7,6 +7,8 @@ import emo.problems.MOP;
 import main.Setting;
 
 /**
+ * 	ファジィ識別器群
+ *
  *	Populationクラスを継承するときは，Individualクラスを継承したクラスをTに設定する． <br>
  *	基本的にメソッドの追加や，オーバーライドの必要はない．<br>
  *

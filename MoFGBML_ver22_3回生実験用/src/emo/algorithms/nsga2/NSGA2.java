@@ -492,6 +492,7 @@ public class NSGA2<T extends Pittsburgh> extends Algorithm<T>{
 	}
 
 	/**
+	 *
 	 * @param optimizer : minimize: 1, maximize: -1
 	 * @return boolean : Is p dominating q ?
 	 */

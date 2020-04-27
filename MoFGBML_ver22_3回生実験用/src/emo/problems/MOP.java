@@ -1,6 +1,5 @@
 package emo.problems;
 
-import ga.Individual;
 import main.Consts;
 
 /**
@@ -10,6 +9,15 @@ import main.Consts;
  * T: Individualを継承したクラス
  */
 
+/**
+ *
+ * @author hirot
+ * @param MIN 最小化目的問題用id (deault = 1)
+ * @param MAX 最小化目的問題用id (deault = -1)
+ * @param optimier MIN or MAX 識別用
+ * @param objectiveNum 目的数
+ * @param <T>
+ */
 public abstract class MOP<T> {
 	// ************************************************************
 	protected int MIN = Consts.MINIMIZE;

@@ -3,6 +3,11 @@ package fgbml.mofgbml;
 import data.SingleDataSetInfo;
 import fgbml.SinglePittsburgh;
 
+/**
+ * problem_MoGBMLのサブクラス
+ * @author hirot
+ *
+ */
 public class MOP1 extends Problem_MoFGBML {
 	// ************************************************************
 
@@ -26,7 +31,7 @@ public class MOP1 extends Problem_MoFGBML {
 	public void evaluate(SinglePittsburgh individual) {
 		double f1 = getMissRate(traID, individual);
 		double f2 = individual.getRuleSet().getRuleNum();
-		double[] fitness = new double[] {f1, f2};
+		double[] fitness = new double[] {f1, f2};//評価結果
 
 		individual.setFitness(fitness);
 	}

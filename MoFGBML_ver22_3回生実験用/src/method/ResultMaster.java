@@ -6,6 +6,12 @@ import java.util.ArrayList;
 import main.Consts;
 import main.Setting;
 
+/**
+ * 一試行分 各世代の現個体群を保持
+ *
+ * @author hirot
+ *
+ */
 public class ResultMaster {
 	// ************************************************************
 	String rootDir;
@@ -23,6 +29,7 @@ public class ResultMaster {
 	public ArrayList<Double> times = new ArrayList<Double>();
 	public ArrayList<Double> evaTimes = new ArrayList<Double>();
 
+	//csv出力
 	public ArrayList<String> population = new ArrayList<String>();
 	public ArrayList<String> offspring = new ArrayList<String>();
 	public ArrayList<String> ruleSetPopulation = new ArrayList<String>();

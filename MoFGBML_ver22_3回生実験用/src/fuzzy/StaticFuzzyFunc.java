@@ -58,6 +58,8 @@ public class StaticFuzzyFunc {
 		} else if(Consts.FUZZY_SET_INITIALIZE == 2) {
 			//Inhomogeneous
 			classEntropyInit((SingleDataSetInfo)Dtra, Consts.PARTITION_NUM, Consts.FUZZY_GRADE);
+		} else if(Consts.FUZZY_SET_INITIALIZE == 3) {
+
 		}
 	}
 
@@ -82,7 +84,11 @@ public class StaticFuzzyFunc {
 		kb = new KB();
 		kb.homogeneousInit(Ndim);
 	}
-	
+
+	/**
+	 * 三角型，区間型，台形型，ガウシアン型，Don't Care を持つファジィ集合
+	 *
+	 */
 	public static void multiInit(int Ndim) {
 		kb = new KB();
 		kb.multiInit(Ndim);

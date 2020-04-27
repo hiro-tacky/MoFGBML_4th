@@ -12,7 +12,7 @@ public abstract class Rule {
 	protected int[] conclusion;	//結論部クラス
 	protected double cf;		//ルール重み
 
-	protected int ruleLength;	//ルール長
+	protected int ruleLength;	//ルール長(Datasetの次元数 * ルール数(Don't Careを除く))
 
 	protected int ncp = 0;		//#of Correct Patterns
 	protected int nmp = 0;		//#of Miss Patterns

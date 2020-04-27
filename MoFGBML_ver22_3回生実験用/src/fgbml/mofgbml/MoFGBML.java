@@ -52,10 +52,10 @@ public class MoFGBML implements Experiment {
 		/* ********************************************************* */
 		//Initialize Fuzzy Sets
 		/********** 重要・必読 **********/
-		StaticFuzzyFunc.initFuzzy(Dtra);
-//		StaticFuzzyFunc.initfuzzy_takigawa(Dtra);
+//		StaticFuzzyFunc.initFuzzy(Dtra);
+		StaticFuzzyFunc.initfuzzy_takigawa(Dtra);
 		/* ********************************************************* */
-		//MOP No.
+		//MOP No. を入力
 		int mopNo;
 		if(args.length < 7) {
 			mopNo = 1;	//MOP1
@@ -65,6 +65,7 @@ public class MoFGBML implements Experiment {
 
 		/* ********************************************************* */
 		//Generate Problem
+		//mopを作成
 		Problem_MoFGBML mop = getMOP(mopNo, Dtra, Dtst);
 
 		/* ********************************************************* */
