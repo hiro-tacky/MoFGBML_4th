@@ -227,6 +227,7 @@ public class GAFunctions {
 	 * @return
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public static Pittsburgh pittsburghCrossover(Pittsburgh[] parent, MersenneTwisterFast rnd) {
 	public static Pittsburgh 
 (Pittsburgh[] parent, MersenneTwisterFast rnd) {
 		MersenneTwisterFast uniqueRnd = new MersenneTwisterFast(rnd.nextInt());
