@@ -228,8 +228,6 @@ public class GAFunctions {
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static Pittsburgh pittsburghCrossover(Pittsburgh[] parent, MersenneTwisterFast rnd) {
-	public static Pittsburgh 
-(Pittsburgh[] parent, MersenneTwisterFast rnd) {
 		MersenneTwisterFast uniqueRnd = new MersenneTwisterFast(rnd.nextInt());
 
 		Pittsburgh mom = parent[0];	//Shallow Copy
@@ -344,7 +342,7 @@ public class GAFunctions {
 
 		int ruleNum = individual.getRuleNum();
 		//各ルールに対してループで試行
-		for(int i = 0; i < ruleNum; i++) { 
+		for(int i = 0; i < ruleNum; i++) {
 			// probability = 1/ruleNum
 			// 突然変異するかの判断
 			if(uniqueRnd.nextInt(ruleNum) == 0) {
@@ -363,7 +361,7 @@ public class GAFunctions {
 					//#of Defined Fuzzy Sets at mutationDim
 					//突然変異させるファジィセットのmembershp関数の数
 					int fuzzySetNum = StaticFuzzyFunc.kb.getFSs(mutationDim).length;
-					
+
 					//ファジィセットに予めidを割り振っている?
 
 					//make List
@@ -374,15 +372,15 @@ public class GAFunctions {
 							list.add(j);
 						}
 					}
-					
+
 					//mutation
 					//ファジィセットのidをランダムに取得
-//					int newFuzzySet = list.get( uniqueRnd.nextInt(list.size()) );
-					
+					int newFuzzySet = list.get( uniqueRnd.nextInt(list.size()) );
+
 					//同じ形状のメンバーシップ関数を取得して1/2で変異
 					//残り1/2で異なる形状のものに変化
-					
-					
+
+
 					individual.getRuleSet().getMicRule(i).setRule(mutationDim, newFuzzySet);
 				} else {
 					//Attribute mutationDim is Categoric.
@@ -393,6 +391,6 @@ public class GAFunctions {
 		}
 
 	}
-	
+
 
 }
