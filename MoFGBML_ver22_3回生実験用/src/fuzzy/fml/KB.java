@@ -138,8 +138,21 @@ public class KB {
 			FSs[i][0] = new FuzzySet("0", FuzzyTermType.TYPE_rectangularShape, dontCare);
 
 			//三角形型メンバーシップ関数
+			int k = 0;
 			for(int j = 0; j < params_triangle.length; j++) {
-				FSs[i][j+1] = new FuzzySet(String.valueOf(j+1), FuzzyTermType.TYPE_triangularShape, params_triangle[j]);
+				FSs[i][k+j+1] = new FuzzySet(String.valueOf(j+1), FuzzyTermType.TYPE_triangularShape, params_triangle[j]);
+			}
+			k += params_triangle.length;
+			for(int j = 0; j < params_gaussian.length; j++) {
+				FSs[i][k+j+1] = new FuzzySet(String.valueOf(j+1), FuzzyTermType.TYPE_gaussianShape, params_gaussian[j]);
+			}
+			k += params_gaussian.length;
+			for(int j = 0; j < params_trapezoid.length; j++) {
+				FSs[i][k+j+1] = new FuzzySet(String.valueOf(j+1), FuzzyTermType.TYPE_trapezoidShape, params_trapezoid[j]);
+			}
+			k += params_trapezoid.length;
+			for(int j = 0; j < params_rectangle.length; j++) {
+				FSs[i][k+j+1] = new FuzzySet(String.valueOf(j+1), FuzzyTermType.TYPE_rectangularShape, params_rectangle[j]);
 			}
 		}
 

@@ -52,8 +52,8 @@ public class MoFGBML implements Experiment {
 		/* ********************************************************* */
 		//Initialize Fuzzy Sets
 		/********** 重要・必読 **********/
-		StaticFuzzyFunc.initFuzzy(Dtra);
-//		StaticFuzzyFunc.initfuzzy_takigawa(Dtra);
+//		StaticFuzzyFunc.initFuzzy(Dtra);
+		StaticFuzzyFunc.initfuzzy_takigawa(Dtra);
 		/* ********************************************************* */
 		//MOP No. を入力
 		int mopNo;

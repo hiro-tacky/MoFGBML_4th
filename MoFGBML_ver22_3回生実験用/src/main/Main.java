@@ -81,9 +81,7 @@ public class Main {
 		/* ********************************************************* */
 		//Repeat x-fold cross-validation
 		//実験試行
-		for(; Setting.shapeType < 4; Setting.shapeType++) {
-			repeatExection(args);
-		}
+		repeatExection(args);
 		/* ********************************************************* */
 
 		Date end = new Date();
@@ -119,29 +117,10 @@ public class Main {
 		String id = format.format(calendar.getTime());
 		/*format: ".\result\iris_20191021-1255_triangle"*/
 
-		//resultファイル名にメンバーシップ関数名を追加
-		String menbership_name = null;
-		switch(Setting.shapeType) {
-			case 0:
-				menbership_name = "triangle";
-				System.out.println("triangle");
-				break;
-			case 1:
-				menbership_name = "gaussian";
-				System.out.println("gaussian");
-				break;
-			case 2:
-				menbership_name = "trapezoid";
-				System.out.println("trapezoid");
-				break;
-			case 3:
-				menbership_name = "rectangle";
-				System.out.println("rectangle");
-				break;
-		}
+
 		//ファイル名構築
 		String resultRoot = System.getProperty("user.dir") + sep + "result" + sep
-							+ Setting.saveDir + sep + Setting.dataName + "_" + id + "_" + menbership_name;
+							+ Setting.saveDir + sep + Setting.dataName + "_" + id;
 		Output.mkdirs(resultRoot);
 
 		/* ********************************************************* */

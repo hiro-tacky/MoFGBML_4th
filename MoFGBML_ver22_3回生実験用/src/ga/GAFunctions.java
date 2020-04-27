@@ -227,7 +227,8 @@ public class GAFunctions {
 	 * @return
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public static Pittsburgh pittsburghCrossover(Pittsburgh[] parent, MersenneTwisterFast rnd) {
+	public static Pittsburgh 
+(Pittsburgh[] parent, MersenneTwisterFast rnd) {
 		MersenneTwisterFast uniqueRnd = new MersenneTwisterFast(rnd.nextInt());
 
 		Pittsburgh mom = parent[0];	//Shallow Copy
@@ -337,34 +338,50 @@ public class GAFunctions {
 	 */
 	@SuppressWarnings("rawtypes")
 	public static void pittsburghMutation(Pittsburgh individual, DataSetInfo dataset, MersenneTwisterFast rnd) {
-		MersenneTwisterFast uniqueRnd = new MersenneTwisterFast(rnd.nextInt());
+		MersenneTwisterFast uniqueRnd = new MersenneTwisterFast(rnd.nextInt()); //乱数生成器(nextintが生成範囲)
 		ArrayList<Integer> list = new ArrayList<Integer>();
 
 		int ruleNum = individual.getRuleNum();
-		for(int i = 0; i < ruleNum; i++) {
+		//各ルールに対してループで試行
+		for(int i = 0; i < ruleNum; i++) { 
 			// probability = 1/ruleNum
+			// 突然変異するかの判断
 			if(uniqueRnd.nextInt(ruleNum) == 0) {
 
 				//Objective Dimension
+				//突然変異させる次元
 				int mutationDim = uniqueRnd.nextInt(individual.getNdim());
 
 				//To judge which attribute i is categorical or numerical.
+				//ルールの種類判別
 				double randPattern = ((Pattern)dataset.getPattern(uniqueRnd.nextInt(dataset.getDataSize()))).getDimValue(mutationDim);
 
 				if(randPattern >= 0.0) {
 					//Attribute mutationDim is Numeric.
 
 					//#of Defined Fuzzy Sets at mutationDim
+					//突然変異させるファジィセットのmembershp関数の数
 					int fuzzySetNum = StaticFuzzyFunc.kb.getFSs(mutationDim).length;
+					
+					//ファジィセットに予めidを割り振っている?
+
 					//make List
+					//突然変異させたいファジィセットで現在使用しているファジィセットを取得．突然変異後に同じファジィセットを入れないため
 					list.clear();
 					for(int j = 0; j < fuzzySetNum; j++) {
 						if(j != individual.getRuleSet().getMicRule(i).getRule(mutationDim)) {
 							list.add(j);
 						}
 					}
+					
 					//mutation
-					int newFuzzySet = list.get( uniqueRnd.nextInt(list.size()) );
+					//ファジィセットのidをランダムに取得
+//					int newFuzzySet = list.get( uniqueRnd.nextInt(list.size()) );
+					
+					//同じ形状のメンバーシップ関数を取得して1/2で変異
+					//残り1/2で異なる形状のものに変化
+					
+					
 					individual.getRuleSet().getMicRule(i).setRule(mutationDim, newFuzzySet);
 				} else {
 					//Attribute mutationDim is Categoric.
@@ -375,5 +392,6 @@ public class GAFunctions {
 		}
 
 	}
+	
 
 }
