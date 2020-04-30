@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
  * @param DataSize : datasetのデータ数
  * @param Ndim : datasetの次元数
  * @param Cnum : datasetのクラス数
- * @prama pattrns : dataset
+ * @prama pattrns : datasetのdataの数
  */
 public abstract class DataSetInfo<T> {
 	// ************************************************************

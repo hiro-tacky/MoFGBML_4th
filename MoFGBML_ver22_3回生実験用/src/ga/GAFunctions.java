@@ -10,6 +10,7 @@ import fgbml.problem.FGBML;
 import fuzzy.Rule;
 import fuzzy.RuleSet;
 import fuzzy.StaticFuzzyFunc;
+import fuzzy.fml.FuzzySet;
 import main.Consts;
 import method.MersenneTwisterFast;
 import method.StaticFunction;
@@ -362,8 +363,13 @@ public class GAFunctions {
 					//突然変異させるファジィセットのmembershp関数の数
 					int fuzzySetNum = StaticFuzzyFunc.kb.getFSs(mutationDim).length;
 
-					//ファジィセットに予めidを割り振っている?
+					//突然変異させるファジィセットを取得
+					FuzzySet[] NewFuzzySet =  StaticFuzzyFunc.kb.getFSs(mutationDim);
+					//突然変異させるファジィ集合のメンバーシップ関数のid取得
+					int ShapeType = NewFuzzySet[individual.getRuleSet().getMicRule(i).getRule(mutationDim)].getShapeType();
 
+
+					//ファジィセットに予めidを割り振っている?
 					//make List
 					//突然変異させたいファジィセットで現在使用しているファジィセットを取得．突然変異後に同じファジィセットを入れないため
 					list.clear();
@@ -379,7 +385,17 @@ public class GAFunctions {
 
 					//同じ形状のメンバーシップ関数を取得して1/2で変異
 					//残り1/2で異なる形状のものに変化
-
+					if(uniqueRnd.nextInt(2) == 1) {
+						while(ShapeType == NewFuzzySet[newFuzzySet].getShapeType()) {
+							//ファジィセットのidをランダムに取得
+							newFuzzySet = list.get( uniqueRnd.nextInt(list.size()) );
+						}
+					}else {
+						while(ShapeType != NewFuzzySet[newFuzzySet].getShapeType()) {
+							//ファジィセットのidをランダムに取得
+							newFuzzySet = list.get( uniqueRnd.nextInt(list.size()) );
+						}
+					}
 
 					individual.getRuleSet().getMicRule(i).setRule(mutationDim, newFuzzySet);
 				} else {

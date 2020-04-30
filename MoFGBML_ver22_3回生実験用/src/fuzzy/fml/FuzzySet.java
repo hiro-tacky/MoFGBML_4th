@@ -6,7 +6,7 @@ import jfml.term.FuzzyTermType;
  * <h1>JFMLのFuzzyTermTypeクラスのWrapperクラス</h1>
  * <p>FuzzyTermTypeを用いて，1つのファジィ集合を定義する</p>
  * @param name オブジェクト名
- * @param shapetype 
+ * @param shapetype sypte_typeのint，idを示す.
  */
 public class FuzzySet {
 	// ************************************************************
@@ -21,11 +21,7 @@ public class FuzzySet {
 	public FuzzySet(String name, int shapeType, float[] params) {
 		this.name = name;
 		this.shapeType = shapeType;
-		this.params = new float[params.length];
-		for(int i = 0; i < params.length; i++) {
-			this.params[i] = params[i];
-			
-		}
+		this.params = params.clone();
 		make();
 	}
 
@@ -62,14 +58,13 @@ public class FuzzySet {
 	public void setParams(int i, float param) {
 		if(this.params.length > i) {
 			this.params[i] = param;
+		}else{
+			throw new IndexOutOfBoundsException("インデックスが範囲外");
 		}
 	}
 
 	public void setParams(float[] params) {
-		this.params = new float[params.length];
-		for(int i = 0; i < params.length; i++) {
-			this.params[i] = params[i];
-		}
+		this.params = params.clone();
 	}
 
 }
