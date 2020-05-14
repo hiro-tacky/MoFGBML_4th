@@ -115,7 +115,7 @@ public class Main {
 		SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd-HHmm");
 		String sep = File.separator;
 		String id = format.format(calendar.getTime());
-		/*format: ".\result\iris_20191021-1255_triangle"*/
+		/*format: ".\result\iris_20191021-1255"*/
 
 
 		//ファイル名構築
