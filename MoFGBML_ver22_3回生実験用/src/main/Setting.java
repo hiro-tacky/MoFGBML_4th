@@ -117,8 +117,6 @@ public class Setting {
 
 		if(bundle.containsKey("calclationType")) { calclationType = Integer.parseInt(bundle.getString("calclationType")); }
 
-		if(bundle.containsKey("shapeType")) { shapeType = Integer.parseInt(bundle.getString("shapeType")); }
-
 		if(bundle.containsKey("useArgs")) { useArgs = Boolean.parseBoolean(bundle.getString("useArgs")); }
 
 		if(bundle.containsKey("dataName")) { dataName = bundle.getString("dataName"); }
