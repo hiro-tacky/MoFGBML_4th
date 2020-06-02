@@ -3,7 +3,7 @@ package fuzzy.fml.params;
 public class homotriangle_takigawa {
 	static float[][] parms = new float[][] {
 
-new float[] {0f, 0f, 0f},
+new float[] {0f, 0f, 1f},
 new float[] {0f, 1f, 1f},
 
 new float[] {0f, 0f, 0.5f},

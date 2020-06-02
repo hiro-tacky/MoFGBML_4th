@@ -124,7 +124,7 @@ public class Consts {
     public static int PARTITION_NUM = 5;
     /** Inhomogeneous Fuzzyfying Grade */
 	public static double FUZZY_GRADE = 0.5;
-	public static int FUZZY_SET_NUM = 14;			//ファジィ集合の種類数
+	public static int FUZZY_SET_NUM = 13;			//ファジィ集合の種類数
 	/** 初期ル―ル数 */
 	public static int INITIATION_RULE_NUM = 30;
 	public static int MAX_FUZZY_DIVIDE_NUM = 5;	//条件部の分割数の最大値
@@ -253,7 +253,7 @@ public class Consts {
 
 		if(bundle.containsKey("FUZZY_SET_NUM")) {
 			if(FUZZY_SET_INITIALIZE == 0) {
-				FUZZY_SET_NUM = 14;
+				FUZZY_SET_NUM = 13;
 			} else {
 				FUZZY_SET_NUM = Integer.parseInt(bundle.getString("FUZZY_SET_NUM"));
 			}

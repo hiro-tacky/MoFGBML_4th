@@ -7,8 +7,10 @@ import java.util.concurrent.ForkJoinPool;
 
 import emo.algorithms.Algorithm;
 import fgbml.Pittsburgh;
+import fgbml.SinglePittsburgh;
 import fgbml.problem.FGBML;
 import fgbml.problem.OutputClass;
+import fuzzy.StaticFuzzyFunc;
 import ga.GAFunctions;
 import ga.Individual;
 import ga.Population;
@@ -19,6 +21,7 @@ import method.MersenneTwisterFast;
 import method.ResultMaster;
 import method.Sort;
 import method.StaticFunction;
+import output.result.Result_MoFGBML;
 import time.TimeWatcher;
 
 /**
@@ -41,7 +44,7 @@ public class NSGA2<T extends Pittsburgh> extends Algorithm<T>{
 	@Override
 	public void main(	FGBML mop, OutputClass output, T instance,
 						ResultMaster resultMaster, MersenneTwisterFast rnd,
-						TimeWatcher timeWatcher, TimeWatcher evaWatcher) {
+						TimeWatcher timeWatcher, TimeWatcher evaWatcher, Result_MoFGBML master) {
 		/* ********************************************************* */
 		//START:
 
@@ -111,7 +114,7 @@ public class NSGA2<T extends Pittsburgh> extends Algorithm<T>{
 		timeWatcher.stop();
 		//Appendix Information
 		mop.setAppendix(manager.getPopulation());
-		output.savePopulationOrOffspring(manager, resultMaster, true);
+//		output.savePopulationOrOffspring(manager, resultMaster, true);
 		timeWatcher.start();
 
 		/* ********************************************************* */
@@ -208,13 +211,13 @@ public class NSGA2<T extends Pittsburgh> extends Algorithm<T>{
 				mop.setAppendix(manager.getOffspring());
 
 				//Save Current Population
-				output.savePopulationOrOffspring(manager, resultMaster, true);
+//				output.savePopulationOrOffspring(manager, resultMaster, true);
 				//Save Offspring
-				output.savePopulationOrOffspring(manager, resultMaster, false);
+//				output.savePopulationOrOffspring(manager, resultMaster, false);
+				master.setPopulation((Population<SinglePittsburgh>) manager.getPopulation(), StaticFuzzyFunc.kb, resultMaster.getNowTrial(), genCount);
 			}
 			timeWatcher.start();
 		}
-
 	}
 
 	/**

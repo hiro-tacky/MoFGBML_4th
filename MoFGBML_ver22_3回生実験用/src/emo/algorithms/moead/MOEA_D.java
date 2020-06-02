@@ -18,6 +18,7 @@ import method.MersenneTwisterFast;
 import method.Output;
 import method.ResultMaster;
 import method.StaticFunction;
+import output.result.Result_MoFGBML;
 import time.TimeWatcher;
 
 @SuppressWarnings("rawtypes")
@@ -47,7 +48,7 @@ public class MOEA_D<T extends Pittsburgh> extends Algorithm<T>{
 	@Override
 	public void main(	FGBML mop, OutputClass output, T instance,
 						ResultMaster resultMaster, MersenneTwisterFast rnd,
-						TimeWatcher timeWatcher, TimeWatcher evaWatcher) {
+						TimeWatcher timeWatcher, TimeWatcher evaWatcher, Result_MoFGBML master) {
 		/* ********************************************************* */
 		//START:
 

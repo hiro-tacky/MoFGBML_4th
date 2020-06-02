@@ -81,4 +81,5 @@ public class Population<T extends Individual> {
 	public ArrayList<T> getIndividuals(){
 		return this.individuals;
 	}
+
 }

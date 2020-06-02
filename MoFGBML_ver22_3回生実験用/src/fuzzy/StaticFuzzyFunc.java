@@ -34,7 +34,9 @@ public class StaticFuzzyFunc {
 	@SuppressWarnings("rawtypes")
 	public static void initfuzzy_takigawa(DataSetInfo Dtra) {
 		if(Consts.FUZZY_SET_INITIALIZE == 0) {
+//			homogeneousInit(Dtra.getNdim());
 			multiInit(Dtra.getNdim());
+//			Consts.FUZZY_SET_NUM = kb.getFSs(0).length;
 		} else if(Consts.FUZZY_SET_INITIALIZE == 1) {
 			//Input FML file
 			String sep = File.separator;

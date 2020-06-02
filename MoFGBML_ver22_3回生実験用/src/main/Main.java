@@ -1,10 +1,15 @@
 package main;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.ForkJoinPool;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
 
 import data.Input;
 import fgbml.mofgbml.MoFGBML;
@@ -13,6 +18,8 @@ import fgbml.subdivision_ver2.Subdivision_ver2;
 import method.MersenneTwisterFast;
 import method.Output;
 import method.ResultMaster;
+import output.toXML;
+import output.result.Result_MoFGBML;
 
 
 /**
@@ -81,6 +88,7 @@ public class Main {
 		/* ********************************************************* */
 		//Repeat x-fold cross-validation
 		//実験試行
+
 		repeatExection(args);
 		/* ********************************************************* */
 
@@ -108,7 +116,7 @@ public class Main {
 			}
 		}
 
-
+		Result_MoFGBML master = new Result_MoFGBML();
 		/* ********************************************************* */
 		//Make result directries
 		Calendar calendar = Calendar.getInstance();
@@ -141,19 +149,22 @@ public class Main {
 		Experiment main = setExperiment();
 
 		MersenneTwisterFast rnd = new MersenneTwisterFast(Setting.seed);
+		int count = 0;
 		for(int rep_i = 0; rep_i < Setting.repeatTimes; rep_i++) {
 			for(int cv_i = 0; cv_i < Setting.crossValidationNum; cv_i++) {
 				//make now trial Directory
 				resultMaster.setNowRep(rep_i);
 				resultMaster.setNowCV(cv_i);
 				resultMaster.setTrialRoot(resultRoot + sep + "trial" + rep_i+cv_i);
+				resultMaster.setNowTrial(count);
+				count++;
 				Output.mkdirs(resultMaster.getTrialRoot());
 
 				System.out.println(Setting.dataName + " : TRIAL: " + rep_i + cv_i);
 
 				main.startExperiment(args,
 									 traFiles[rep_i][cv_i], tstFiles[rep_i][cv_i],
-									 rnd, resultMaster);
+									 rnd, resultMaster, master);
 
 				System.out.println();
 			}
@@ -162,6 +173,21 @@ public class Main {
 		//Output Times
 		fileName = resultRoot + sep + "Times_" + id + ".csv";
 		resultMaster.outputTimes(fileName);
+
+		try {
+			toXML result = new toXML("result");
+			toXML ruleset = new toXML("ruleset");
+			result.ResultToXML(master);
+			ruleset.RuleSetToXML(master);
+			result.output(args[3]+"_result_single");
+			ruleset.output(args[3]+"_ruleset_single");
+		} catch (TransformerConfigurationException | ParserConfigurationException e) {
+			// TODO 自動生成された catch ブロック
+			e.printStackTrace();
+		} catch (FileNotFoundException | TransformerException e) {
+			// TODO 自動生成された catch ブロック
+			e.printStackTrace();
+		}
 
 	}
 

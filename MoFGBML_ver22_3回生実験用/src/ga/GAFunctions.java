@@ -383,19 +383,19 @@ public class GAFunctions {
 					//ファジィセットのidをランダムに取得
 					int newFuzzySet = list.get( uniqueRnd.nextInt(list.size()) );
 
-					//同じ形状のメンバーシップ関数を取得して1/2で変異
-					//残り1/2で異なる形状のものに変化
-					if(uniqueRnd.nextInt(2) == 1) {
-						while(ShapeType == NewFuzzySet[newFuzzySet].getShapeType()) {
-							//ファジィセットのidをランダムに取得
-							newFuzzySet = list.get( uniqueRnd.nextInt(list.size()) );
-						}
-					}else {
-						while(ShapeType != NewFuzzySet[newFuzzySet].getShapeType()) {
-							//ファジィセットのidをランダムに取得
-							newFuzzySet = list.get( uniqueRnd.nextInt(list.size()) );
-						}
-					}
+//					//同じ形状のメンバーシップ関数を取得して1/2で変異
+//					//残り1/2で異なる形状のものに変化
+//					if(uniqueRnd.nextInt(2) == 1) {
+//						while(ShapeType == NewFuzzySet[newFuzzySet].getShapeType()) {
+//							//ファジィセットのidをランダムに取得
+//							newFuzzySet = list.get( uniqueRnd.nextInt(list.size()) );
+//						}
+//					}else {
+//						while(ShapeType != NewFuzzySet[newFuzzySet].getShapeType()) {
+//							//ファジィセットのidをランダムに取得
+//							newFuzzySet = list.get( uniqueRnd.nextInt(list.size()) );
+//						}
+//					}
 
 					individual.getRuleSet().getMicRule(i).setRule(mutationDim, newFuzzySet);
 				} else {

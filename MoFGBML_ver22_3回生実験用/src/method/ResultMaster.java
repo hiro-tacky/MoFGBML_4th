@@ -19,6 +19,7 @@ public class ResultMaster {
 	String trialRoot;
 	int nowCV;
 	int nowRep;
+	int nowTrial;
 
 
 	public ArrayList<Double> traAve = new ArrayList<Double>();
@@ -170,4 +171,12 @@ public class ResultMaster {
 		return this.trialRoot;
 	}
 
+	public int getNowTrial() {
+		return nowTrial;
+	}
+
+	public void setNowTrial(int nowTrial) {
+		this.nowTrial = nowTrial;
+	}
+	
 }

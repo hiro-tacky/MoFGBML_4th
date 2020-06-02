@@ -15,6 +15,7 @@ import main.Setting;
 import method.MersenneTwisterFast;
 import method.Output;
 import method.ResultMaster;
+import output.result.Result_MoFGBML;
 import time.TimeWatcher;
 
 /**
@@ -41,7 +42,7 @@ import time.TimeWatcher;
 public class MultiLabel_ver3 implements Experiment {
 
 	public void startExperiment( String[] args, String traFile, String tstFile,
-										MersenneTwisterFast rnd, ResultMaster resultMaster) {
+										MersenneTwisterFast rnd, ResultMaster resultMaster, Result_MoFGBML master) {
 		/* ********************************************************* */
 		//START:
 
@@ -112,7 +113,7 @@ public class MultiLabel_ver3 implements Experiment {
 			algorithm = new NSGA2<MultiPittsburgh>();
 			algorithm.main( mop, output, instance,
 							resultMaster, rnd,
-							timeWatcher, evaWatcher);
+							timeWatcher, evaWatcher, master);
 		}
 		else if(Setting.emoType == Consts.WS ||
 				Setting.emoType == Consts.TCHEBY ||
@@ -122,7 +123,7 @@ public class MultiLabel_ver3 implements Experiment {
 			algorithm = new MOEA_D<MultiPittsburgh>();
 			algorithm.main( mop, output, instance,
 							resultMaster, rnd,
-							timeWatcher, evaWatcher);
+							timeWatcher, evaWatcher, master);
 		}
 		/* ********************************************************* */
 		/* ********************************************************* */

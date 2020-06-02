@@ -16,16 +16,16 @@ import main.Setting;
 import method.MersenneTwisterFast;
 import method.Output;
 import method.ResultMaster;
+import output.result.Result_MoFGBML;
 import time.TimeWatcher;
 
 public class MoFGBML implements Experiment {
 
 	public void startExperiment(String[] args,
 								String traFile, String tstFile,
-								MersenneTwisterFast rnd, ResultMaster resultMaster) {
+								MersenneTwisterFast rnd, ResultMaster resultMaster, Result_MoFGBML master) {
 		/* ********************************************************* */
 		//START:
-
 		/* ********************************************************* */
 		//Load Dataset
 		SingleDataSetInfo Dtra = new SingleDataSetInfo();
@@ -54,6 +54,7 @@ public class MoFGBML implements Experiment {
 		/********** 重要・必読 **********/
 //		StaticFuzzyFunc.initFuzzy(Dtra);
 		StaticFuzzyFunc.initfuzzy_takigawa(Dtra);
+
 		/* ********************************************************* */
 		//MOP No. を入力
 		int mopNo;
@@ -93,7 +94,7 @@ public class MoFGBML implements Experiment {
 			algorithm = new NSGA2<SinglePittsburgh>();
 			algorithm.main( mop, output, instance,
 							resultMaster, rnd,
-							timeWatcher, evaWatcher);
+							timeWatcher, evaWatcher, master);
 		}
 		else if(Setting.emoType == Consts.WS ||
 				Setting.emoType == Consts.TCHEBY ||
@@ -102,7 +103,7 @@ public class MoFGBML implements Experiment {
 			algorithm = new MOEA_D<SinglePittsburgh>();
 			algorithm.main( mop, output, instance,
 							resultMaster, rnd,
-							timeWatcher, evaWatcher);
+							timeWatcher, evaWatcher, master);
 		}
 		/* ********************************************************* */
 		/* ********************************************************* */

@@ -5,7 +5,6 @@ import java.util.ArrayList;
 
 import data.SingleDataSetInfo;
 import fuzzy.FuzzyPartitioning;
-import fuzzy.fml.params.HomoTriangle_2_3_4_5;
 import fuzzy.fml.params.HomoTriangle_3;
 import fuzzy.fml.params.homogaussian_takigawa;
 import fuzzy.fml.params.homorectangle_takigawa;
@@ -101,16 +100,17 @@ public class KB {
 		FSs = new FuzzySet[Ndim][];
 
 		float[] dontCare = new float[] {0f, 1f};
-		float[][] params = HomoTriangle_2_3_4_5.getParams();
+		float[][] params_triangle = homotriangle_takigawa.get_parms();
+		int FuzzySetNum = params_triangle.length;
 
 		for(int i = 0; i < Ndim; i++) {
-			FSs[i] = new FuzzySet[params.length + 1];
+			FSs[i] = new FuzzySet[FuzzySetNum + 1];
 			//Don't Care
 			FSs[i][0] = new FuzzySet("0", FuzzyTermType.TYPE_rectangularShape, dontCare);
 
-
-			for(int j = 0; j < params.length; j++) {
-				FSs[i][j+1] = new FuzzySet(String.valueOf(j+1), FuzzyTermType.TYPE_triangularShape, params[j]);
+			//三角形型メンバーシップ関数
+			for(int j = 0; j < params_triangle.length; j++) {
+				FSs[i][j+1] = new FuzzySet(String.valueOf(j+1), FuzzyTermType.TYPE_triangularShape, params_triangle[j]);
 			}
 		}
 
@@ -130,8 +130,8 @@ public class KB {
 		float[][] params_gaussian = homogaussian_takigawa.get_parms();
 		float[][] params_trapezoid = homotrapezoid_takigawa.get_parms();
 		float[][] params_rectangle = homorectangle_takigawa.get_parms();
-		int FuzzySetNum = params_triangle.length + params_gaussian.length + params_trapezoid.length + params_rectangle.length;
-
+//		int FuzzySetNum = params_triangle.length + params_gaussian.length + params_trapezoid.length + params_rectangle.length;
+		int FuzzySetNum = params_triangle.length;
 		for(int i = 0; i < Ndim; i++) {
 			FSs[i] = new FuzzySet[FuzzySetNum + 1];
 			//Don't Care
@@ -142,18 +142,18 @@ public class KB {
 			for(int j = 0; j < params_triangle.length; j++) {
 				FSs[i][k+j+1] = new FuzzySet(String.valueOf(j+1), FuzzyTermType.TYPE_triangularShape, params_triangle[j]);
 			}
-			k += params_triangle.length;
-			for(int j = 0; j < params_gaussian.length; j++) {
-				FSs[i][k+j+1] = new FuzzySet(String.valueOf(j+1), FuzzyTermType.TYPE_gaussianShape, params_gaussian[j]);
-			}
-			k += params_gaussian.length;
-			for(int j = 0; j < params_trapezoid.length; j++) {
-				FSs[i][k+j+1] = new FuzzySet(String.valueOf(j+1), FuzzyTermType.TYPE_trapezoidShape, params_trapezoid[j]);
-			}
-			k += params_trapezoid.length;
-			for(int j = 0; j < params_rectangle.length; j++) {
-				FSs[i][k+j+1] = new FuzzySet(String.valueOf(j+1), FuzzyTermType.TYPE_rectangularShape, params_rectangle[j]);
-			}
+//			k += params_triangle.length;
+//			for(int j = 0; j < params_gaussian.length; j++) {
+//				FSs[i][k+j+1] = new FuzzySet(String.valueOf(j+1), FuzzyTermType.TYPE_gaussianShape, params_gaussian[j]);
+//			}
+//			k += params_gaussian.length;
+//			for(int j = 0; j < params_trapezoid.length; j++) {
+//				FSs[i][k+j+1] = new FuzzySet(String.valueOf(j+1), FuzzyTermType.TYPE_trapezoidShape, params_trapezoid[j]);
+//			}
+//			k += params_trapezoid.length;
+//			for(int j = 0; j < params_rectangle.length; j++) {
+//				FSs[i][k+j+1] = new FuzzySet(String.valueOf(j+1), FuzzyTermType.TYPE_rectangularShape, params_rectangle[j]);
+//			}
 		}
 
 	}
@@ -299,6 +299,10 @@ public class KB {
 
 	public FuzzySet[] getFSs(int dim) {
 		return this.FSs[dim];
+	}
+
+	public int getFSsnum(int dim) {
+		return this.FSs[dim].length;
 	}
 
 }
