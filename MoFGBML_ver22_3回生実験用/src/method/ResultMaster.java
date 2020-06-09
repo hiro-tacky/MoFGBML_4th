@@ -178,5 +178,5 @@ public class ResultMaster {
 	public void setNowTrial(int nowTrial) {
 		this.nowTrial = nowTrial;
 	}
-	
+
 }

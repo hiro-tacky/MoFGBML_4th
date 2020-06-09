@@ -350,15 +350,16 @@ public class toXML {
 		for(int i=0; i<input.getResult().size(); i++) {
 			Element trial = addChildNode("trial", master);
 			Result_trial Trial = input.getResultTrial(i);
-			trial.setAttribute("trial", String.valueOf(Trial.getTrial()));
 
 			for(int j=0; j<Trial.getResult().size(); j++) {
+				//出力を最終世代に限定
 				j = Trial.getResult().size() - 1;
+
 				Element pop = addChildNode("population", trial);
 				Result_population Pop = Trial.getResultPopulation(j);
-				pop.setAttribute("ID", String.valueOf(j));
 				pop.setAttribute("generation", String.valueOf(Pop.getGen()));
 				pop.setAttribute("trial", String.valueOf(Trial.getTrial()));
+
 
 				KB kb = Pop.getKb();
 
@@ -421,9 +422,6 @@ public class toXML {
 					SinglePittsburgh singlePittsburg = Individual.getRule();
 
 					Element individual = addChildNode("individual", pop);
-					individual.setAttribute("ID", String.valueOf(singlePittsburg.getID()));
-					individual.setAttribute("generation", String.valueOf(Pop.getGen()));
-					individual.setAttribute("trial", String.valueOf(Trial.getTrial()));
 					individual.setAttribute("ruleNum", String.valueOf(singlePittsburg.getRuleNum()));
 
 					for(int l=0; l<Individual.getF().size(); l++) {
@@ -439,7 +437,6 @@ public class toXML {
 					//ruleSet
 					SingleRuleSet ruleSet = singlePittsburg.getRuleSet();
 					Element singleruleset = addChildNode("ruleSet", individual);
-					singleruleset.setAttribute("Class", "SingleRuleSet");
 
 						//micRules
 					ArrayList<SingleRule> micRules = ruleSet.getMicRules();

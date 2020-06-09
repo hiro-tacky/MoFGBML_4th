@@ -5,8 +5,12 @@ from sklearn import datasets
 from sklearn import preprocessing
 import pandas as pd
 import os
+from datetime import datetime
     
-
+trial_plot = 2 #plotするtriaslのID
+gen_plot = 1000 #plotする世代数
+my_path = os.getcwd()
+    
 def irisplot(plt, j):
     iris = datasets.load_iris()
     mm = preprocessing.MinMaxScaler()
@@ -29,11 +33,13 @@ def nodelist(root):
         print("{:3d}: {:20}{:10}{}".format(i, child.tag, str(txt), child.attrib))
         i += 1;
         
-def figSave(fig):
+def figSave(fig, filename = None):
+    if filename == None:
         print("image file name:")
         filename = input()
-        my_path = os.getcwd()
-        fig.savefig(os.path.join(my_path + '\png', filename))        
+    now = datetime.now()
+    buf = filename + "_{0:%Y%m%d%H%M%S}_{1:%f}.png".format(now, now)
+    fig.savefig(os.path.join(my_path + '\png', buf))        
 
 
 #xmlの基本的な操作スーパークラス
@@ -96,21 +102,23 @@ class KB():
                 FS[i] = fuzzyterm(ft)
             self.FSs[dim] = FS
         
-    def Show(self):
-        for i, ft in self.FSs[0].items:
+    def show(self):
+        dim_plot = 0
+        for i, ft in self.FSs[dim_plot].items():
             print(ft.parameters)
-            ft.Show()
+            ft.show()
             
-    def Set(self, ax):
-        for i, ft in self.FSs[0].items:
-            ft.Set(ax)
+    def setAx(self, ax):
+        dim_plot = 0
+        for i, ft in self.FSs[dim_plot].items:
+            ft.setAx(ax)
             
-    def ShowID(self, dim, i):
+    def showID(self, dim, i):
         print(self.FSs[dim][i].parameters)
-        self.FSs[dim][i].Show()
+        self.FSs[dim][i].show()
         
-    def SetID(self, dim, i, ax):
-        self.FSs[dim][i].Set(ax)
+    def setID(self, dim, i, ax):
+        self.FSs[dim][i].setAx(ax)
         
 class singleRule_ruleset():
     
@@ -131,7 +139,7 @@ class singleRule_ruleset():
         Num = len(self.rule)
         fig = plt.figure(figsize = (24, (Num/3+1)*6))
         ax = []
-        for dim in range(len(self.rule)):
+        for dim in range(Num):
             buf = fig.add_subplot(Num/3+1, 3, dim+1)
             ax.append(buf)
             ax[dim].grid(True)
@@ -139,13 +147,15 @@ class singleRule_ruleset():
             ax[dim].set_xlim(-0.05, 1.05)
             self.kb.setID(dim, self.rule[dim], ax[dim])
 #            irisplot(plt, dim)
-        figSave(fig)
+        figSave(fig, "Rule")
+        
+    def setAx(self, ax):
+        for dim, ID in enumerate(self.rule.values()):
+            self.kb.setID(dim, ID, ax[dim])
 
 class individual_ruleset():
     
     def __init__(self, kb_input, individual):
-        self.gen = int(individual.get('generation'))
-        self.trial = int(individual.get('trial'))
         self.f0 = float(individual.find('f0').text)
         self.f1 = float(individual.find('f1').text)
         self.rank = int(individual.find('rank').text)
@@ -161,6 +171,29 @@ class individual_ruleset():
             print("============rule ID:"+str(i)+ "================")
             self.rules[i].show()
             
+    def showDim(self):
+        dimNum = len(self.rules[0].rule)
+        fig = plt.figure(figsize = (24, (dimNum/3+1)*6))
+        ax = []
+        for dim in range(dimNum):
+            buf = fig.add_subplot(dimNum/3+1, 3, dim+1)
+            ax.append(buf)
+            ax[dim].grid(True)
+            ax[dim].set_ylim(-0.17, 1.05)
+            ax[dim].set_xlim(-0.05, 1.05)
+            ax[dim].set_title("RuleDim" + str(dim))
+            
+        for rule in self.rules.values():
+            rule.setAx(ax)
+        
+        figSave(fig, "individual_Dim")
+        plt.close(fig)
+        del ax
+            
+    def setAx(self, ax):            
+        for rule in self.rules.values():
+            rule.setAx(ax)       
+            
 class population_ruleset():
     def __init__(self, population):
         #KB
@@ -168,14 +201,14 @@ class population_ruleset():
         #XML_ruleクラスの配列(len:個体数)
         self.individual = [individual_ruleset(self.kb, buf) for buf in population.findall('individual')]
         self.gen = int(population.get('generation'))
-        self.trail = int(population.get('trial'))
+        self.trial = int(population.get('trial'))
         
     def show(self):
-        dinNum = len(self.individual[0].rules[0].rule)
-        fig = plt.figure(figsize = (24, (dinNum/3+1)*6))
+        dimNum = len(self.individual[0].rules[0].rule)
+        fig = plt.figure(figsize = (24, (dimNum/3+1)*6))
         ax = []
-        for dim in range(dinNum):
-            buf = fig.add_subplot(dinNum/3+1, 3, dim+1)
+        for dim in range(dimNum):
+            buf = fig.add_subplot(dimNum/3+1, 3, dim+1)
             ax.append(buf)
             ax[dim].grid(True)
             ax[dim].set_ylim(-0.17, 1.05)
@@ -183,10 +216,10 @@ class population_ruleset():
             for i in range(len(self.individual)):
                 for j in range(len(self.individual[i].rules)):
                     fuzyytermID = self.individual[i].rules[j].rule[dim]
-                    self.kb.SetID(dim, fuzyytermID, ax[dim])
+                    self.kb.setID(dim, fuzyytermID, ax[dim])
             ax[dim].set_title("RuleDim" + str(dim))
 #            irisplot(plt, dim)
-        figSave(fig)
+        figSave(fig, "Population_" + str(self.trial) + "_" + str(self.gen))
     
 class fuzzyterm:
     def __init__(self, fuzzyterm):
@@ -196,8 +229,8 @@ class fuzzyterm:
         for buf in fuzzyterm.find('parameters'):
             self.parameters[int(buf.get('id'))] = float(buf.text)
     
-    def Set(self, ax):
-        ax.set_title(self.name)
+    def setAx(self, ax):
+#        ax.set_title(self.name)
         if self.TypeID == 3:
             x = np.array([0, self.parameters[0], self.parameters[1], self.parameters[2], 1])
             y = np.array([0, 0, 1, 0, 0])
@@ -217,13 +250,14 @@ class fuzzyterm:
             y = np.array([0, 0, 1, 1, 0, 0])
             ax.plot(x, y)
             
-    def Show(self):
-        plt.title(self.name)
-        plt.grid(True)
-        plt.ylim(-0.05, 1.05)
-        plt.xlim(-0.05, 1.05)
-        self.Set(plt)
-        plt.show()
+    def show(self):
+        fig = plt.figure()
+        ax = fig.add_subplot(1, 1, 1)
+        ax.grid(True)
+        ax.set_ylim(-0.05, 1.05)
+        ax.set_xlim(-0.05, 1.05)
+        self.setAx(plt)
+        fig.show()
         
 class result(XML):
     def __init__(self, filename):
@@ -289,12 +323,34 @@ class dataset():
         self.multi = result(multi_name)
         
     def plot(self):
-        fig = plt.figure()
-        ax = fig.add_subplot(1, 1, 1)
-        ax.grid(True)
-        self.single.setplotTrialGen(0, 1000, ax, name = "single")
-        self.multi.setplotTrialGen(0, 1000, ax, name = "multi")
-        ax.legend(loc='upper right')
+        fig = plt.figure(figsize = (24, (10/3+1)*6))
+        ax = []
+        for i, dim in enumerate(range(100, 1100, 100)):
+            buf = fig.add_subplot(10/3+1, 3, i+1)
+            ax.append(buf)
+            ax[i].grid(True)
+            ax[i].set_xlim(1.5, 10)
+            ax[i].set_ylim(25, 60)
+            self.single.setplotTrialGen(trial_plot, dim, ax[i], name = "single")
+            self.multi.setplotTrialGen(trial_plot, dim, ax[i], name = "multi")
+            ax[i].legend(loc='upper right')
+            ax[i].set_title("dim:" + str(dim))
+        fig.show()
+        
+    def plot_2(self):
+        fig = plt.figure(figsize = (24, (10/3+1)*6))
+        ax = []
+        i = 0
+        dim = 1000
+        buf = fig.add_subplot(10/3+1, 3, i+1)
+        ax.append(buf)
+        ax[i].grid(True)
+        ax[i].set_xlim(1.5, 10)
+        ax[i].set_ylim(25, 60)
+        self.single.setplotTrialGen(trial_plot, dim, ax[i], name = "single")
+        self.multi.setplotTrialGen(trial_plot, dim, ax[i], name = "multi")
+        ax[i].legend(loc='upper right')
+        ax[i].set_title("dim:" + str(dim))
         fig.show()
             
 class ruleset(XML):
@@ -307,8 +363,101 @@ class ruleset(XML):
                 pop[int(population.get('generation'))] = population_ruleset(population)
             self.rs_tri_gen[i] = pop
             
-    def getRuleset(self, trial, gen):
-        return self.rs_tri_gen[0][1000]
+    def getIndividual(self, trial = 0, gen = 1000, ID = 0):
+        return self.rs_tri_gen[trial][gen].individual[ID]
+    
+    def getKB(self, trial = 0, gen = 1000):
+        return self.rs_tri_gen[trial][gen].kb
     
     def plot(self, trial = 0, gen = 1000, ruleID = 0):
         self.rs_tri_gen[trial][gen].show()
+        
+    def selectedRuleset(self):
+        print("class num")
+        classNum = int(input())
+        buf = []
+        ruleNum = 100
+        for trial in self.rs_tri_gen.values():
+            population = trial[1000]
+            for individual in population.individual:
+                check = {i : False for i in range(classNum)}
+                for l, SingleRule in enumerate(individual.rules.values()):
+                    check[SingleRule.conclusion] = True
+                if(all(check.values())):
+                    if len(individual.rules) < ruleNum:
+                        ruleNum = len(individual.rules)
+                    buf.append(individual)
+
+        rulelist = [ind for ind in buf if len(ind.rules) == ruleNum]
+        for tmp in rulelist:
+            tmp.showDim()
+        
+    def selectedTrial(self):
+        print("class num")
+        classNum = int(input())
+        dimNum = len(self.getIndividual().rules[0].rule)
+            
+        for trial in self.rs_tri_gen.values():
+            fig = plt.figure(figsize = (24, (dimNum/3+1)*6))
+            ax = []
+            for dim in range(dimNum):
+                buf = fig.add_subplot(dimNum/3+1, 3, dim+1)
+                ax.append(buf)
+                ax[dim].grid(True)
+                ax[dim].set_ylim(-0.17, 1.05)
+                ax[dim].set_xlim(-0.05, 1.05)
+                ax[dim].set_title("RuleDim" + str(dim))
+                
+            buf = []
+            ruleNum = 100
+            population = trial[1000]
+            for individual in population.individual:
+                check = {i : False for i in range(classNum)}
+                for l, SingleRule in enumerate(individual.rules.values()):
+                    check[SingleRule.conclusion] = True
+                if(all(check.values())):
+                    if len(individual.rules) < ruleNum:
+                        ruleNum = len(individual.rules)
+                    buf.append(individual)
+            rulelist = [ind for ind in buf if len(ind.rules) == ruleNum]
+            for tmp in rulelist:
+                tmp.setAx(ax)
+            figSave(fig, "RuleCoverAll_buf")
+            plt.close(fig)
+            del ax, buf
+            
+    def selectedAll(self):
+        print("class num")
+        classNum = int(input())
+        dimNum = len(self.getIndividual().rules[0].rule)
+            
+        fig = plt.figure(figsize = (24, (dimNum/3+1)*6))
+        ax = []
+        for dim in range(dimNum):
+            buf = fig.add_subplot(dimNum/3+1, 3, dim+1)
+            ax.append(buf)
+            ax[dim].grid(True)
+            ax[dim].set_ylim(-0.17, 1.05)
+            ax[dim].set_xlim(-0.05, 1.05)
+            ax[dim].set_title("RuleDim" + str(dim))
+            
+        for trial in self.rs_tri_gen.values():
+            buf = []
+            ruleNum = 100
+            population = trial[1000]
+            for individual in population.individual:
+                check = {i : False for i in range(classNum)}
+                for l, SingleRule in enumerate(individual.rules.values()):
+                    check[SingleRule.conclusion] = True
+                if(all(check.values())):
+                    if len(individual.rules) < ruleNum:
+                        ruleNum = len(individual.rules)
+                    buf.append(individual)
+                    
+        rulelist = [ind for ind in buf if len(ind.rules) == ruleNum]
+        print(len(rulelist))
+        for tmp in buf:
+            tmp.setAx(ax)
+        figSave(fig, "RuleCoverAll_All")
+        plt.close(fig)
+        del ax, buf

@@ -1,7 +1,5 @@
 package fgbml.mofgbml;
 
-import java.io.File;
-
 import data.Input;
 import data.SingleDataSetInfo;
 import emo.algorithms.Algorithm;
@@ -14,7 +12,6 @@ import main.Consts;
 import main.Experiment;
 import main.Setting;
 import method.MersenneTwisterFast;
-import method.Output;
 import method.ResultMaster;
 import output.result.Result_MoFGBML;
 import time.TimeWatcher;
@@ -32,22 +29,6 @@ public class MoFGBML implements Experiment {
 		SingleDataSetInfo Dtst = new SingleDataSetInfo();
 		Input.inputFile(Dtra, traFile);
 		Input.inputFile(Dtst, tstFile);
-
-		/* ********************************************************* */
-		//Make result directry
-		String sep = File.separator;
-		String resultRoot = resultMaster.getRootDir();
-
-		String trialRoot = resultMaster.getTrialRoot();
-		Output.makeDir(trialRoot, Consts.POPULATION);
-		Output.makeDir(trialRoot, Consts.OFFSPRING);
-
-		String populationDir = resultMaster.getTrialRoot() + sep + Consts.POPULATION;
-		String offspringDir = resultMaster.getTrialRoot() + sep + Consts.OFFSPRING;
-		Output.makeDir(populationDir, Consts.INDIVIDUAL);
-		Output.makeDir(populationDir, Consts.RULESET);
-		Output.makeDir(offspringDir, Consts.INDIVIDUAL);
-		Output.makeDir(offspringDir, Consts.RULESET);
 
 		/* ********************************************************* */
 		//Initialize Fuzzy Sets
@@ -75,6 +56,7 @@ public class MoFGBML implements Experiment {
 
 		/* ********************************************************* */
 		//Generate OutputClass
+		//このMoFGBMLに関しては使ってない，
 		OutputClass<SinglePittsburgh> output = new Output_MoFGBML();
 
 		/* ********************************************************* */
@@ -112,13 +94,6 @@ public class MoFGBML implements Experiment {
 		timeWatcher.stop();
 		resultMaster.addTimes( timeWatcher.getSec() );
 		resultMaster.addEvaTimes( evaWatcher.getSec() );
-
-		//Output One Trial Information
-		resultMaster.outputIndividual(populationDir, offspringDir);
-		resultMaster.population.clear();
-		resultMaster.ruleSetPopulation.clear();
-		resultMaster.offspring.clear();
-		resultMaster.ruleSetOffspring.clear();
 
 		System.out.println();
 	}

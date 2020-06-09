@@ -7,7 +7,7 @@ import java.util.Comparator;
 
 public class SingleDataSetInfo extends DataSetInfo<SinglePattern>{
 	// ************************************************************
-
+	ArrayList<Double> average;
 	// ************************************************************
 	public SingleDataSetInfo() {}
 
@@ -39,6 +39,23 @@ public class SingleDataSetInfo extends DataSetInfo<SinglePattern>{
 	public void sortPattern() {
 		Collections.sort(this.patterns, new patternComparatorByConClass() );
 	}
+
+	public void calcAverage() {
+		for(int i=0; i<this.patterns.get(0).getNdim(); i++) {
+			double buf = 0;
+			for(SinglePattern v: this.patterns) {
+				buf += v.getDimValue(i);
+			}
+			buf /= this.getDataSize();
+			average.add(buf);
+		}
+	}
+
+
+	public ArrayList<Double> getAverage() {
+		return average;
+	}
+
 
 	/**
 	 * Sort by Conclusion Class

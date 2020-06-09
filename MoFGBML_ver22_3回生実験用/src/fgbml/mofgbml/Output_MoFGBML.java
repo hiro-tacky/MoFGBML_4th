@@ -3,7 +3,6 @@ package fgbml.mofgbml;
 import fgbml.SinglePittsburgh;
 import fgbml.problem.OutputClass;
 import ga.Population;
-import main.Setting;
 
 public class Output_MoFGBML extends OutputClass<SinglePittsburgh> {
 
@@ -62,22 +61,6 @@ public class Output_MoFGBML extends OutputClass<SinglePittsburgh> {
 			//crowding distance
 			str += "," + population.getIndividual(p).getCrowding();
 
-			String menbership_name = null;
-			switch(Setting.shapeType) {
-				case 0:
-					menbership_name = "triangle";
-					break;
-				case 1:
-					menbership_name = "gaussian";
-					break;
-				case 2:
-					menbership_name = "trapezoid";
-					break;
-				case 3:
-					menbership_name = "rectangle";
-					break;
-			}
-			str += "," + menbership_name;
 			strs += str + ln;
 		}
 

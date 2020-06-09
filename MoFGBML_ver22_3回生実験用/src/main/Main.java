@@ -87,9 +87,14 @@ public class Main {
 
 		/* ********************************************************* */
 		//Repeat x-fold cross-validation
-		//実験試行
 
-		repeatExection(args);
+		//実験試行
+		int FuzzySetType[] = {99, 3, 4, 7, 9};
+		/** 99:multi 3:triangular 4:gaussian 7:trapezoid 9:rectangular */
+		for(int v :FuzzySetType) {
+			Setting.FuzzySetType = v;
+			repeatExection(args);
+		}
 		/* ********************************************************* */
 
 		Date end = new Date();
@@ -158,7 +163,6 @@ public class Main {
 				resultMaster.setTrialRoot(resultRoot + sep + "trial" + rep_i+cv_i);
 				resultMaster.setNowTrial(count);
 				count++;
-				Output.mkdirs(resultMaster.getTrialRoot());
 
 				System.out.println(Setting.dataName + " : TRIAL: " + rep_i + cv_i);
 
@@ -174,13 +178,21 @@ public class Main {
 		fileName = resultRoot + sep + "Times_" + id + ".csv";
 		resultMaster.outputTimes(fileName);
 
+		String FuzzyTypeName = "";
+		switch(Setting.FuzzySetType) {
+			case 99: FuzzyTypeName = "multi"; break;
+			case 3: FuzzyTypeName = "triangle"; break;
+			case 4: FuzzyTypeName = "gaussian"; break;
+			case 7: FuzzyTypeName = "trapezoid"; break;
+			case 9: FuzzyTypeName = "rectangule"; break;
+		}
 		try {
 			toXML result = new toXML("result");
 			toXML ruleset = new toXML("ruleset");
 			result.ResultToXML(master);
 			ruleset.RuleSetToXML(master);
-			result.output(args[3]+"_result_single");
-			ruleset.output(args[3]+"_ruleset_single");
+			result.output(args[3] + "_" +  FuzzyTypeName + "_result");
+			ruleset.output(args[3] + "_" + FuzzyTypeName + "_ruleset");
 		} catch (TransformerConfigurationException | ParserConfigurationException e) {
 			// TODO 自動生成された catch ブロック
 			e.printStackTrace();

@@ -133,6 +133,7 @@ public class SinglePittsburgh extends Pittsburgh<SingleRuleSet>{
 		//Initialize Each Fuzzy Rules with Heuristic Rule Generation Method
 		for(int i = 0; i < ruleNum; i++) {
 			michigan[i] = new SingleMichigan(Ndim, objectiveNum);
+
 			michigan[i].initHeuristic((Pattern)train.getPattern(index[i]), uniqueRnd);
 			michigan[i].gene2rule();
 		}

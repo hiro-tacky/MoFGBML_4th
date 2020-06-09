@@ -12,6 +12,7 @@ import data.Pattern;
 import data.SingleDataSetInfo;
 import fuzzy.fml.KB;
 import main.Consts;
+import main.Setting;
 import method.MersenneTwisterFast;
 
 /**
@@ -34,9 +35,14 @@ public class StaticFuzzyFunc {
 	@SuppressWarnings("rawtypes")
 	public static void initfuzzy_takigawa(DataSetInfo Dtra) {
 		if(Consts.FUZZY_SET_INITIALIZE == 0) {
-//			homogeneousInit(Dtra.getNdim());
-			multiInit(Dtra.getNdim());
-//			Consts.FUZZY_SET_NUM = kb.getFSs(0).length;
+			switch(Setting.FuzzySetType) {
+			case 99: multiInit(Dtra.getNdim()); break;
+			case 3: triangleInit(Dtra.getNdim()); break;
+			case 4: gaussianInit(Dtra.getNdim()); break;
+			case 7: trapezoidInit(Dtra.getNdim()); break;
+			case 9: rectangleInit(Dtra.getNdim()); break;
+		}
+			Consts.FUZZY_SET_NUM = kb.getFSs(0).length - 1;
 		} else if(Consts.FUZZY_SET_INITIALIZE == 1) {
 			//Input FML file
 			String sep = File.separator;
@@ -86,7 +92,51 @@ public class StaticFuzzyFunc {
 		kb = new KB();
 		kb.homogeneousInit(Ndim);
 	}
+	
+	/**
+	 * <h1>Initialize Fuzzy Set - ファジィ集合初期化</h1><br>
+	 * 2-5分割の等分割三角型ファジィ集合 + Don't Careの15種を全attributeに定義<br>
+	 * <br>
+	 * @param Ndim
+	 */
+	public static void triangleInit(int Ndim) {
+		kb = new KB();
+		kb.triangleInit(Ndim);
+	}
 
+	/**11
+	 * <h1>Initialize Fuzzy Set - ファジィ集合初期化</h1><br>
+	 * 2-5分割の等分割区間型ファジィ集合 + Don't Careの15種を全attributeに定義<br>
+	 * <br>
+	 * @param Ndim
+	 */
+	public static void rectangleInit(int Ndim) {
+		kb = new KB();
+		kb.rectangleInit(Ndim);
+	}
+	
+	/**
+	 * <h1>Initialize Fuzzy Set - ファジィ集合初期化</h1><br>
+	 * 2-5分割の等分割ガウシアン型ファジィ集合 + Don't Careの15種を全attributeに定義<br>
+	 * <br>
+	 * @param Ndim
+	 */
+	public static void gaussianInit(int Ndim) {
+		kb = new KB();
+		kb.gaussianInit(Ndim);
+	}
+	
+	/**
+	 * <h1>Initialize Fuzzy Set - ファジィ集合初期化</h1><br>
+	 * 2-5分割の等分割台形型ファジィ集合 + Don't Careの15種を全attributeに定義<br>
+	 * <br>
+	 * @param Ndim
+	 */
+	public static void trapezoidInit(int Ndim) {
+		kb = new KB();
+		kb.trapezoidInit(Ndim);
+	}
+	
 	/**
 	 * 三角型，区間型，台形型，ガウシアン型，Don't Care を持つファジィ集合
 	 *
@@ -379,8 +429,6 @@ public class StaticFuzzyFunc {
 
 		return rule;
 	}
-
-
 
 }
 

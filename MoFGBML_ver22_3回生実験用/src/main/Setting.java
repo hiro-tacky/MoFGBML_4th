@@ -35,8 +35,6 @@ public class Setting {
 
 	public static int calclationType = 0;	//0:Single node, 1:Apache Spark, 2:Simple Socket
 
-	/** 0:Triangle, 1:Gaussian, 2:Trapezoid, 3:Rectangle */
-	public static int shapeType = 0;
 	/* ********************************************************* */
 	/** Do use command line argument for Below parameters<br>
 	 *  true:use, false:properties file */
@@ -48,6 +46,10 @@ public class Setting {
 	/** #of CPU cores */
 	public static int parallelCores = 1;
 	/* ********************************************************* */
+
+	/** FuzzySetType */
+	/** 99:multi 3:triangular 4:gaussian 7:trapezoid 9:rectangular */
+	public static int FuzzySetType = 99;
 
 	/** Termination Criteria (true: generation, false: evaluation) */
 	public static boolean terminationCriteria = true;
@@ -125,6 +127,8 @@ public class Setting {
 
 		if(bundle.containsKey("parallelCores")) { parallelCores = Integer.parseInt(bundle.getString("parallelCores")); }
 
+		if(bundle.containsKey("FuzzySetType")){ FuzzySetType = Integer.parseInt(bundle.getString("FuzzySetType"));}
+
 		if(bundle.containsKey("terminationCriteria")) { terminationCriteria = Boolean.parseBoolean(bundle.getString("terminationCriteria")); }
 
 		if(bundle.containsKey("generationNum")) { generationNum = Integer.parseInt(bundle.getString("generationNum")); }
@@ -181,7 +185,7 @@ public class Setting {
 
 		//設定値を追加したい時は，以下のvariableとkeyを追加すれば良い
 		//if(bundle.containsKey("key")){
-		//	variable = Integer.parseInt(bundle.getStrint("key"));
+		//	variable = Integer.parseInt(bundle.getString("key"));
 		//}
 
 		bundle = null;
