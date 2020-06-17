@@ -363,12 +363,6 @@ public class GAFunctions {
 					//突然変異させるファジィセットのmembershp関数の数
 					int fuzzySetNum = StaticFuzzyFunc.kb.getFSs(mutationDim).length;
 
-					//突然変異させるファジィセットを取得
-					FuzzySet[] NewFuzzySet =  StaticFuzzyFunc.kb.getFSs(mutationDim);
-					//突然変異させるファジィ集合のメンバーシップ関数のid取得
-					int ShapeType = NewFuzzySet[individual.getRuleSet().getMicRule(i).getRule(mutationDim)].getShapeType();
-
-
 					//ファジィセットに予めidを割り振っている?
 					//make List
 					//突然変異させたいファジィセットで現在使用しているファジィセットを取得．突然変異後に同じファジィセットを入れないため
@@ -383,20 +377,6 @@ public class GAFunctions {
 					//ファジィセットのidをランダムに取得
 					int newFuzzySet = list.get( uniqueRnd.nextInt(list.size()) );
 
-//					//同じ形状のメンバーシップ関数を取得して1/2で変異
-//					//残り1/2で異なる形状のものに変化
-//					if(uniqueRnd.nextInt(2) == 1) {
-//						while(ShapeType == NewFuzzySet[newFuzzySet].getShapeType()) {
-//							//ファジィセットのidをランダムに取得
-//							newFuzzySet = list.get( uniqueRnd.nextInt(list.size()) );
-//						}
-//					}else {
-//						while(ShapeType != NewFuzzySet[newFuzzySet].getShapeType()) {
-//							//ファジィセットのidをランダムに取得
-//							newFuzzySet = list.get( uniqueRnd.nextInt(list.size()) );
-//						}
-//					}
-
 					individual.getRuleSet().getMicRule(i).setRule(mutationDim, newFuzzySet);
 				} else {
 					//Attribute mutationDim is Categoric.
@@ -408,5 +388,77 @@ public class GAFunctions {
 
 	}
 
+
+
+	/**
+	 * <h1>Pittsburgh Type Mutation</h1>
+	 * @param individual : Pittsburgh : Objective Individual
+	 * @param rnd
+	 */
+	@SuppressWarnings("rawtypes")
+	public static void pittsburghMutationMulti(Pittsburgh individual, DataSetInfo dataset, MersenneTwisterFast rnd) {
+		MersenneTwisterFast uniqueRnd = new MersenneTwisterFast(rnd.nextInt()); //乱数生成器(nextintが生成範囲)
+		ArrayList<Integer> list = new ArrayList<Integer>();
+
+		int ruleNum = individual.getRuleNum();
+		//各ルールに対してループで試行
+		for(int i = 0; i < ruleNum; i++) {
+			// probability = 1/ruleNum
+			// 突然変異するかの判断
+			if(uniqueRnd.nextInt(ruleNum) == 0) {
+
+				//Objective Dimension
+				//突然変異させる次元
+				int mutationDim = uniqueRnd.nextInt(individual.getNdim());
+
+				//To judge which attribute i is categorical or numerical.
+				//ルールの種類判別
+				double randPattern = ((Pattern)dataset.getPattern(uniqueRnd.nextInt(dataset.getDataSize()))).getDimValue(mutationDim);
+
+				if(randPattern >= 0.0) {
+					//Attribute mutationDim is Numeric.
+					//突然変異させるファジィセットを取得
+					FuzzySet[] NewFuzzySet =  StaticFuzzyFunc.kb.getFSs(mutationDim);
+					//突然変異させるファジィ集合のメンバーシップ関数のid取得
+					int ShapeType = NewFuzzySet[individual.getRuleSet().getMicRule(i).getRule(mutationDim)].getShapeType();
+
+					//#of Defined Fuzzy Sets at mutationDim
+					//突然変異させるファジィセットのmembershp関数の数
+					int fuzzySetNum = StaticFuzzyFunc.kb.getFSs(mutationDim).length;
+					list.clear();
+					if(uniqueRnd.nextInt(2) == 0) {
+						//ファジィセットに予めidを割り振っている?
+						//make List
+						//突然変異させたいファジィセットで現在使用しているファジィセットを取得．突然変異後に同じファジィセットを入れないため
+						for(int j = 0; j < fuzzySetNum; j++) {
+							if(j != individual.getRuleSet().getMicRule(i).getRule(mutationDim) && (NewFuzzySet[j].getShapeType() == ShapeType || ShapeType == Consts.DONT_CARE_SHAPE_TYPE_ID)) {
+								list.add(j);
+							}
+						}
+					}else {
+						//ファジィセットに予めidを割り振っている?
+						//make List
+						//突然変異させたいファジィセットで現在使用しているファジィセットを取得．突然変異後に同じファジィセットを入れないため
+						for(int j = 0; j < fuzzySetNum; j++) {
+							if(j != individual.getRuleSet().getMicRule(i).getRule(mutationDim) && NewFuzzySet[j].getShapeType() != ShapeType) {
+								list.add(j);
+							}
+						}
+					}
+
+					//mutation
+					//ファジィセットのidをランダムに取得
+					int newFuzzySet = list.get( uniqueRnd.nextInt(list.size()) );
+
+					individual.getRuleSet().getMicRule(i).setRule(mutationDim, newFuzzySet);
+				} else {
+					//Attribute mutationDim is Categoric.
+					individual.getRuleSet().getMicRule(i).setRule(mutationDim, (int)randPattern);
+				}
+
+			}
+		}
+
+	}
 
 }

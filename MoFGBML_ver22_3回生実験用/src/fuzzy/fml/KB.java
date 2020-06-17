@@ -15,6 +15,7 @@ import jfml.JFML;
 import jfml.knowledgebase.KnowledgeBaseType;
 import jfml.knowledgebase.variable.FuzzyVariableType;
 import jfml.term.FuzzyTermType;
+import main.Consts;
 
 /**
  * Fuzzy Markup LanguageのKnowledgeBaseを扱うクラス
@@ -135,6 +136,7 @@ public class KB {
 			FSs[i] = new FuzzySet[FuzzySetNum + 1];
 			//Don't Care
 			FSs[i][0] = new FuzzySet("0", FuzzyTermType.TYPE_rectangularShape, dontCare);
+			FSs[i][0].setShapeType(Consts.DONT_CARE_SHAPE_TYPE_ID);
 
 			//三角形型メンバーシップ関数
 			int k = 0;
@@ -168,6 +170,7 @@ public class KB {
 		for(int i=0; i<Ndim; i++){
 			FSs[i] = new FuzzySet[params.length + 1];
 			FSs[i][0] = new FuzzySet("0", FuzzyTermType.TYPE_rectangularShape, dontcare );
+			FSs[i][0].setShapeType(Consts.DONT_CARE_SHAPE_TYPE_ID);
 
 			for(int j=0; j< params.length; j++) {
 				FSs[i][j+1] =  new FuzzySet(String.valueOf(j+1), FuzzyTermType.TYPE_triangularShape, params[j]);
@@ -187,6 +190,7 @@ public class KB {
 		for(int i=0; i<Ndim; i++){
 			FSs[i] = new FuzzySet[params.length + 1];
 			FSs[i][0] = new FuzzySet("0", FuzzyTermType.TYPE_rectangularShape, dontcare );
+			FSs[i][0].setShapeType(Consts.DONT_CARE_SHAPE_TYPE_ID);
 
 			for(int j=0; j< params.length; j++) {
 				FSs[i][j+1] =  new FuzzySet(String.valueOf(j+1), FuzzyTermType.TYPE_gaussianShape, params[j]);
@@ -206,6 +210,7 @@ public class KB {
 		for(int i=0; i<Ndim; i++){
 			FSs[i] = new FuzzySet[params.length + 1];
 			FSs[i][0] = new FuzzySet("0", FuzzyTermType.TYPE_rectangularShape, dontcare );
+			FSs[i][0].setShapeType(Consts.DONT_CARE_SHAPE_TYPE_ID);
 
 			for(int j=0; j< params.length; j++) {
 				FSs[i][j+1] =  new FuzzySet(String.valueOf(j+1), FuzzyTermType.TYPE_trapezoidShape, params[j]);
@@ -225,6 +230,7 @@ public class KB {
 		for(int i=0; i<Ndim; i++){
 			FSs[i] = new FuzzySet[params.length + 1];
 			FSs[i][0] = new FuzzySet("0", FuzzyTermType.TYPE_rectangularShape, dontcare );
+			FSs[i][0].setShapeType(Consts.DONT_CARE_SHAPE_TYPE_ID);
 
 			for(int j=0; j< params.length; j++) {
 				FSs[i][j+1] =  new FuzzySet(String.valueOf(j+1), FuzzyTermType.TYPE_rectangularShape, params[j]);

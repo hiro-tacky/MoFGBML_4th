@@ -12,7 +12,7 @@ public class FuzzySet {
 	// ************************************************************
 	String name;
 	int shapeType;
-
+	double weight = 1.0;
 	FuzzyTermType term;
 
 	float[] params;
@@ -36,7 +36,7 @@ public class FuzzySet {
 
 	/********** 重要・必読 **********/
 	public double calcMembership(double x) {
-		return term.getMembershipValue((float)x);
+		return term.getMembershipValue((float)x) * weight;
 	}
 
 	public void setName(String name) {
@@ -53,6 +53,14 @@ public class FuzzySet {
 
 	public int getShapeType() {
 		return this.shapeType;
+	}
+
+	public double getWeight() {
+		return weight;
+	}
+
+	public void setWeight(double weight) {
+		this.weight = weight;
 	}
 
 	public void setParams(int i, float param) {

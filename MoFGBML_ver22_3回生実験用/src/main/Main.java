@@ -184,7 +184,7 @@ public class Main {
 			case 3: FuzzyTypeName = "triangle"; break;
 			case 4: FuzzyTypeName = "gaussian"; break;
 			case 7: FuzzyTypeName = "trapezoid"; break;
-			case 9: FuzzyTypeName = "rectangule"; break;
+			case 9: FuzzyTypeName = "rectangle"; break;
 		}
 		try {
 			toXML result = new toXML("result");

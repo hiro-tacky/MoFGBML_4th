@@ -164,7 +164,11 @@ public class NSGA2<T extends Pittsburgh> extends Algorithm<T>{
 					}
 
 					//Step 3. Mutation
-					GAFunctions.pittsburghMutation(child, mop.getTrain(), rnd);
+					if(Setting.FuzzySetType == 99) {
+						GAFunctions.pittsburghMutationMulti(child, mop.getTrain(), rnd);
+					}else {
+						GAFunctions.pittsburghMutation(child, mop.getTrain(), rnd);
+					}
 
 					//Step 4. Learning
 					child.getRuleSet().learning(mop.getTrain(), forkJoinPool);

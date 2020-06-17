@@ -399,6 +399,7 @@ public class toXML {
 							case 14: ShapeName = "circularDefinition"; break;
 							case 15: ShapeName = "customShape"; break;
 							case 16: ShapeName = "customMonotonicShape"; break;
+							case 99: ShapeName = "DontCare"; break;
 						}
 						addChildNode_value("Shape_Type", ft, ShapeName);
 						//parameters
@@ -412,6 +413,7 @@ public class toXML {
 							parameter.appendChild(textContents);
 							params.appendChild(parameter);
 						}
+						addChildNode_value("weight", ft, String.valueOf(vv.getWeight()));
 					}
 				}
 
@@ -422,6 +424,8 @@ public class toXML {
 					SinglePittsburgh singlePittsburg = Individual.getRule();
 
 					Element individual = addChildNode("individual", pop);
+					individual.setAttribute("generation", String.valueOf(Pop.getGen()));
+					individual.setAttribute("trial", String.valueOf(Trial.getTrial()));
 					individual.setAttribute("ruleNum", String.valueOf(singlePittsburg.getRuleNum()));
 
 					for(int l=0; l<Individual.getF().size(); l++) {

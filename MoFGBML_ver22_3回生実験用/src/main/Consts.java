@@ -48,12 +48,14 @@ public class Consts {
 	public static boolean IS_ISLAND_TIME = false;	//サーバ1大の時に各島の時間も測る．(評価だけ並列の時)
 
 	//GBML's parameters
+	// don't care のshapetypeのID
+	public static int  DONT_CARE_SHAPE_TYPE_ID = 99;
 	/** don't careにしない条件部の数 */
 	public static int ANTECEDENT_LEN = 5;
 	/** don't care適応確率 */
 	public static double DONT_CARE_RT = 0.8;
 	/** don't careを確率で行う */
-	public static boolean IS_PROBABILITY_DONT_CARE = false;
+	public static boolean IS_PROBABILITY_DONT_CARE = true;
 	/** ミシガン操作時にルールを追加する（置き換えでなく） */
 	public static boolean DO_ADD_RULES = false;
 	/** ES型個体群更新戦略 */
@@ -258,6 +260,8 @@ public class Consts {
 				FUZZY_SET_NUM = Integer.parseInt(bundle.getString("FUZZY_SET_NUM"));
 //			}
 		}
+
+		if(bundle.containsKey("DONT_CARE_SHAPE_TYPE_ID")) { DONT_CARE_SHAPE_TYPE_ID = Integer.parseInt(bundle.getString("DONT_CARE_SHAPE_TYPE_ID")); }
 		if(bundle.containsKey("INITIATION_RULE_NUM")) { INITIATION_RULE_NUM = Integer.parseInt(bundle.getString("INITIATION_RULE_NUM")); }
 		if(bundle.containsKey("MAX_FUZZY_DIVIDE_NUM")) { MAX_FUZZY_DIVIDE_NUM = Integer.parseInt(bundle.getString("MAX_FUZZY_DIVIDE_NUM")); }
 		if(bundle.containsKey("MAX_RULE_NUM")) { MAX_RULE_NUM = Integer.parseInt(bundle.getString("MAX_RULE_NUM")); }
