@@ -701,17 +701,20 @@ public class toXML {
 	 * @throws FileNotFoundException
 	 * @throws TransformerException
 	 */
-	public void output(String FileName) throws FileNotFoundException, TransformerException {
+	public void output(String FileName, String file_dir) throws FileNotFoundException, TransformerException {
 		if(!(FileName.endsWith(".xml"))) {
 			FileName = FileName +".xml";
 		}
-		String path = new File(".").getAbsoluteFile().getParent();
-		FileName = path + "\\xml\\" + FileName;
+//		String path = new File(".").getAbsoluteFile().getParent();
+//		FileName = path + "\\xml\\" + FileName;
+		String sep = File.separator;
+		FileName = file_dir + sep + FileName;
 		File newXML = new File(FileName);
-		//エラー吐いたときは．直下に "xml" フォルダを作って
 		DOMSource source = new DOMSource(document);
 		FileOutputStream os = new FileOutputStream(newXML);
 		StreamResult result = new StreamResult(os);
 		transformer.transform(source, result);
 	}
+
+
 }

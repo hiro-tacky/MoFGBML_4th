@@ -40,6 +40,11 @@ import output.result.Result_MoFGBML;
  * args[5] : String : saveDir<br>
  * </p>
  */
+
+//src/jfml/term/FuzzyTerm.java にこの部分追加したら、エラー消える
+//public int getType(){
+//    return this.type;
+//}
 public class Main {
 	/**
 	 * main関数
@@ -72,6 +77,7 @@ public class Main {
 		//基本データ出力
 		System.out.println("Processors: " + Runtime.getRuntime().availableProcessors() + " ");
 		System.out.println();
+
 		System.out.print("args: ");
 		for(int i = 0; i < args.length; i++) {
 			System.out.print(args[i] + " ");
@@ -88,12 +94,25 @@ public class Main {
 		/* ********************************************************* */
 		//Repeat x-fold cross-validation
 
+		
+		//Make result directries
+		Calendar calendar = Calendar.getInstance();
+		SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd-HHmm");
+		String sep = File.separator;
+		String id = format.format(calendar.getTime());
+		/*format: ".\result\iris_20191021-1255"*/
+
+
+		//ファイル名構築
+		String resultRoot = System.getProperty("user.dir") + sep + "result" + sep
+							+ Setting.saveDir + sep + Setting.dataName + "_" + id;
+		
 		//実験試行
 		int FuzzySetType[] = {99, 3, 4, 7, 9};
 		/** 99:multi 3:triangular 4:gaussian 7:trapezoid 9:rectangular */
 		for(int v :FuzzySetType) {
 			Setting.FuzzySetType = v;
-			repeatExection(args);
+			repeatExection(args, resultRoot);
 		}
 		/* ********************************************************* */
 
@@ -108,7 +127,7 @@ public class Main {
 		 *
 		 * @param args 実行の構成からの引数
 		 */
-	public static void repeatExection(String[] args) {
+	public static void repeatExection(String[] args, String dir_path) {
 		/* ********************************************************* */
 		//The names of files
 		//データセットのファイル名作成
@@ -132,8 +151,7 @@ public class Main {
 
 
 		//ファイル名構築
-		String resultRoot = System.getProperty("user.dir") + sep + "result" + sep
-							+ Setting.saveDir + sep + Setting.dataName + "_" + id;
+		String resultRoot = dir_path + sep + Setting.dataName + "_" + id;
 		Output.mkdirs(resultRoot);
 
 		/* ********************************************************* */
@@ -191,8 +209,8 @@ public class Main {
 			toXML ruleset = new toXML("ruleset");
 			result.ResultToXML(master);
 			ruleset.RuleSetToXML(master);
-			result.output(args[3] + "_" +  FuzzyTypeName + "_result");
-			ruleset.output(args[3] + "_" + FuzzyTypeName + "_ruleset");
+			result.output(args[3] + "_" +  FuzzyTypeName + "_result", resultRoot);
+			ruleset.output(args[3] + "_" + FuzzyTypeName + "_ruleset", resultRoot);
 		} catch (TransformerConfigurationException | ParserConfigurationException e) {
 			// TODO 自動生成された catch ブロック
 			e.printStackTrace();

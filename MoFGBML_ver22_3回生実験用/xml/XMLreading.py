@@ -6,11 +6,11 @@ from sklearn import preprocessing
 import pandas as pd
 import os
 from datetime import datetime
-
     
 trial_plot = 1 #plotするtriaslのID
 gen_plot = 1000 #plotする世代数
 dim_plot = 0
+trial_num = 30
 my_path = os.getcwd()
 FuzzyTypeNum = {3:"triangle", 4:"gaussian", 7:"trapezoid", 9:"rectangle"}
 
@@ -350,8 +350,8 @@ class result(XML):
                     ave[buf.f1][1] += 1                    
                 except:
                     ave[buf.f1] = [buf.f0, 1]
-        x = [ruleNum for ruleNum in ave.keys()]
-        y = [average[0]/average[1] for average in ave.values()]
+        x = [ruleNum for ruleNum, average in ave.items() if average[1] > trial_num/2]
+        y = [average[0]/average[1] for average in ave.values() if average[1] > trial_num/2]
         ax.scatter(x, y, label = name)
 
     def setplotGenAve_tst(self, gen, ax, name = ""):
@@ -366,8 +366,8 @@ class result(XML):
                     ave[buf.f1][1] += 1                    
                 except:
                     ave[buf.f1] = [buf.Dtst, 1]
-        x = [ruleNum for ruleNum in ave.keys()]
-        y = [average[0]/average[1] for average in ave.values()]
+        x = [ruleNum for ruleNum, average in ave.items() if average[1] > trial_num/2]
+        y = [average[0]/average[1] for average in ave.values() if average[1] > trial_num/2]
         ax.scatter(x, y, label = name)
 
     def setplotGenBest(self, gen, ax, name = ""):
@@ -390,8 +390,8 @@ class result(XML):
                 except:
                     best[RuleNum] = [bestValue, 1]
             del best_pop
-        x = [ruleNum for ruleNum in best.keys()]
-        y = [average[0]/average[1] for average in best.values()]
+        x = [ruleNum for ruleNum, average in best.items() if average[1] > trial_num/2]
+        y = [average[0]/average[1] for average in best.values() if average[1] > trial_num/2]
         ax.scatter(x, y, label = name)
         
     def setplotGenBest_tst(self, gen, ax, name = ""):
@@ -414,8 +414,8 @@ class result(XML):
                 except:
                     best[RuleNum] = [bestValue, 1]
             del best_pop
-        x = [ruleNum for ruleNum in best.keys()]
-        y = [average[0]/average[1] for average in best.values()]
+        x = [ruleNum for ruleNum, average in best.items() if average[1] > trial_num/2]
+        y = [average[0]/average[1] for average in best.values() if average[1] > trial_num/2]
         ax.scatter(x, y, label = name)
         
 class dataset():
@@ -486,26 +486,25 @@ class dataset():
         figSave(fig, "result_step",self.datasetname)
 
     def plot_ave(self):
-        genNum = len(self.multi.root.find("trial").findall("population"))
-        fig = plt.figure(figsize = (24, ((genNum-1)/3+1)*6))
-        fig.suptitle(self.datasetname + " [Dtra's average of all individual of each gen]", size = 36)        
-        ax = []
+        ims = []
         x_lim = [1000, -1]
         y_lim = [1000, -1]
         for i, pop in enumerate(self.multi.root.find("trial").findall("population")):
+            fig = plt.figure(figsize = (8, 6))
+            fig.suptitle(self.datasetname + " [Dtra's average of all individual of each gen]", size = 24)        
             dim = int(pop.get("generation"))
-            buf = fig.add_subplot((genNum+2)/3, 3, i+1)
-            ax.append(buf)
-            ax[i].grid(True)
-            self.triangle.setplotGenAve(dim, ax[i], name = "triangle")
-            self.trapezoid.setplotGenAve(dim, ax[i], name = "trapezoid")
-            self.rectangle.setplotGenAve(dim, ax[i], name = "rectangle")
-            self.gaussian.setplotGenAve(dim, ax[i], name = "gaussian")
-            self.multi.setplotGenAve(dim, ax[i], name = "multi")      
-            ax[i].legend(loc='upper right')
-            ax[i].set_title("dim:" + str(dim))
-            buf_x = ax[i].get_xlim()
-            buf_y = ax[i].get_ylim()
+            ax = fig.add_subplot(1, 1, 1)
+            ax.grid(True)
+            self.triangle.setplotGenAve(dim, ax, name = "triangle")
+            self.trapezoid.setplotGenAve(dim, ax, name = "trapezoid")
+            self.rectangle.setplotGenAve(dim, ax, name = "rectangle")
+            self.gaussian.setplotGenAve(dim, ax, name = "gaussian")
+            self.multi.setplotGenAve(dim, ax, name = "multi")      
+            ax.legend(loc='upper right')
+            ax.set_title("dim:" + str(dim))
+            ims.append(fig)
+            buf_x = ax.get_xlim()
+            buf_y = ax.get_ylim()
             if buf_x[0] < x_lim[0]:
                 x_lim[0] = buf_x[0]
             if buf_x[1] > x_lim[1]:
@@ -515,74 +514,35 @@ class dataset():
             if buf_y[1] > y_lim[1]:
                 y_lim[1] = buf_y[1]
         
-        for buf in ax:
+        for i, fig in enumerate(ims):
+            buf = fig.axes[0]
             buf.set_xlim(x_lim)
             buf.set_ylim(y_lim)
             buf.set_xticks(range(2, int(x_lim[1]), lim(x_lim[0], x_lim[1])))
             buf.set_xlabel("number of rule")
-            buf.set_ylabel("error rate[%]")            
-        figSave(fig, self.datasetname + "_Result_Step_All_Dtra", self.datasetname)
-    
+            buf.set_ylabel("error rate[%]") 
+            figSave(fig, self.datasetname + "_Result_Step_All_Dtra" + str(i), self.datasetname + '/ave')
         
     def plot_ave_tst(self):
-        genNum = len(self.multi.root.find("trial").findall("population"))
-        fig = plt.figure(figsize = (24, ((genNum-1)/3+1)*6))
-        fig.suptitle(self.datasetname + " [Dtst's average of all individual of each gen]", size = 36)        
-        ax = []
+        ims = []
         x_lim = [1000, -1]
         y_lim = [1000, -1]
         for i, pop in enumerate(self.multi.root.find("trial").findall("population")):
+            fig = plt.figure(figsize = (8, 6))
+            fig.suptitle(self.datasetname + " [Dtst's average of all individual of each gen]", size = 24)        
             dim = int(pop.get("generation"))
-            buf = fig.add_subplot((genNum+2)/3, 3, i+1)
-            ax.append(buf)
-            ax[i].grid(True)
-            self.triangle.setplotGenAve_tst(dim, ax[i], name = "triangle")
-            self.trapezoid.setplotGenAve_tst(dim, ax[i], name = "trapezoid")
-            self.rectangle.setplotGenAve_tst(dim, ax[i], name = "rectangle")
-            self.gaussian.setplotGenAve_tst(dim, ax[i], name = "gaussian")
-            self.multi.setplotGenAve_tst(dim, ax[i], name = "multi")      
-            ax[i].legend(loc='upper right')
-            ax[i].set_title("dim:" + str(dim))
-            buf_x = ax[i].get_xlim()
-            buf_y = ax[i].get_ylim()
-            if buf_x[0] < x_lim[0]:
-                x_lim[0] = buf_x[0]
-            if buf_x[1] > x_lim[1]:
-                x_lim[1] = buf_x[1]
-            if buf_y[0] < y_lim[0]:
-                y_lim[0] = buf_y[0]
-            if buf_y[1] > y_lim[1]:
-                y_lim[1] = buf_y[1]        
-        
-        for buf in ax:
-            buf.set_xlim(x_lim)
-            buf.set_ylim(y_lim)
-            buf.set_xticks(range(2, int(x_lim[1]), lim(x_lim[0], x_lim[1])))
-            buf.set_xlabel("number of rule")
-            buf.set_ylabel("error rate[%]")
-        figSave(fig, self.datasetname + "_Result_Step_All_Dtst", self.datasetname)
-
-    def plot_best(self):
-        genNum = len(self.multi.root.find("trial").findall("population"))
-        fig = plt.figure(figsize = (24, ((genNum-1)/3+1)*6))
-        fig.suptitle(self.datasetname + " [Dtra's average of best individual of each gen]", size = 36)        
-        ax = []
-        x_lim = [1000, -1]
-        y_lim = [1000, -1]
-        for i, pop in enumerate(self.multi.root.find("trial").findall("population")):
-            dim = int(pop.get("generation"))
-            buf = fig.add_subplot((genNum+2)/3, 3, i+1)
-            ax.append(buf)
-            ax[i].grid(True)
-            self.triangle.setplotGenBest(dim, ax[i], name = "triangle")
-            self.trapezoid.setplotGenBest(dim, ax[i], name = "trapezoid")
-            self.rectangle.setplotGenBest(dim, ax[i], name = "rectangle")
-            self.gaussian.setplotGenBest(dim, ax[i], name = "gaussian")
-            self.multi.setplotGenBest(dim, ax[i], name = "multi")      
-            ax[i].legend(loc='upper right')
-            ax[i].set_title("dim:" + str(dim))
-            buf_x = ax[i].get_xlim()
-            buf_y = ax[i].get_ylim()
+            ax = fig.add_subplot(1, 1, 1)
+            ax.grid(True)
+            self.triangle.setplotGenAve_tst(dim, ax, name = "triangle")
+            self.trapezoid.setplotGenAve_tst(dim, ax, name = "trapezoid")
+            self.rectangle.setplotGenAve_tst(dim, ax, name = "rectangle")
+            self.gaussian.setplotGenAve_tst(dim, ax, name = "gaussian")
+            self.multi.setplotGenAve_tst(dim, ax, name = "multi")      
+            ax.legend(loc='upper right')
+            ax.set_title("dim:" + str(dim))
+            ims.append(fig)
+            buf_x = ax.get_xlim()
+            buf_y = ax.get_ylim()
             if buf_x[0] < x_lim[0]:
                 x_lim[0] = buf_x[0]
             if buf_x[1] > x_lim[1]:
@@ -591,37 +551,36 @@ class dataset():
                 y_lim[0] = buf_y[0]
             if buf_y[1] > y_lim[1]:
                 y_lim[1] = buf_y[1]
-                
-        for buf in ax:
+        
+        for i, fig in enumerate(ims):
+            buf = fig.axes[0]
             buf.set_xlim(x_lim)
             buf.set_ylim(y_lim)
             buf.set_xticks(range(2, int(x_lim[1]), lim(x_lim[0], x_lim[1])))
             buf.set_xlabel("number of rule")
-            buf.set_ylabel("error rate[%]")
-        figSave(fig, self.datasetname + "_Result_Step_Best_Dtra", self.datasetname)
-    
-        
-    def plot_best_tst(self):
-        genNum = len(self.multi.root.find("trial").findall("population"))
-        fig = plt.figure(figsize = (24, ((genNum-1)/3+1)*6))
-        fig.suptitle(self.datasetname + " [Dtst's average of best individual of each gen]", size = 36)        
-        ax = []
+            buf.set_ylabel("error rate[%]") 
+            figSave(fig, self.datasetname + "_Result_Step_All_Dtst" + str(i), self.datasetname + '/ave_tst')
+
+    def plot_best(self):
+        ims = []
         x_lim = [1000, -1]
         y_lim = [1000, -1]
         for i, pop in enumerate(self.multi.root.find("trial").findall("population")):
+            fig = plt.figure(figsize = (8, 6))
+            fig.suptitle(self.datasetname + " [Dtra's average of best individual of each gen]", size = 24)        
             dim = int(pop.get("generation"))
-            buf = fig.add_subplot((genNum+2)/3, 3, i+1)
-            ax.append(buf)
-            ax[i].grid(True)
-            self.triangle.setplotGenBest_tst(dim, ax[i], name = "triangle")
-            self.trapezoid.setplotGenBest_tst(dim, ax[i], name = "trapezoid")
-            self.rectangle.setplotGenBest_tst(dim, ax[i], name = "rectangle")
-            self.gaussian.setplotGenBest_tst(dim, ax[i], name = "gaussian")
-            self.multi.setplotGenBest_tst(dim, ax[i], name = "multi")      
-            ax[i].legend(loc='upper right')
-            ax[i].set_title("dim:" + str(dim))
-            buf_x = ax[i].get_xlim()
-            buf_y = ax[i].get_ylim()
+            ax = fig.add_subplot(1, 1, 1)
+            ax.grid(True)
+            self.triangle.setplotGenBest(dim, ax, name = "triangle")
+            self.trapezoid.setplotGenBest(dim, ax, name = "trapezoid")
+            self.rectangle.setplotGenBest(dim, ax, name = "rectangle")
+            self.gaussian.setplotGenBest(dim, ax, name = "gaussian")
+            self.multi.setplotGenBest(dim, ax, name = "multi")      
+            ax.legend(loc='upper right')
+            ax.set_title("dim:" + str(dim))
+            ims.append(fig)
+            buf_x = ax.get_xlim()
+            buf_y = ax.get_ylim()
             if buf_x[0] < x_lim[0]:
                 x_lim[0] = buf_x[0]
             if buf_x[1] > x_lim[1]:
@@ -629,15 +588,91 @@ class dataset():
             if buf_y[0] < y_lim[0]:
                 y_lim[0] = buf_y[0]
             if buf_y[1] > y_lim[1]:
-                y_lim[1] = buf_y[1]        
+                y_lim[1] = buf_y[1]
         
-        for buf in ax:
+        for i, fig in enumerate(ims):
+            buf = fig.axes[0]
             buf.set_xlim(x_lim)
             buf.set_ylim(y_lim)
             buf.set_xticks(range(2, int(x_lim[1]), lim(x_lim[0], x_lim[1])))
             buf.set_xlabel("number of rule")
-            buf.set_ylabel("error rate[%]")
-        figSave(fig, self.datasetname + "_Result_Step_Best_Dtst", self.datasetname)
+            buf.set_ylabel("error rate[%]") 
+            figSave(fig, self.datasetname + "_Result_Step_Best_Dtra" + str(i), self.datasetname + '/best')    
+        
+    def plot_best_tst(self):
+        ims = []
+        x_lim = [1000, -1]
+        y_lim = [1000, -1]
+        for i, pop in enumerate(self.multi.root.find("trial").findall("population")):
+            fig = plt.figure(figsize = (8, 6))
+            fig.suptitle(self.datasetname + " [Dtst's average of best individual of each gen]", size = 24)        
+            dim = int(pop.get("generation"))
+            ax = fig.add_subplot(1, 1, 1)
+            ax.grid(True)
+            self.triangle.setplotGenBest(dim, ax, name = "triangle")
+            self.trapezoid.setplotGenBest(dim, ax, name = "trapezoid")
+            self.rectangle.setplotGenBest(dim, ax, name = "rectangle")
+            self.gaussian.setplotGenBest(dim, ax, name = "gaussian")
+            self.multi.setplotGenBest(dim, ax, name = "multi")      
+            ax.legend(loc='upper right')
+            ax.set_title("dim:" + str(dim))
+            ims.append(fig)
+            buf_x = ax.get_xlim()
+            buf_y = ax.get_ylim()
+            if buf_x[0] < x_lim[0]:
+                x_lim[0] = buf_x[0]
+            if buf_x[1] > x_lim[1]:
+                x_lim[1] = buf_x[1]
+            if buf_y[0] < y_lim[0]:
+                y_lim[0] = buf_y[0]
+            if buf_y[1] > y_lim[1]:
+                y_lim[1] = buf_y[1]
+        
+        for i, fig in enumerate(ims):
+            buf = fig.axes[0]
+            buf.set_xlim(x_lim)
+            buf.set_ylim(y_lim)
+            buf.set_xticks(range(2, int(x_lim[1]), lim(x_lim[0], x_lim[1])))
+            buf.set_xlabel("number of rule")
+            buf.set_ylabel("error rate[%]") 
+            figSave(fig, self.datasetname + "_Result_Step_Best_Dtst" + str(i), self.datasetname + '/best_tst')
+            
+#        genNum = len(self.multi.root.find("trial").findall("population"))
+#        fig = plt.figure(figsize = (24, ((genNum-1)/3+1)*6))
+#        fig.suptitle(self.datasetname + " [Dtst's average of best individual of each gen]", size = 36)        
+#        ax = []
+#        x_lim = [1000, -1]
+#        y_lim = [1000, -1]
+#        for i, pop in enumerate(self.multi.root.find("trial").findall("population")):
+#            dim = int(pop.get("generation"))
+#            buf = fig.add_subplot((genNum+2)/3, 3, i+1)
+#            ax.append(buf)
+#            ax[i].grid(True)
+#            self.triangle.setplotGenBest_tst(dim, ax[i], name = "triangle")
+#            self.trapezoid.setplotGenBest_tst(dim, ax[i], name = "trapezoid")
+#            self.rectangle.setplotGenBest_tst(dim, ax[i], name = "rectangle")
+#            self.gaussian.setplotGenBest_tst(dim, ax[i], name = "gaussian")
+#            self.multi.setplotGenBest_tst(dim, ax[i], name = "multi")      
+#            ax[i].legend(loc='upper right')
+#            ax[i].set_title("dim:" + str(dim))
+#            buf_x = ax[i].get_xlim()
+#            buf_y = ax[i].get_ylim()
+#            if buf_x[0] < x_lim[0]:
+#                x_lim[0] = buf_x[0]
+#            if buf_x[1] > x_lim[1]:
+#                x_lim[1] = buf_x[1]
+#            if buf_y[0] < y_lim[0]:
+#                y_lim[0] = buf_y[0]
+#            if buf_y[1] > y_lim[1]:
+#                y_lim[1] = buf_y[1]        
+#        
+#        for buf in ax:
+#            buf.set_xlim(x_lim)
+#            buf.set_ylim(y_lim)
+#            buf.set_xticks(range(2, int(x_lim[1]), lim(x_lim[0], x_lim[1])))
+#            buf.set_xlabel("number of rule")
+#            buf.set_ylabel("error rate[%]")
+#        figSave(fig, self.datasetname + "_Result_Step_Best_Dtst", self.datasetname)
         
     def plot_final(self):
         dim = gen_plot
@@ -769,7 +804,7 @@ class ruleset(XML):
             population = trial[gen_plot]
             for individual in population.individual:
                 check = {i : False for i in range(classNum)}
-                for l, SingleRule in enumerate(individual.rules.values()):
+                for l, SingleRule in result(individual.rules.values()):
                     check[SingleRule.conclusion] = True
                 if(all(check.values())):
                     if len(individual.rules) < ruleNum:

@@ -5,3 +5,7 @@ MoFGBML_ver22_3回生実験用/result/
 MoFGBML_ver22_3回生実験用/xml/
 dataset_zip/
 /.metadata/
+dataset_viewer/*
+!dataset_viewer/*py
+result/xml/*
+!result/xml/*.py

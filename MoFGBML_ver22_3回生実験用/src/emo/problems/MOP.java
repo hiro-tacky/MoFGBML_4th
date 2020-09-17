@@ -11,7 +11,6 @@ import main.Consts;
 
 /**
  *
- * @author hirot
  * @param MIN 最小化目的問題用id (deault = 1)
  * @param MAX 最小化目的問題用id (deault = -1)
  * @param optimier MIN or MAX 識別用
