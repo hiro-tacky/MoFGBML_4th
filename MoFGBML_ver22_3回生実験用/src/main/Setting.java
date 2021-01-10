@@ -31,7 +31,7 @@ public class Setting {
 	public static ForkJoinPool forkJoinPool = null;
 
 	/** Using Main Experiment */
-	public static String experimentName = "Subdivision";
+	public static String experimentName = "MoFGBML";
 
 	public static int calclationType = 0;	//0:Single node, 1:Apache Spark, 2:Simple Socket
 
@@ -50,6 +50,8 @@ public class Setting {
 	/** FuzzySetType */
 	/** 99:multi 3:triangular 4:gaussian 7:trapezoid 9:rectangular */
 	public static int FuzzySetType = 99;
+    /** #of Inhomogeneous Partitions */
+    public static int[] PatitionNumSet = {2, 3, 4, 5};
 
 	/** Termination Criteria (true: generation, false: evaluation) */
 	public static boolean terminationCriteria = true;
@@ -128,6 +130,14 @@ public class Setting {
 		if(bundle.containsKey("parallelCores")) { parallelCores = Integer.parseInt(bundle.getString("parallelCores")); }
 
 		if(bundle.containsKey("FuzzySetType")){ FuzzySetType = Integer.parseInt(bundle.getString("FuzzySetType"));}
+
+		if(bundle.containsKey("PARTITION_NUM_SET")) {
+			int PatitionNumSetLength = bundle.getString("PARTITION_NUM_SET").split(",").length;
+			PatitionNumSet = new int[PatitionNumSetLength];
+			for(int i = 0; i < PatitionNumSetLength; i++) {
+				PatitionNumSet[i] = Integer.parseInt( bundle.getString("PARTITION_NUM_SET").split(",")[i] );
+			}
+		}
 
 		if(bundle.containsKey("terminationCriteria")) { terminationCriteria = Boolean.parseBoolean(bundle.getString("terminationCriteria")); }
 

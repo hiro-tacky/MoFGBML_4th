@@ -33,25 +33,42 @@ public class StaticFuzzyFunc {
 	}
 
 	@SuppressWarnings("rawtypes")
-	public static void initfuzzy_takigawa(DataSetInfo Dtra) {
+	public static void initfuzzy_multi(DataSetInfo Dtra) {
 		if(Consts.FUZZY_SET_INITIALIZE == 0) {
 			switch(Setting.FuzzySetType) {
-			case 99: multiInit(Dtra.getNdim()); break;
-			case 3: triangleInit(Dtra.getNdim()); break;
-			case 4: gaussianInit(Dtra.getNdim()); break;
-			case 7: trapezoidInit(Dtra.getNdim()); break;
-			case 9: rectangleInit(Dtra.getNdim()); break;
-		}
-			Consts.FUZZY_SET_NUM = kb.getFSs(0).length - 1;
+				case 99: multiInit(Dtra.getNdim()); break;
+				case 3: triangleInit(Dtra.getNdim()); break;
+				case 4: gaussianInit(Dtra.getNdim()); break;
+				case 7: trapezoidInit(Dtra.getNdim()); break;
+				case 9: rectangleInit(Dtra.getNdim()); break;
+			}
 		} else if(Consts.FUZZY_SET_INITIALIZE == 1) {
 			//Input FML file
 			String sep = File.separator;
 			String fileName = System.getProperty("user.dir") + sep + "dataset" + sep + Consts.XML_FILE;
 			initFML(fileName);
 		} else if(Consts.FUZZY_SET_INITIALIZE == 2) {
-			//Inhomogeneous
-			classEntropyInit((SingleDataSetInfo)Dtra, Consts.PARTITION_NUM, Consts.FUZZY_GRADE);
+			switch(Setting.FuzzySetType) {
+				case 99:
+					kb = new KB();
+					kb.classEntropyMultiInit((SingleDataSetInfo)Dtra, Setting.PatitionNumSet, Consts.FUZZY_GRADE);
+					break;
+				case 3:
+				case 7:
+					//Inhomogeneous
+					classEntropyInit((SingleDataSetInfo)Dtra, Setting.PatitionNumSet, Consts.FUZZY_GRADE);
+					break;
+				case 4:
+					kb = new KB();
+					kb.classEntropyGaussianInit((SingleDataSetInfo)Dtra, Setting.PatitionNumSet);
+					break;
+				case 9:
+					kb = new KB();
+					kb.classEntropyRectangleInit((SingleDataSetInfo)Dtra, Setting.PatitionNumSet);
+					break;
+			}
 		}
+		Consts.FUZZY_SET_NUM = kb.getFSs(0).length - 1;
 	}
 
 	@SuppressWarnings("rawtypes")
@@ -65,13 +82,11 @@ public class StaticFuzzyFunc {
 			initFML(fileName);
 		} else if(Consts.FUZZY_SET_INITIALIZE == 2) {
 			//Inhomogeneous
-			classEntropyInit((SingleDataSetInfo)Dtra, Consts.PARTITION_NUM, Consts.FUZZY_GRADE);
-		} else if(Consts.FUZZY_SET_INITIALIZE == 3) {
-
+			classEntropyInit((SingleDataSetInfo)Dtra, Setting.PatitionNumSet, Consts.FUZZY_GRADE);
 		}
 	}
 
-	public static void classEntropyInit(SingleDataSetInfo tra, int K, double F) {
+	public static void classEntropyInit(SingleDataSetInfo tra, int[] K, double F) {
 		kb = new KB();
 		kb.classEntropyInit(tra, K, F);
 	}
@@ -92,7 +107,7 @@ public class StaticFuzzyFunc {
 		kb = new KB();
 		kb.homogeneousInit(Ndim);
 	}
-	
+
 	/**
 	 * <h1>Initialize Fuzzy Set - ファジィ集合初期化</h1><br>
 	 * 2-5分割の等分割三角型ファジィ集合 + Don't Careの15種を全attributeに定義<br>
@@ -114,7 +129,7 @@ public class StaticFuzzyFunc {
 		kb = new KB();
 		kb.rectangleInit(Ndim);
 	}
-	
+
 	/**
 	 * <h1>Initialize Fuzzy Set - ファジィ集合初期化</h1><br>
 	 * 2-5分割の等分割ガウシアン型ファジィ集合 + Don't Careの15種を全attributeに定義<br>
@@ -125,7 +140,7 @@ public class StaticFuzzyFunc {
 		kb = new KB();
 		kb.gaussianInit(Ndim);
 	}
-	
+
 	/**
 	 * <h1>Initialize Fuzzy Set - ファジィ集合初期化</h1><br>
 	 * 2-5分割の等分割台形型ファジィ集合 + Don't Careの15種を全attributeに定義<br>
@@ -136,7 +151,7 @@ public class StaticFuzzyFunc {
 		kb = new KB();
 		kb.trapezoidInit(Ndim);
 	}
-	
+
 	/**
 	 * 三角型，区間型，台形型，ガウシアン型，Don't Care を持つファジィ集合
 	 *

@@ -43,7 +43,7 @@ public class KB {
 
 	// ************************************************************
 
-	public void classEntropyInit(SingleDataSetInfo tra, int K, double F) {
+	public void classEntropyInit(SingleDataSetInfo tra, int[] K, double F) {
 		ArrayList<ArrayList<double[]>> trapezoids = FuzzyPartitioning.startPartition(tra, K, F);
 
 		this.Ndim = trapezoids.size();
@@ -66,13 +66,128 @@ public class KB {
 												FuzzyTermType.TYPE_trapezoidShape,
 												points[k]);
 			}
+		}
+
+	}
+	/**
+	 * エントロピーに基づいたガウシアン型ファジィ集合の生成
+	 *
+	 * @param tra データセット
+	 * @param K 分割数のリスト
+	 */
+	public void classEntropyGaussianInit(SingleDataSetInfo tra, int[] K) {
+		Partitions partitions = new Partitions(tra.getNdim());
+		partitions.makePartition(tra, K);
+
+		this.Ndim = partitions.getNdim();
+
+		FSs = new FuzzySet[Ndim][];
+		float[] dontCare = new float[] {0f, 1f};
+
+		float[][][] params = partitions.gaussian();
+		for(int dim_i = 0; dim_i < Ndim; dim_i++) {
+			float[][] points = new float[params[dim_i].length][2];
+			for(int k = 0; k < points.length; k++) {
+				for(int param_i = 0; param_i < points[k].length; param_i++) {
+					points[k][param_i] = params[dim_i][k][param_i];
+				}
+			}
+
+			FSs[dim_i] = new FuzzySet[points.length + 1];
+			FSs[dim_i][0] = new FuzzySet("0", FuzzyTermType.TYPE_rectangularShape, dontCare);
+			FSs[dim_i][0].setShapeType(Consts.DONT_CARE_SHAPE_TYPE_ID);
 			for(int k = 0; k < points.length; k++) {
 				FSs[dim_i][k+1] = new FuzzySet( String.valueOf(k+1),
-												FuzzyTermType.TYPE_trapezoidShape,
+												FuzzyTermType.TYPE_gaussianShape,
 												points[k]);
 			}
 		}
+	}
+	/**
+	 * エントロピーに基づいた区間型ファジィ集合の生成
+	 *
+	 * @param tra データセット
+	 * @param K 分割数のリスト
+	 */
+	public void classEntropyRectangleInit(SingleDataSetInfo tra, int[] K) {
+		Partitions partitions = new Partitions(tra.getNdim());
+		partitions.makePartition(tra, K);
 
+		this.Ndim = partitions.getNdim();
+
+		FSs = new FuzzySet[Ndim][];
+		float[] dontCare = new float[] {0f, 1f};
+
+		float[][][] params = partitions.gaussian();
+		for(int dim_i = 0; dim_i < Ndim; dim_i++) {
+			float[][] points = new float[params[dim_i].length][2];
+			for(int k = 0; k < points.length; k++) {
+				for(int param_i = 0; param_i < points[k].length; param_i++) {
+					points[k][param_i] = params[dim_i][k][param_i];
+				}
+			}
+
+			FSs[dim_i] = new FuzzySet[points.length + 1];
+			FSs[dim_i][0] = new FuzzySet("0", FuzzyTermType.TYPE_rectangularShape, dontCare);
+			FSs[dim_i][0].setShapeType(Consts.DONT_CARE_SHAPE_TYPE_ID);
+			for(int k = 0; k < points.length; k++) {
+				FSs[dim_i][k+1] = new FuzzySet( String.valueOf(k+1),
+												FuzzyTermType.TYPE_rectangularShape,
+												points[k]);
+			}
+		}
+	}
+
+	public void classEntropyMultiInit(SingleDataSetInfo tra, int[] K, double F) {
+		Partitions partitions = new Partitions(tra.getNdim());
+		partitions.makePartition(tra, K);
+
+		this.Ndim = partitions.getNdim();
+
+		FSs = new FuzzySet[Ndim][];
+		float[] dontCare = new float[] {0f, 1f};
+
+		float[][][] params_gaussian = partitions.gaussian();
+		float[][][] params_rectangle = partitions.rectangle();
+		ArrayList<ArrayList<double[]>> params_trapezoid = FuzzyPartitioning.startPartition(tra, K, F);
+
+		for(int dim_i = 0; dim_i < Ndim; dim_i++) {
+			float[][] points_gaussian = new float[params_gaussian[dim_i].length][2];
+			for(int k = 0; k < points_gaussian.length; k++) {
+				for(int param_i = 0; param_i < points_gaussian[k].length; param_i++) {
+					points_gaussian[k][param_i] = params_gaussian[dim_i][k][param_i];
+				}
+			}
+			float[][] points_rectangle = new float[params_rectangle[dim_i].length][2];
+			for(int k = 0; k < params_rectangle.length; k++) {
+				for(int param_i = 0; param_i < points_rectangle[k].length; param_i++) {
+					points_rectangle[k][param_i] = params_rectangle[dim_i][k][param_i];
+				}
+			}
+			float[][] points_trapezoid = new float[params_trapezoid.get(dim_i).size()][4];
+			for(int k = 0; k < points_trapezoid.length; k++) {
+				for(int param_i = 0; param_i < 4; param_i++) {
+					points_trapezoid[k][param_i] = (float)params_trapezoid.get(dim_i).get(k)[param_i];
+				}
+			}
+
+			int FuzzySetSize = points_gaussian.length + points_rectangle.length + points_trapezoid.length + 1;
+			FSs[dim_i] = new FuzzySet[FuzzySetSize];
+			FSs[dim_i][0] = new FuzzySet("0", FuzzyTermType.TYPE_rectangularShape, dontCare);
+			FSs[dim_i][0].setShapeType(Consts.DONT_CARE_SHAPE_TYPE_ID);
+			int tmp = 0;
+			for(int k = 0; k < points_gaussian.length; k++) {
+				FSs[dim_i][tmp+k+1] = new FuzzySet( String.valueOf(k+1),FuzzyTermType.TYPE_gaussianShape,points_gaussian[k]);
+			}
+			tmp += points_gaussian.length;
+			for(int k = 0; k < points_rectangle.length; k++) {
+				FSs[dim_i][tmp+k+1] = new FuzzySet( String.valueOf(k+1),FuzzyTermType.TYPE_rectangularShape,points_gaussian[k]);
+			}
+			tmp += points_rectangle.length;
+			for(int k = 0; k < points_trapezoid.length; k++) {
+				FSs[dim_i][tmp+k+1] = new FuzzySet( String.valueOf(k+1),FuzzyTermType.TYPE_trapezoidShape,points_gaussian[k]);
+			}
+		}
 	}
 
 	public void threeTriangle(int Ndim) {

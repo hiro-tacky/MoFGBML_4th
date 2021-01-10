@@ -17,7 +17,7 @@ public class FuzzyPartitioning {
 
 	// ************************************************************
 
-	public static ArrayList<ArrayList<double[]>> startPartition(SingleDataSetInfo tra, int K, double F){
+	public static ArrayList<ArrayList<double[]>> startPartition(SingleDataSetInfo tra, int[] K, double F){
 		ArrayList<ArrayList<double[]>> trapezoids = new ArrayList<ArrayList<double[]>>();
 
 		for(int dim_i = 0; dim_i < tra.getNdim(); dim_i++) {
@@ -43,14 +43,60 @@ public class FuzzyPartitioning {
 					else {return 0;}
 				}
 			});
+			for(int k: K) {
+				//Step 2. Optimal Splitting.
+				ArrayList<Double> partitions = optimalSplitting(patterns, k, tra.getCnum());
 
-			//Step 2. Optimal Splitting.
-			ArrayList<Double> partitions = optimalSplitting(patterns, K, tra.getCnum());
-
-			//Step 3. Fuzzify partitions
-			trapezoids.add(makeTrapezoids(partitions, F));
+				//Step 3. Fuzzify partitions
+				trapezoids.add(makeTrapezoids(partitions, F));
+			}
 		}
 		return trapezoids;
+	}
+
+	/**
+	 * エントロピーに基づいた境界を返す．
+	 *
+	 * @param tra データセット
+	 * @param K 分割数の配列
+	 * @return boundaries[属性値][分割数][境界値]
+	 */
+	public static ArrayList<ArrayList<ArrayList<Double>>> makePartition(SingleDataSetInfo tra, int[] K){
+		ArrayList<ArrayList<ArrayList<Double>>> boundaries = new ArrayList<ArrayList<ArrayList<Double>>>();
+
+		for(int dim_i = 0; dim_i < tra.getNdim(); dim_i++) {
+			//Step 0. Judge Categoric.
+			if(tra.getPattern(0).getDimValue(dim_i) < 0) {
+				//If it's categoric, do NOT partitinon.
+				boundaries.add(new ArrayList<ArrayList<Double>>());
+				continue;
+			}
+
+			//Step 1. Sort patterns by attribute "dim_i"
+			ArrayList<ForSortPattern> patterns = new ArrayList<ForSortPattern>();
+			for(int p = 0; p < tra.getDataSize(); p++) {
+				patterns.add( new ForSortPattern(tra.getPattern(p).getDimValue(dim_i),
+						tra.getPattern(p).getConClass()));
+			}
+			Collections.sort(patterns, new Comparator<ForSortPattern>() {
+				@Override
+				//Ascending Order
+				public int compare(ForSortPattern o1, ForSortPattern o2) {
+					if(o1.getX() > o2.getX()) {return 1;}
+					else if(o1.getX() < o2.getX()) {return -1;}
+					else {return 0;}
+				}
+			});
+
+			//Step 3. add boundaries
+			for(int k: K) {
+				// Optimal Splitting.
+				ArrayList<Double> partitions = optimalSplitting(patterns, k, tra.getCnum());
+
+				boundaries.get(dim_i).add(partitions);
+			}
+		}
+		return boundaries;
 	}
 
 	/**
