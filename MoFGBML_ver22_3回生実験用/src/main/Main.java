@@ -94,7 +94,7 @@ public class Main {
 		/* ********************************************************* */
 		//Repeat x-fold cross-validation
 
-		
+
 		//Make result directries
 		Calendar calendar = Calendar.getInstance();
 		SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd-HHmm");
@@ -106,14 +106,14 @@ public class Main {
 		//ファイル名構築
 		String resultRoot = System.getProperty("user.dir") + sep + "result" + sep
 							+ Setting.saveDir + sep + Setting.dataName + "_" + id;
-		
+
 		//実験試行
-		int FuzzySetType[] = {99, 3, 4, 7, 9};
+//		int FuzzySetType[] = {99, 3, 4, 7, 9};
 		/** 99:multi 3:triangular 4:gaussian 7:trapezoid 9:rectangular */
-		for(int v :FuzzySetType) {
-			Setting.FuzzySetType = v;
+//		for(int i=0; i<ExperimentInfo.experimentInfoSetNum; i++) {
+			ExperimentInfo.experimentInfoSet(9);
 			repeatExection(args, resultRoot);
-		}
+//		}
 		/* ********************************************************* */
 
 		Date end = new Date();
@@ -197,7 +197,7 @@ public class Main {
 		resultMaster.outputTimes(fileName);
 
 		String FuzzyTypeName = "";
-		switch(Setting.FuzzySetType) {
+		switch(ExperimentInfo.FuzzySetType) {
 			case 99: FuzzyTypeName = "multi"; break;
 			case 3: FuzzyTypeName = "triangle"; break;
 			case 4: FuzzyTypeName = "gaussian"; break;

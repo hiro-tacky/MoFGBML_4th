@@ -65,10 +65,10 @@ public class FuzzyPartitioning {
 		ArrayList<ArrayList<ArrayList<Double>>> boundaries = new ArrayList<ArrayList<ArrayList<Double>>>();
 
 		for(int dim_i = 0; dim_i < tra.getNdim(); dim_i++) {
+			boundaries.add(new ArrayList<ArrayList<Double>>());
 			//Step 0. Judge Categoric.
 			if(tra.getPattern(0).getDimValue(dim_i) < 0) {
 				//If it's categoric, do NOT partitinon.
-				boundaries.add(new ArrayList<ArrayList<Double>>());
 				continue;
 			}
 
@@ -116,16 +116,17 @@ public class FuzzyPartitioning {
 		//Step 1. Collect class changing point.
 		ArrayList<Double> candidate = new ArrayList<>();
 		double point = 0;
-		candidate.add(point);
+//		candidate.add(point);
 		for(int p = 1; p < patterns.size(); p++) {
 			if(patterns.get(p-1).getConClass() != patterns.get(p).getConClass()) {
 				point = 0.5 * (patterns.get(p-1).getX() + patterns.get(p).getX());
 			}
-			if(!candidate.contains(point)) {
+
+			if(!candidate.contains(point) && point != 0 && point != 1) {
 				candidate.add(point);
 			}
 		}
-		candidate.remove(0);
+//		candidate.remove(0);
 
 		//Step 2. Search K partitions which minimize class-entropy.
 		for(int k = 2; k <= K; k++) {

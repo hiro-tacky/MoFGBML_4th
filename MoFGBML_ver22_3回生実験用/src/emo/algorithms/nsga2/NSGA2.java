@@ -16,6 +16,7 @@ import ga.Individual;
 import ga.Population;
 import ga.PopulationManager;
 import main.Consts;
+import main.ExperimentInfo;
 import main.Setting;
 import method.MersenneTwisterFast;
 import method.ResultMaster;
@@ -164,7 +165,7 @@ public class NSGA2<T extends Pittsburgh> extends Algorithm<T>{
 					}
 
 					//Step 3. Mutation
-					if(Setting.FuzzySetType == 99) {
+					if(ExperimentInfo.FuzzySetType == 99) {
 						GAFunctions.pittsburghMutationMulti(child, mop.getTrain(), rnd);
 					}else {
 						GAFunctions.pittsburghMutation(child, mop.getTrain(), rnd);

@@ -102,6 +102,7 @@ public class KB {
 												points[k]);
 			}
 		}
+		int n = 0; //消せ
 	}
 	/**
 	 * エントロピーに基づいた区間型ファジィ集合の生成
@@ -159,7 +160,7 @@ public class KB {
 				}
 			}
 			float[][] points_rectangle = new float[params_rectangle[dim_i].length][2];
-			for(int k = 0; k < params_rectangle.length; k++) {
+			for(int k = 0; k < points_rectangle.length; k++) {
 				for(int param_i = 0; param_i < points_rectangle[k].length; param_i++) {
 					points_rectangle[k][param_i] = params_rectangle[dim_i][k][param_i];
 				}
@@ -180,12 +181,14 @@ public class KB {
 				FSs[dim_i][tmp+k+1] = new FuzzySet( String.valueOf(k+1),FuzzyTermType.TYPE_gaussianShape,points_gaussian[k]);
 			}
 			tmp += points_gaussian.length;
+
 			for(int k = 0; k < points_rectangle.length; k++) {
-				FSs[dim_i][tmp+k+1] = new FuzzySet( String.valueOf(k+1),FuzzyTermType.TYPE_rectangularShape,points_gaussian[k]);
+				FSs[dim_i][tmp+k+1] = new FuzzySet( String.valueOf(k+1),FuzzyTermType.TYPE_rectangularShape,points_rectangle[k]);
 			}
 			tmp += points_rectangle.length;
+
 			for(int k = 0; k < points_trapezoid.length; k++) {
-				FSs[dim_i][tmp+k+1] = new FuzzySet( String.valueOf(k+1),FuzzyTermType.TYPE_trapezoidShape,points_gaussian[k]);
+				FSs[dim_i][tmp+k+1] = new FuzzySet( String.valueOf(k+1),FuzzyTermType.TYPE_trapezoidShape,points_trapezoid[k]);
 			}
 		}
 	}

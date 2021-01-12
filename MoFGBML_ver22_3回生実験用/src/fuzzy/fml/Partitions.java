@@ -12,6 +12,7 @@ import fuzzy.FuzzyPartitioning;
  *
  */
 public class Partitions {
+	/** データセットの次元数 */
 	int Ndim;
 	ArrayList<ArrayList<ArrayList<Double>>> partitions;
 	int[] numPartitions;
@@ -37,21 +38,7 @@ public class Partitions {
 	public int numPartitions(int dim) {
 		int numPartitions = 0;
 		for(ArrayList<Double> partitions_list: this.partitions.get(dim)) {
-			numPartitions += partitions_list.size();
-		}
-		return numPartitions;
-	}
-
-	/**
-	 * 任意の次元の分割数を求める
- 	 * @return
-	 */
-	public int sumPartitions() {
-		int numPartitions = 0;
-		for(ArrayList<ArrayList<Double>> partition_sets: this.partitions) {
-			for(ArrayList<Double> partition_list: partition_sets) {
-				numPartitions += partition_list.size();
-			}
+			numPartitions += partitions_list.size()-1;
 		}
 		return numPartitions;
 	}
@@ -64,20 +51,21 @@ public class Partitions {
 	public float[][][] gaussian(){
 		float[][][] params = new float[this.Ndim][][];
 		for(int dim_i=0; dim_i<this.partitions.size(); dim_i++) {
-			ArrayList<ArrayList<Double>> partition_sets = this.partitions.get(dim_i);
 			params[dim_i] = new float[this.numPartitions[dim_i]][2];
-			for(ArrayList<Double> partition_list: partition_sets) {
+			int tmp = 0;
+			for(ArrayList<Double> partition_list: this.partitions.get(dim_i)) {
 				for(int i=0; i<partition_list.size()-1; i++) {
 					//最初と最後だけ頂点が区間端になるようにする．
 					if(i == 0){
-						params[dim_i][i] = calcGaussParam(0, (float)(double)partition_list.get(i+1), 0.5f);
+						params[dim_i][tmp+i] = calcGaussParam(0, (float)(double)partition_list.get(i+1), 0.5f);
 					}else if(i == partition_list.size()-2) {
-						params[dim_i][i] = calcGaussParam(1, (float)(double)partition_list.get(i), 0.5f);
+						params[dim_i][tmp+i] = calcGaussParam(1, (float)(double)partition_list.get(i), 0.5f);
 					}else {
 						double left = partition_list.get(i), right = partition_list.get(i+1);
-						params[dim_i][i] = calcGaussParam((float)(left + right)/2, (float)(double)partition_list.get(i), 0.5f);
+						params[dim_i][tmp+i] = calcGaussParam((float)(left + right)/2, (float)(double)partition_list.get(i), 0.5f);
 					}
 				}
+				tmp += partition_list.size()-1;
 			}
 		}
 		return params;
@@ -91,12 +79,13 @@ public class Partitions {
 	public float[][][] rectangle(){
 		float[][][] params = new float[this.Ndim][][];
 		for(int dim_i=0; dim_i<this.partitions.size(); dim_i++) {
-			ArrayList<ArrayList<Double>> partition_sets = this.partitions.get(dim_i);
 			params[dim_i] = new float[this.numPartitions[dim_i]][2];
-			for(ArrayList<Double> partition_list: partition_sets) {
+			int tmp = 0;
+			for(ArrayList<Double> partition_list: this.partitions.get(dim_i)) {
 				for(int i=0; i<partition_list.size()-1; i++) {
-					params[dim_i][i] = new float[] {(float)(double)partition_list.get(i), (float)(double)partition_list.get(i)};
+					params[dim_i][tmp+i] = new float[] {(float)(double)partition_list.get(i), (float)(double)partition_list.get(i+1)};
 				}
+				tmp += partition_list.size()-1;
 			}
 		}
 		return params;

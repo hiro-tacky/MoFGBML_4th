@@ -12,6 +12,7 @@ import data.Pattern;
 import data.SingleDataSetInfo;
 import fuzzy.fml.KB;
 import main.Consts;
+import main.ExperimentInfo;
 import main.Setting;
 import method.MersenneTwisterFast;
 
@@ -35,7 +36,7 @@ public class StaticFuzzyFunc {
 	@SuppressWarnings("rawtypes")
 	public static void initfuzzy_multi(DataSetInfo Dtra) {
 		if(Consts.FUZZY_SET_INITIALIZE == 0) {
-			switch(Setting.FuzzySetType) {
+			switch(ExperimentInfo.FuzzySetType) {
 				case 99: multiInit(Dtra.getNdim()); break;
 				case 3: triangleInit(Dtra.getNdim()); break;
 				case 4: gaussianInit(Dtra.getNdim()); break;
@@ -48,7 +49,7 @@ public class StaticFuzzyFunc {
 			String fileName = System.getProperty("user.dir") + sep + "dataset" + sep + Consts.XML_FILE;
 			initFML(fileName);
 		} else if(Consts.FUZZY_SET_INITIALIZE == 2) {
-			switch(Setting.FuzzySetType) {
+			switch(ExperimentInfo.FuzzySetType) {
 				case 99:
 					kb = new KB();
 					kb.classEntropyMultiInit((SingleDataSetInfo)Dtra, Setting.PatitionNumSet, Consts.FUZZY_GRADE);

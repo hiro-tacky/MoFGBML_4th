@@ -41,7 +41,48 @@ public class ExperimentInfo {
 	/** #of Offspring */
 	public static int offspringSize = 50;
 
+	/** num of experimentInfoSet */
+	public static int experimentInfoSetNum = 5;
+
 	// ************************************************************
+
+
+	/**
+	 * 引数に応じた実験設定に変更する
+	 *
+	 * @param index
+	 */
+	public static void experimentInfoSet(int index){
+		switch (index) {
+		case 0:
+			ExperimentInfo.setSaveDir("multi");
+			ExperimentInfo.setFuzzySetType(99);
+			break;
+
+		case 1:
+			ExperimentInfo.setSaveDir("triangular");
+			ExperimentInfo.setFuzzySetType(3);
+			break;
+
+		case 2:
+			ExperimentInfo.setSaveDir("gaussian");
+			ExperimentInfo.setFuzzySetType(4);
+			break;
+
+		case 3:
+			ExperimentInfo.setSaveDir("trapezoid");
+			ExperimentInfo.setFuzzySetType(7);
+			break;
+
+		case 4:
+			ExperimentInfo.setSaveDir("rectangular");
+			ExperimentInfo.setFuzzySetType(9);
+			break;
+
+		}
+	}
+
+
 	public static void setSettings(String dir, String source) {
 
 		URLClassLoader urlLoader = null;
@@ -74,6 +115,81 @@ public class ExperimentInfo {
 
 	}
 
+
+
+	public static boolean isUseArgs() {
+		return useArgs;
+	}
+
+
+
+	public static void setUseArgs(boolean useArgs) {
+		ExperimentInfo.useArgs = useArgs;
+	}
+
+
+
+	public static String getDataName() {
+		return dataName;
+	}
+
+
+
+	public static void setDataName(String dataName) {
+		ExperimentInfo.dataName = dataName;
+	}
+
+
+
+	public static String getSaveDir() {
+		return saveDir;
+	}
+
+
+
+	public static void setSaveDir(String saveDir) {
+		ExperimentInfo.saveDir = saveDir;
+	}
+
+
+
+	public static int getFuzzySetType() {
+		return FuzzySetType;
+	}
+
+
+
+	public static void setFuzzySetType(int fuzzySetType) {
+		FuzzySetType = fuzzySetType;
+	}
+
+
+
+	public static int getPopulationSize() {
+		return populationSize;
+	}
+
+
+
+	public static void setPopulationSize(int populationSize) {
+		ExperimentInfo.populationSize = populationSize;
+	}
+
+
+
+	public static int getOffspringSize() {
+		return offspringSize;
+	}
+
+
+
+	public static void setOffspringSize(int offspringSize) {
+		ExperimentInfo.offspringSize = offspringSize;
+	}
+
+
+
+
 	public String getStaticValues() {
 		StringBuilder sb = new StringBuilder();
 		String sep = System.lineSeparator();
@@ -91,3 +207,4 @@ public class ExperimentInfo {
 	}
 
 }
+
