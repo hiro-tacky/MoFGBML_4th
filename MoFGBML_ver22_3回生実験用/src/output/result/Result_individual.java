@@ -30,11 +30,11 @@ public class Result_individual {
 		ruleNum = input.getRuleSet().getRuleNum();
 		//ruleLength
 		ruleLength = input.getRuleSet().getRuleLength();
-
-		//rank
-		rank = input.getRank();
-		//crowding distance
-		crowding = input.getCrowding();
+//
+//		//rank
+//		rank = input.getRank();
+//		//crowding distance
+//		crowding = input.getCrowding();
 
 	}
 

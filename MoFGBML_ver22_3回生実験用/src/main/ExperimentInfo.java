@@ -36,6 +36,9 @@ public class ExperimentInfo {
 	* 99:multi 3:triangular 4:gaussian 7:trapezoid 9:rectangular */
 	public static int FuzzySetType = 99;
 
+	/** 使用中のファジィセットの名前 */
+	public static String FuzzyTypeName = "multi";
+
 	/** #of Population */
 	public static int populationSize = 50;
 	/** #of Offspring */
@@ -44,12 +47,21 @@ public class ExperimentInfo {
 	/** num of experimentInfoSet */
 	public static int experimentInfoSetNum = 5;
 
+	/** 比較実験のセットのリスト．experimentInfoSet()のswitch関数のindexに対応 */
+	public static int[] experimentInfoSetList = {0, 2, 3, 4};
+
+	/** 比較実験のセットのリストから実行中の実験セットのindex．最初からやる場合は-1に設定*/
+	public static int experimentInfoSetListIndex = -1;
+
+	/** 実験中のセットのID．experimentInfoSet()のswitch関数のindexに対応 */
+	public static int experimentInfoSetListID = 0;
+
 	// ************************************************************
 
 
 	/**
-	 * 引数に応じた実験設定に変更する
-	 *
+	 * 引数に応じた実験設定に変更する<br>
+	 * 設定した実験セットのindexをexperimentInfoSetListに入れると実行される．
 	 * @param index
 	 */
 	public static void experimentInfoSet(int index){
@@ -57,31 +69,49 @@ public class ExperimentInfo {
 		case 0:
 			ExperimentInfo.setSaveDir("multi");
 			ExperimentInfo.setFuzzySetType(99);
+			ExperimentInfo.setFuzzyTypeName("multi");
 			break;
 
 		case 1:
 			ExperimentInfo.setSaveDir("triangular");
 			ExperimentInfo.setFuzzySetType(3);
+			ExperimentInfo.setFuzzyTypeName("triangular");
 			break;
 
 		case 2:
 			ExperimentInfo.setSaveDir("gaussian");
 			ExperimentInfo.setFuzzySetType(4);
+			ExperimentInfo.setFuzzyTypeName("gaussian");
 			break;
 
 		case 3:
 			ExperimentInfo.setSaveDir("trapezoid");
 			ExperimentInfo.setFuzzySetType(7);
+			ExperimentInfo.setFuzzyTypeName("trapezoid");
 			break;
 
 		case 4:
 			ExperimentInfo.setSaveDir("rectangular");
 			ExperimentInfo.setFuzzySetType(9);
+			ExperimentInfo.setFuzzyTypeName("rectangular");
 			break;
 
 		}
 	}
-
+	/** 次の実験セットに行く<br>
+	 * 設定した実験セットのindexをexperimentInfoSetListに入れると実行される．
+	 * @return 次の実験セットが存在する:正<br>存在しない:負 */
+	public static boolean nextExperimentInfoSet() {
+		if(ExperimentInfo.experimentInfoSetListIndex + 1 < ExperimentInfo.experimentInfoSetList.length) {
+			ExperimentInfo.experimentInfoSetListIndex++;
+			ExperimentInfo.setExperimentInfoSetListID(
+					ExperimentInfo.experimentInfoSetList[ExperimentInfo.experimentInfoSetListIndex]);
+			ExperimentInfo.experimentInfoSet(ExperimentInfo.experimentInfoSetListID);
+			return true;
+		}else {
+			return false;
+		}
+	}
 
 	public static void setSettings(String dir, String source) {
 
@@ -115,81 +145,6 @@ public class ExperimentInfo {
 
 	}
 
-
-
-	public static boolean isUseArgs() {
-		return useArgs;
-	}
-
-
-
-	public static void setUseArgs(boolean useArgs) {
-		ExperimentInfo.useArgs = useArgs;
-	}
-
-
-
-	public static String getDataName() {
-		return dataName;
-	}
-
-
-
-	public static void setDataName(String dataName) {
-		ExperimentInfo.dataName = dataName;
-	}
-
-
-
-	public static String getSaveDir() {
-		return saveDir;
-	}
-
-
-
-	public static void setSaveDir(String saveDir) {
-		ExperimentInfo.saveDir = saveDir;
-	}
-
-
-
-	public static int getFuzzySetType() {
-		return FuzzySetType;
-	}
-
-
-
-	public static void setFuzzySetType(int fuzzySetType) {
-		FuzzySetType = fuzzySetType;
-	}
-
-
-
-	public static int getPopulationSize() {
-		return populationSize;
-	}
-
-
-
-	public static void setPopulationSize(int populationSize) {
-		ExperimentInfo.populationSize = populationSize;
-	}
-
-
-
-	public static int getOffspringSize() {
-		return offspringSize;
-	}
-
-
-
-	public static void setOffspringSize(int offspringSize) {
-		ExperimentInfo.offspringSize = offspringSize;
-	}
-
-
-
-
 	public String getStaticValues() {
 		StringBuilder sb = new StringBuilder();
 		String sep = System.lineSeparator();
@@ -204,6 +159,72 @@ public class ExperimentInfo {
 			}
 		}
 		return sb.toString();
+	}
+	public static boolean isUseArgs() {
+		return useArgs;
+	}
+	public static void setUseArgs(boolean useArgs) {
+		ExperimentInfo.useArgs = useArgs;
+	}
+	public static String getDataName() {
+		return dataName;
+	}
+	public static void setDataName(String dataName) {
+		ExperimentInfo.dataName = dataName;
+	}
+	public static String getSaveDir() {
+		return saveDir;
+	}
+	public static void setSaveDir(String saveDir) {
+		ExperimentInfo.saveDir = saveDir;
+	}
+	public static int getFuzzySetType() {
+		return FuzzySetType;
+	}
+	public static void setFuzzySetType(int fuzzySetType) {
+		FuzzySetType = fuzzySetType;
+	}
+	public static String getFuzzyTypeName() {
+		return FuzzyTypeName;
+	}
+	public static void setFuzzyTypeName(String fuzzyTypeName) {
+		FuzzyTypeName = fuzzyTypeName;
+	}
+	public static int getPopulationSize() {
+		return populationSize;
+	}
+	public static void setPopulationSize(int populationSize) {
+		ExperimentInfo.populationSize = populationSize;
+	}
+	public static int getOffspringSize() {
+		return offspringSize;
+	}
+	public static void setOffspringSize(int offspringSize) {
+		ExperimentInfo.offspringSize = offspringSize;
+	}
+	public static int getExperimentInfoSetNum() {
+		return experimentInfoSetNum;
+	}
+	public static void setExperimentInfoSetNum(int experimentInfoSetNum) {
+		ExperimentInfo.experimentInfoSetNum = experimentInfoSetNum;
+	}
+	public static int[] getExperimentInfoSetList() {
+		return experimentInfoSetList;
+	}
+	public static void setExperimentInfoSetList(int[] experimentInfoSetList) {
+		ExperimentInfo.experimentInfoSetList = experimentInfoSetList;
+	}
+	public static int getExperimentInfoSetListIndex() {
+		return experimentInfoSetListIndex;
+	}
+	public static void setExperimentInfoSetListIndex(int experimentInfoSetListIndex) {
+		ExperimentInfo.experimentInfoSetListIndex = experimentInfoSetListIndex;
+	}
+	public static int getExperimentInfoSetListID() {
+		return experimentInfoSetListID;
+	}
+	public static void setExperimentInfoSetListID(int experimentInfoSetListID) {
+		ExperimentInfo.experimentInfoSetListID = experimentInfoSetListID;
 	}
 
 }

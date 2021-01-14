@@ -14,7 +14,9 @@ import fuzzy.FuzzyPartitioning;
 public class Partitions {
 	/** データセットの次元数 */
 	int Ndim;
+	/** 分割境界集合[次元][分割数][境界] ＊[境界]は2分割なら{0.0, 0.3, 1.0}といった感じ*/
 	ArrayList<ArrayList<ArrayList<Double>>> partitions;
+	/**	次元ごとの分割数の総数のリスト */
 	int[] numPartitions;
 
 	public Partitions(int Ndim) {
@@ -23,11 +25,36 @@ public class Partitions {
 		this.numPartitions = new int[Ndim];
 	}
 
+
+	/**
+	 * 分割区間を生成する
+	 * @param tra データセット
+	 * @param K 分割数のリスト
+	 */
 	public void makePartition(SingleDataSetInfo tra, int[] K) {
 		this.partitions = FuzzyPartitioning.makePartition(tra, K);
 		for(int dim_i=0; dim_i<this.Ndim; dim_i++) {
 			this.numPartitions[dim_i] = numPartitions(dim_i);
 		}
+	}
+
+	/**
+	 * 等分割の分割区間を生成する
+	 * @param K 分割数のリスト
+	 */
+	public void makeHomePartition(int[] K) {
+		ArrayList<ArrayList<ArrayList<Double>>> partitions_set = new ArrayList<ArrayList<ArrayList<Double>>>();
+		for(int i_dim=0; i_dim<this.Ndim; i_dim++) {
+			ArrayList<ArrayList<Double>> partition_list = new ArrayList<ArrayList<Double>>();
+			for(int k: K) {
+				ArrayList<Double> partition = new ArrayList<Double>();
+				for(int i=0; i<=k; i++) {
+					partition.add(((double)i)/k);
+				}
+				partition_list.add(partition);
+			}
+		}
+		this.partitions = partitions_set;
 	}
 
 	/**

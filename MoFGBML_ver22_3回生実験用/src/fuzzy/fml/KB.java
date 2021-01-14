@@ -119,7 +119,7 @@ public class KB {
 		FSs = new FuzzySet[Ndim][];
 		float[] dontCare = new float[] {0f, 1f};
 
-		float[][][] params = partitions.gaussian();
+		float[][][] params = partitions.rectangle();
 		for(int dim_i = 0; dim_i < Ndim; dim_i++) {
 			float[][] points = new float[params[dim_i].length][2];
 			for(int k = 0; k < points.length; k++) {

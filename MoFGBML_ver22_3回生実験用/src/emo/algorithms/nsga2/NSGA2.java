@@ -86,8 +86,6 @@ public class NSGA2<T extends Pittsburgh> extends Algorithm<T>{
 				if(individual.getRuleSet().getMicRules().size() != 0) {
 					break;
 				}
-
-
 			}
 
 			individual.ruleset2michigan();
