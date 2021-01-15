@@ -3,7 +3,7 @@ import xml.etree.ElementTree as ET
 import matplotlib.pyplot as plt
 import pandas as pd
 import os
-from datetime import datetime
+import datetime
 import glob
 
 
@@ -14,7 +14,7 @@ trial_num = 30 #試行回数
 gen_num = 5000 #世代数
 my_path = os.getcwd()
 FuzzyTypeID = {9:"rectangle", 7:"trapezoid", 3:"triangle", 4:"gaussian", 99:"multi"}
-gen_list = range(100, 5000+1, 100)
+gen_list = range(500, 5000+1, 500)
 trial_list = range(30)
 
 DatasetList = {
@@ -80,7 +80,7 @@ def SaveFig(fig, filePath, filename = None):
         print("image file name:")
         filename = input()
     os.makedirs(filePath, exist_ok=True)
-    now = datetime.now()
+    now = datetime.datetime.now()
     imageName = filename + "_{0:%Y%m%d%H%M%S}_{1:%f}.png".format(now, now)
     fig.savefig(my_path + '\\' + filePath + "\\" + imageName, transparent=False)     
 
@@ -121,10 +121,10 @@ class XML:
         nodelist(self.root)
         
         
-class result(XML):
+class resultXML(XML):
     """1つのxmlファイル(実験結果)用クラス"""
-    def __init__(self, filename):
-        super(result, self).__init__(filename)
+    def __init__(self, filePath):
+        super(resultXML, self).__init__(filePath)
         self.data = {}
         for i, trial in enumerate(self.root.findall('trial')):
             trial_buf = {}
@@ -232,34 +232,42 @@ class result(XML):
 ###################################################################################################
         
         
-class dataset():
+class Result():
     """データセットに対する全タイプの識別器の結果用クラス"""
     def __init__(self):
         print("dataset name:")
         self.datasetname = input()
         self.filename_set = set()
         self.resultObj_set = {} #オブジェクト用辞書 key:ファジィセット名 value:resultオブジェクト
-        self.folderList = ["5000_15"]
-        self.FuzzyTypeList = ["rectangle", "trapezoid", "triangle", "gaussian", "multi"]
-        for folderName in self.folderList:
-            for fuzzyType in self.FuzzyTypeList:
+        self.FuzzyTypeList = ["rectangular", "trapezoid", "gaussian", "multi"] #比較されるファジィタイプ
+        self.folderList = ["default", "entropy"] #比較するxmlファイルが存在するフォルダ
+        for fuzzyType in self.FuzzyTypeList:
+            resultObj_buf = {}
+            for folderName in self.folderList:
                 self.fileName = "*" + fuzzyType + "_result.xml"
-                self.pathList = glob.glob(folderName + "/" + self.datasetname + "*/" + self.datasetname + "*/" + self.fileName)
+                self.pathList = glob.glob(folderName + "/" + self.datasetname + "*/" + self.datasetname + "_" + fuzzyType + "*/" + self.fileName)
+                ############################################
+                #ラベルネーム変更忘れるな
+                label_name = folderName #比較される(同一画像に描写される)xmlファイルのネームラベル
+                figFileList = fuzzyType #生成される複数の画像のネームラベル
+                ############################################
                 for path in self.pathList:
+                    print(path)
+                    resultObj_buf[label_name] = resultXML(path)
                     
-                    ############################################
-                    label_name = fuzzyType #ラベルネーム変更忘れるな
-                    ############################################
-                    
-                    self.resultObj_set[label_name] = result(path)
+            self.resultObj_set[figFileList] = resultObj_buf
         
         #####################################################################
-        self.savePath = "result/" + self.datasetname + "/5000_15/" #変更忘れるな 
+        self.savePath = "result/" + self.datasetname + "/entropy-based/" #変更忘れるな 
         #####################################################################
         
         #(Dtst or Dtrs) or (Ave or Best)の4つの場合でメソッドを実行
         for tmp in [[True, True], [False, True], [True, False], [False, False]]:
             self.plot_result(isDtst = tmp[0], isAve = tmp[1])
+    
+    def getDataFrame(self, FuzzyType = "multi", folderName = "entropy"):
+        return self.resultObj_set[FuzzyType][folderName]
+        
         
     def plot_individuals(self, gen = gen_list, trial = trial_list, title = "Result_individuals", filename = None):
         """特定の個体の結果を出力する"""
@@ -296,6 +304,7 @@ class dataset():
 
 
     def plot_result(self, gen = gen_list, isDtst = True, isAve = True, title = None, filename = None):
+        d_today = datetime.date.today()
         if title is None:
             if isDtst and isAve:
                 fig_title = self.datasetname + " [Dtst's average of all individual of each gen]"
@@ -313,38 +322,40 @@ class dataset():
                 fig_title = self.datasetname + " [Dtra's average of best individual of each gen]"
                 filename = self.datasetname + "_Result_Step_Best_Dtra"   
                 savepath = self.savePath + "BestDtra/"
+        savepath = savepath + "{0:%Y%m%d}".format(d_today)+ "/"
         print(savepath)
         
         gen_tmp = [gen] if type(gen) is int else gen
-
-        x_lim,y_lim  = [1000, -1], [1000, -1]
-        for i, gen_buf in enumerate(gen_tmp):
-            fig =  singleFig_set(fig_title)
-            ax = fig.gca()
-            if isAve:
-                for FuzzySet_name, resultObj in self.resultObj_set.items():
-                    resultObj.setplotGenAve(gen_buf, ax, label_name = FuzzySet_name, title = "gen:" + str(gen_buf), isDtst = isDtst) 
-            elif not isAve:
-                for FuzzySet_name, resultObj in self.resultObj_set.items():
-                    resultObj.setplotGenBest(gen_buf, ax, label_name = FuzzySet_name, title = "gen:" + str(gen_buf), isDtst = isDtst)                  
-            ax.legend(loc='upper right')
-            buf_x, buf_y = ax.get_xlim(), ax.get_ylim()
-            if buf_x[0] < x_lim[0]: x_lim[0] = buf_x[0] 
-            if buf_x[1] > x_lim[1]: x_lim[1] = buf_x[1]
-            if buf_y[0] < y_lim[0]: y_lim[0] = buf_y[0]
-            if buf_y[1] > y_lim[1]: y_lim[1] = buf_y[1]
-            
-        fignums = plt.get_fignums()
-        for i, fignum in enumerate(fignums):
-            plt.figure(fignum)
-            fig = plt.gcf()
-            ax = fig.gca()
-            ax.set_xlim(x_lim)
-            ax.set_ylim(y_lim)
-            ax.set_xticks(range(2, int(x_lim[1]), lim(x_lim[0], x_lim[1])))
-            ax.set_xlabel("number of rule")
-            ax.set_ylabel("error rate[%]")
-            SaveFig(fig, savepath, filename + str(i).zfill(3))
-        plt.close('all')
+        
+        for FuzzyType, resultObj_dict in self.resultObj_set.items():
+            x_lim,y_lim  = [1000, -1], [1000, -1]
+            for gen_buf in gen_tmp:
+                fig =  singleFig_set(fig_title)
+                ax = fig.gca()
+                if isAve:
+                    for folderName, resultObj in resultObj_dict.items():
+                        resultObj.setplotGenAve(gen_buf, ax, label_name = folderName, title = "gen:" + str(gen_buf), isDtst = isDtst) 
+                elif not isAve:
+                    for folderName, resultObj in resultObj_dict.items():
+                        resultObj.setplotGenBest(gen_buf, ax, label_name = folderName, title = "gen:" + str(gen_buf), isDtst = isDtst)                  
+                ax.legend(loc='upper right')
+                buf_x, buf_y = ax.get_xlim(), ax.get_ylim()
+                if buf_x[0] < x_lim[0]: x_lim[0] = buf_x[0] 
+                if buf_x[1] > x_lim[1]: x_lim[1] = buf_x[1]
+                if buf_y[0] < y_lim[0]: y_lim[0] = buf_y[0]
+                if buf_y[1] > y_lim[1]: y_lim[1] = buf_y[1]
+                
+            fignums = plt.get_fignums()
+            for i, fignum in enumerate(fignums):
+                plt.figure(fignum)
+                fig = plt.gcf()
+                ax = fig.gca()
+                ax.set_xlim(x_lim)
+                ax.set_ylim(y_lim)
+                ax.set_xticks(range(2, int(x_lim[1]), lim(x_lim[0], x_lim[1])))
+                ax.set_xlabel("number of rule")
+                ax.set_ylabel("error rate[%]")
+                SaveFig(fig, savepath + FuzzyType + "/", filename + str(i).zfill(3))
+            plt.close('all')
         print("fin")
 

@@ -369,7 +369,7 @@ class main:
         except:
             print("no exist datafile")
             return
-        self.folderList = ["5000_7_8"]
+        self.folderList = ["default", "entropy"]
         self.FuzzyTypeList = ["rectangle", "trapezoid", "triangle", "gaussian", "multi"]
         self.pathList = []
         for folderName in self.folderList:
