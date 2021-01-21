@@ -239,23 +239,24 @@ class Result():
         self.datasetname = input()
         self.resultObj_set = {} #[FuzzyTypeList][folderList] = RuleSetXMLオブジェクト
         self.FuzzyTypeList = ["rectangular", "trapezoid", "gaussian", "multi"] #比較されるファジィタイプ
-        self.folderList = ["entropy"] #比較するxmlファイルが存在するフォルダ
+        self.folderList = ["default", "entropy"] #比較するxmlファイルが存在するフォルダ
         for fuzzyType in self.FuzzyTypeList:
             for folderName in self.folderList:
                 self.fileName = "*" + fuzzyType + "_result.xml"
                 self.pathList = glob.glob(folderName + "/" + self.datasetname + "*/" + self.datasetname + "_" + fuzzyType + "*/" + self.fileName)
                 ############################################
                 #ラベルネーム変更忘れるな
-                ExperimentName = folderName  #比較される(同一画像に描写される)xmlファイルのネームラベル
-                label_name = fuzzyType #生成される複数の画像のネームラベル
+                ExperimentName = fuzzyType   #比較される(同一画像に描写される)xmlファイルのネームラベル
+                label_name = folderName  #生成される複数の画像のネームラベル
                 ############################################
                 for path in self.pathList:
                     print(path)
                     print(ExperimentName, label_name)
+                    tmp = resultXML(path)
                     try:
-                        self.resultObj_set[ExperimentName][label_name] = resultXML(path)
+                        self.resultObj_set[ExperimentName][label_name] = tmp
                     except:
-                        self.resultObj_set[ExperimentName] = {label_name: resultXML(path)}
+                        self.resultObj_set[ExperimentName] = {label_name: tmp}
                     
             # self.resultObj_set[figFileList] = resultObj_buf
         

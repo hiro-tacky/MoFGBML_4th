@@ -5,6 +5,7 @@ import pandas as pd
 import os
 from datetime import datetime
 import glob
+from scipy.stats import gaussian_kde
 
 #######  setting  #######
 ###############################################################################
@@ -12,6 +13,7 @@ import glob
 trial_num = 30 #試行回数
 gen_num = 5000 #世代数
 individual_num = 50 #個体数
+partiton_num_set = (2, 3, 4, 5) #分割数のリスト
 my_path = os.getcwd()
 DontCareID = 99
 FuzzyTypeID = {9:"rectangle", 7:"trapezoid", 3:"triangle", 4:"gaussian", DontCareID:"DontCare"}
@@ -48,13 +50,6 @@ default_titlesize = 18
 
 lim = lambda s, g: int((g-s)/10) if int((g-s)/10) != 0 else 1
 
-def nodelist(root):
-    for i, child in enumerate(root):
-        if i<5 or i>len(list(root))-3:
-            txt = "node" if child.text == None else str(child.text)
-            print("{:3d}: {:20}{:10}{}".format(i, child.tag, str(txt), child.attrib))
-        elif i>9 and i<13:
-            print("         .")
         
 def singleFig_set(title = None):
         """保存する画像(グラフ1つ)の基本設定
@@ -94,8 +89,16 @@ class XML:
     def __init__(self, filename):
         self.tree = ET.parse(filename)
         self.rootNode = self.tree.getroot()
-        nodelist(self.rootNode)
+        self.nodelist(self.rootNode)
         self.CurrentElement = [] #木構造の現在参照しているノードの位置を保存する
+
+    def nodelist(self, root):
+        for i, child in enumerate(root):
+            if i<5 or i>len(list(root))-3:
+                txt = "node" if child.text == None else str(child.text)
+                print("{:3d}: {:20}{:10}{}".format(i, child.tag, str(txt), child.attrib))
+            elif i>9 and i<13:
+                print("         .")
         
     def down(self, id):
         """指定したIDの子要素を参照する"""
@@ -110,7 +113,7 @@ class XML:
         print("current node:" + buf.tag)
         print(buf.attrib)
         print("\n")
-        nodelist(buf)
+        self.nodelist(buf)
             
     def up(self):
         """指定したIDの親要素を参照する"""
@@ -121,22 +124,56 @@ class XML:
         print("current node:" + buf.tag)
         print(buf.attrib)
         print("\n")
-        nodelist(buf)
+        self.nodelist(buf)
             
     def root(self):
         """木の根にもどる"""
         self.CurrentElement.clear()
-        nodelist(self.rootNode)
+        self.nodelist(self.rootNode)
+        
+    def showAll(self):
+        buf = self.rootNode
+        for i in self.CurrentElement:
+            buf = buf[i]
+        for i, child in enumerate(buf):
+            txt = "node" if child.text == None else str(child.text)
+            print("{:3d}: {:20}{:10}{}".format(i, child.tag, str(txt), child.attrib))
             
 class detaset_df:
     def __init__(self, datasetName):
         self.datasetName = datasetName
         self.attributeNum = DatasetList[self.datasetName]["Attribute"]
-        df_original = pd.read_csv("./dataset/" + self.datasetName + ".csv", header=None)
-        df_buf = df_original.iloc[:, 0:self.attributeNum]
+        try:
+            df_original = pd.read_csv("./dataset/" + self.datasetName + ".csv", header=None)
+        except:
+            return
         classList_buf = df_original.iloc[:, self.attributeNum]
+        self.classList = set() #クラス名のリスト
+        for className in classList_buf:
+            self.classList.add(className)
+        df_buf = df_original.iloc[:, 0:self.attributeNum]
         self.df = pd.concat([(df_buf - df_buf.min()) / (df_buf.max() - df_buf.min()), classList_buf], axis=1, join='inner') #正規化されたdetaframe
-        # self.classDict = 
+        
+        self.dfByClass = {} #クラス別の正規化されたdataframe
+        for className in self.classList:
+            df_buf = self.df[self.df[self.attributeNum] == className]
+            self.dfByClass[className] = df_buf
+
+    def setAx(self, dim, ax):
+        ax2 = ax.twinx()
+        for className in self.classList:
+            kde_model = gaussian_kde(self.dfByClass[className][dim])
+            x_grid = np.linspace(0, max(self.dfByClass[className][dim]), num=100)
+            y = kde_model(x_grid)
+            ax2.plot(x_grid, y)
+    
+    def setAxHist(self, dim, ax):
+        ax2 = ax.twinx()
+        for c, className in enumerate(self.classList):
+            ax2.hist(self.dfByClass[className][dim], bins = 15, range = (0.0, 1.0), alpha = 0.5-0.07*c, color = cmap(c))
+            ax2.hist(self.dfByClass[className][dim], bins = 15, range = (0.0, 1.0), histtype="step", color = cmap(c))
+            ylim = ax2.get_ylim();
+            ax2.set_ylim(-0.05*ylim[1], ylim[1]*1.05)
         
 class FuzzyTerm:
     """Fuzzy Termのためのクラス"""
@@ -200,24 +237,46 @@ class KB:
                 FuzzyTerms_ByAttribute[int(fuzzyTermNode.get("ID"))] = FuzzyTerm(fuzzyTermNode)
             self.fuzzySets[int(fuzzySet.get("dimension"))] = FuzzyTerms_ByAttribute
         
-    def plot(self, savePath, isSave = True, inOneFig = False, Dataset_df = None):
-        if inOneFig:
+    def plot(self, savePath, isSave = True, inOneFig = False, Dataset_df = None, ByPartitoinNum = True, df = None):
+        if inOneFig and ByPartitoinNum: #FuzzySetByPartition
+            for dimension, FuzzySet in self.fuzzySets.items():
+                CurrentFuzzySetID = 1
+                while len(FuzzySet)>CurrentFuzzySetID:
+                    for partiton_num in partiton_num_set:
+                        fig = singleFig_set("KB_trial" + str(self.trial) + "_gen" + str(self.gen) + "_Attribute" + str(dimension) + "_Partition" + str(partiton_num))
+                        ax = fig.gca()
+                        if df is not None:
+                            df.setAx(dimension, ax)
+                        for i in range(partiton_num):
+                            FuzzySet[CurrentFuzzySetID + i].setAx(ax)
+                        if isSave:
+                            SaveFig(fig, savePath + "KnowledgeBase/FuzzySetByPartition/Attribute_" + str(dimension) + "/", \
+                                    self.datasetName + "_KB_trial" + str(self.trial) + "_gen" + str(self.gen) + "_Attribute" + str(dimension) + "_partition" + str(CurrentFuzzySetID) + "-" + str(CurrentFuzzySetID + partiton_num - 1))
+                        elif not isSave:
+                            fig.show()
+                        plt.close("all")
+                        CurrentFuzzySetID += partiton_num
+        elif inOneFig and not ByPartitoinNum: #FuzzySetALL
             for dimension, FuzzySet in self.fuzzySets.items():
                 fig = singleFig_set("KnowledgeBase_trial" + str(self.trial) + "_gen" + str(self.gen) + "_Attribute" + str(dimension))
                 ax = fig.gca()
+                if df is not None:
+                    df.setAx(dimension, ax)
                 for FuzzyTermID, FuzzyTerm in FuzzySet.items():
-                    self.fuzzySets[dimension][FuzzyTermID].setAx(ax)
+                    FuzzyTerm.setAx(ax)
                 if isSave:
                     SaveFig(fig, savePath + "KnowledgeBase/FuzzySetALL/", \
                             self.datasetName + "_KnowledgeBase_trial" + str(self.trial) + "_gen" + str(self.gen) + "_Attribute" + str(dimension))
                 elif not isSave:
                     fig.show()
                 plt.close("all")
-        elif not inOneFig:
+        elif not inOneFig: #FuzzySetSingle
             for dimension, FuzzySet in self.fuzzySets.items():
                 for FuzzyTermID, FuzzyTerm in FuzzySet.items():
                     fig = singleFig_set("KnowledgeBase_trial" + str(self.trial) + "_gen" + str(self.gen) + "_Attribute" + str(dimension) + "_FuzzyTermID" + str(FuzzyTermID))
                     ax = fig.gca()
+                    if df is not None:
+                        df.setAx(dimension, ax)
                     self.fuzzySets[dimension][FuzzyTermID].setAx(ax)
                     if isSave:
                         SaveFig(fig, savePath + "KnowledgeBase/FuzzySetSingle/Attribute_" + str(dimension) + "/", \
@@ -313,17 +372,17 @@ class RuleSetXML(XML):
     def getPopulation(self, ID_tuple):
         return self.ruleset[ID_tuple[0]][ID_tuple[1]]
     
-    def KBplot(self, trial = None, generation = None, inOneFig = False):
+    def KBplot(self, trial = None, generation = None, inOneFig = False, ByPartitoinNum = True, df = None):
         trial_list = [trial] if type(trial) is int else trial
         generation_list = [generation] if type(generation) is int else generation
         if trial is None and generation is None:
             for trialID, populations in self.ruleset.items():
                 for generation, population in populations.items():
-                    population.kb.plot(self.savePath + "trial_" + str(trialID) + "/generation_" + str(generation) + "/", isSave = True, inOneFig = inOneFig, Dataset_df = None)
+                    population.kb.plot(self.savePath + "trial_" + str(trialID) + "/generation_" + str(generation) + "/", isSave = True, inOneFig = inOneFig, Dataset_df = None, ByPartitoinNum = ByPartitoinNum, df = df)
         else:
             for trialID in trial_list:
                 for generationID in generation_list:
-                    self.ruleset[trialID][generationID].kb.plot(self.savePath + "trial_" + str(trialID) + "/generation_" + str(generation) + "/", isSave = True, inOneFig = inOneFig, Dataset_df = None)
+                    self.ruleset[trialID][generationID].kb.plot(self.savePath + "trial_" + str(trialID) + "/generation_" + str(generation) + "/", isSave = True, inOneFig = inOneFig, Dataset_df = None, ByPartitoinNum = ByPartitoinNum, df = df)
            
                 
     def IndividualsCoverAllclasses(self):
@@ -404,8 +463,8 @@ class RuleSet:
         print("RULESET\n dataset name:")
         self.datasetName = input()
         self.detaset_df = detaset_df(self.datasetName)
-        self.FuzzyTypeList = ["trapezoid"]#["rectangular", "trapezoid", "gaussian", "multi"]
-        self.folderList = ["entropy_0.7"] #["default", "entropy"]
+        self.FuzzyTypeList = ["rectangular", "trapezoid", "gaussian"]
+        self.folderList = ["entropy"] #["default", "entropy"]
         self.pathList = []
         self.RuleSetObj = {} #[FuzzyTypeList][folderList] = RuleSetXMLオブジェクト
         for fuzzyType in self.FuzzyTypeList:
@@ -416,10 +475,11 @@ class RuleSet:
                 self.savePath = "result/" + self.datasetName + "/" + folderName + "/" + fuzzyType + "/" #変更忘れるな 
                 for path in self.pathList:
                     print(path)
+                    print(fuzzyType, folderName)
                     RuleSetObj_buf[folderName] = RuleSetXML(path, self.savePath, self.datasetName)
             self.RuleSetObj[fuzzyType] = RuleSetObj_buf
             
-        self.KBplot()                
+        self.KBplot(inOneFig = True, ByPartitoinNum = True)                
             
     def getRuleSetXML(self, fuzzyType = "multi", folderName = "default"):
         return self.RuleSetObj[fuzzyType][folderName]
@@ -431,8 +491,8 @@ class RuleSet:
                     RuleSet.CoverAllClasses()
                 RuleSet.ByConclusion()
     
-    def KBplot(self):
+    def KBplot(self, inOneFig = True, ByPartitoinNum = True):
         for fuzzyType, RuleSetObj_dict in self.RuleSetObj.items():
             for folderName, RuleSet in RuleSetObj_dict.items():
                 print(RuleSet.savePath)
-                RuleSet.KBplot(0, 5000, inOneFig = True)
+                RuleSet.KBplot(0, 5000, inOneFig = inOneFig, ByPartitoinNum = ByPartitoinNum, df = self.detaset_df)
