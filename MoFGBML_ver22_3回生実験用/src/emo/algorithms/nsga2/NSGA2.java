@@ -9,7 +9,6 @@ import emo.algorithms.Algorithm;
 import fgbml.Pittsburgh;
 import fgbml.SinglePittsburgh;
 import fgbml.problem.FGBML;
-import fgbml.problem.OutputClass;
 import fuzzy.StaticFuzzyFunc;
 import ga.GAFunctions;
 import ga.Individual;
@@ -43,7 +42,7 @@ public class NSGA2<T extends Pittsburgh> extends Algorithm<T>{
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public void main(	FGBML mop, OutputClass output, T instance,
+	public void main(	FGBML mop, /*OutputClass output,*/ T instance,
 						ResultMaster resultMaster, MersenneTwisterFast rnd,
 						TimeWatcher timeWatcher, TimeWatcher evaWatcher, Result_MoFGBML master) {
 		/* ********************************************************* */

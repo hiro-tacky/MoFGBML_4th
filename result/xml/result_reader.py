@@ -238,7 +238,7 @@ class Result():
         print("RESULT\n dataset name:")
         self.datasetname = input()
         self.resultObj_set = {} #[FuzzyTypeList][folderList] = RuleSetXMLオブジェクト
-        self.FuzzyTypeList = ["rectangular", "trapezoid", "gaussian", "multi"] #比較されるファジィタイプ
+        self.FuzzyTypeList = ["rectangular", "trapezoid", "gaussian"] #比較されるファジィタイプ"multi"
         self.folderList = ["default", "entropy"] #比較するxmlファイルが存在するフォルダ
         for fuzzyType in self.FuzzyTypeList:
             for folderName in self.folderList:

@@ -6,7 +6,6 @@ import emo.algorithms.Algorithm;
 import emo.algorithms.moead.MOEA_D;
 import emo.algorithms.nsga2.NSGA2;
 import fgbml.SinglePittsburgh;
-import fgbml.problem.OutputClass;
 import fuzzy.StaticFuzzyFunc;
 import main.Consts;
 import main.Experiment;
@@ -57,7 +56,7 @@ public class MoFGBML implements Experiment {
 		/* ********************************************************* */
 		//Generate OutputClass
 		//このMoFGBMLに関しては使ってない，
-		OutputClass<SinglePittsburgh> output = new Output_MoFGBML();
+//		OutputClass<SinglePittsburgh> output = new Output_MoFGBML();
 
 		/* ********************************************************* */
 		//Generate Individual Instance
@@ -74,7 +73,7 @@ public class MoFGBML implements Experiment {
 		//GA Start
 		if(Setting.emoType == Consts.NSGA2) {
 			algorithm = new NSGA2<SinglePittsburgh>();
-			algorithm.main( mop, output, instance,
+			algorithm.main( mop, /*output,*/ instance,
 							resultMaster, rnd,
 							timeWatcher, evaWatcher, master);
 		}
@@ -83,7 +82,7 @@ public class MoFGBML implements Experiment {
 				Setting.emoType == Consts.PBI ||
 				Setting.emoType == Consts.AOF) {
 			algorithm = new MOEA_D<SinglePittsburgh>();
-			algorithm.main( mop, output, instance,
+			algorithm.main( mop, /*output,*/ instance,
 							resultMaster, rnd,
 							timeWatcher, evaWatcher, master);
 		}

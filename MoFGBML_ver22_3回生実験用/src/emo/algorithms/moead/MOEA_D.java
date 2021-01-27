@@ -46,7 +46,7 @@ public class MOEA_D<T extends Pittsburgh> extends Algorithm<T>{
 	 * @param evaWatcher
 	 */
 	@Override
-	public void main(	FGBML mop, OutputClass output, T instance,
+	public void main(	FGBML mop, /*OutputClass output,*/ T instance,
 						ResultMaster resultMaster, MersenneTwisterFast rnd,
 						TimeWatcher timeWatcher, TimeWatcher evaWatcher, Result_MoFGBML master) {
 		/* ********************************************************* */

@@ -48,9 +48,9 @@ public class ExperimentInfo {
 	public static int experimentInfoSetNum = 5;
 
 	/** 比較実験のセットのリスト．experimentInfoSet()のswitch関数のindexに対応 */
-	public static int[] experimentInfoSetList = {0, 2, 3, 4};
+	public static int[] experimentInfoSetList = {0};
 
-	/** 比較実験のセットのリストから実行中の実験セットのindex．最初からやる場合は-1に設定*/
+	/** 比較実験のセットのリストから実行中の実験セットの"リスト"のindex．最初からやる場合は-1に設定*/
 	public static int experimentInfoSetListIndex = -1;
 
 	/** 実験中のセットのID．experimentInfoSet()のswitch関数のindexに対応 */

@@ -125,6 +125,7 @@ public class Main {
 		 * @param args 実行の構成からの引数
 		 */
 	public static void repeatExection(String[] args, String dir_path) {
+		System.out.println(ExperimentInfo.FuzzyTypeName);
 		/* ********************************************************* */
 		//The names of files
 		//データセットのファイル名作成

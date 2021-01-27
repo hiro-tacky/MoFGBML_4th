@@ -17,14 +17,23 @@ public class FuzzyPartitioning {
 
 	// ************************************************************
 
-	public static ArrayList<ArrayList<double[]>> startPartition(SingleDataSetInfo tra, int[] K, double F){
-		ArrayList<ArrayList<double[]>> trapezoids = new ArrayList<ArrayList<double[]>>();
+	/**
+	 * エントロピーに基づいた境界を返す．
+	 *
+	 * @param tra データセット
+	 * @param K 分割数の配列
+	 * @param F ファジィ度合
+	 * @return boundaries[属性値][分割数][境界値]
+	 */
+	public static float[][][] startPartition(SingleDataSetInfo tra, int[] K, double F){
+		int K_sum = 0;
+		for(int k:K){K_sum += k;}
+		float[][][] trapezoids = new float[tra.getNdim()][K_sum][4];
 
 		for(int dim_i = 0; dim_i < tra.getNdim(); dim_i++) {
 			//Step 0. Judge Categoric.
 			if(tra.getPattern(0).getDimValue(dim_i) < 0) {
 				//If it's categoric, do NOT partitinon.
-				trapezoids.add(new ArrayList<double[]>());
 				continue;
 			}
 
@@ -43,12 +52,19 @@ public class FuzzyPartitioning {
 					else {return 0;}
 				}
 			});
+			K_sum = 0;
 			for(int k: K) {
 				//Step 2. Optimal Splitting.
 				ArrayList<Double> partitions = optimalSplitting(patterns, k, tra.getCnum());
 
-				//Step 3. Fuzzify partitions
-				trapezoids.add(makeTrapezoids(partitions, F));
+				//Step 3. Fuzzify partitions]
+				ArrayList<double[]> tmp = makeTrapezoids(partitions, F);
+				for(int partiton_i=0; partiton_i<tmp.size(); partiton_i++) {
+					for(int point_i=0; point_i<tmp.get(partiton_i).length; point_i++) {
+						trapezoids[dim_i][K_sum + partiton_i][point_i] = (float)tmp.get(partiton_i)[point_i];
+					}
+				}
+				K_sum += k;
 			}
 		}
 		return trapezoids;
@@ -205,6 +221,16 @@ public class FuzzyPartitioning {
 			candidate.remove(minIndex);
 			if(candidate.size() == 0) {
 				break;
+			}
+		}
+		if(partitions.size() < K+1) {
+			for(int i=2; i<=K; i++) {
+				for(int j=1; j<i; j++) {
+					double tmp = (double)j/i;
+					if(partitions.size() < K+1 && !partitions.contains(tmp)) {
+						partitions.add(tmp);
+					}
+				}
 			}
 		}
 		Collections.sort(partitions);	//Ascending Order

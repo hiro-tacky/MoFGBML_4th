@@ -1,10 +1,6 @@
 package method;
 
-import java.io.File;
 import java.util.ArrayList;
-
-import main.Consts;
-import main.Setting;
 
 /**
  * 一試行分 各世代の現個体群を保持
@@ -31,10 +27,10 @@ public class ResultMaster {
 	public ArrayList<Double> evaTimes = new ArrayList<Double>();
 
 	//csv出力
-	public ArrayList<String> population = new ArrayList<String>();
-	public ArrayList<String> offspring = new ArrayList<String>();
-	public ArrayList<String> ruleSetPopulation = new ArrayList<String>();
-	public ArrayList<String> ruleSetOffspring = new ArrayList<String>();
+//	public ArrayList<String> population = new ArrayList<String>();
+//	public ArrayList<String> offspring = new ArrayList<String>();
+//	public ArrayList<String> ruleSetPopulation = new ArrayList<String>();
+//	public ArrayList<String> ruleSetOffspring = new ArrayList<String>();
 
 	// ************************************************************
 	public ResultMaster() {}
@@ -67,29 +63,29 @@ public class ResultMaster {
 		Output.writeln(fileName, strs);
 	}
 
-	public void outputIndividual(String populationDir, String offspringDir) {
-		String sep = File.separator;
-		String fileName;
-
-		//Population
-		for(int i = 0; i < population.size(); i++) {
-			int genCount = i * Setting.timingOutput;
-			fileName = populationDir + sep + Consts.INDIVIDUAL + sep + "gen" + genCount + ".csv";
-			Output.writeln(fileName, population.get(i));
-			fileName = populationDir + sep + Consts.RULESET + sep + "gen" + genCount + ".txt";
-			Output.writeln(fileName, ruleSetPopulation.get(i));
-		}
-
-		//Offspring
-		for(int i = 0; i < offspring.size(); i++) {
-			int genCount = (i+1) * Setting.timingOutput;
-			fileName = offspringDir + sep + Consts.INDIVIDUAL + sep + "gen" + genCount + ".csv";
-			Output.writeln(fileName, offspring.get(i));
-			fileName = offspringDir + sep + Consts.RULESET + sep + "gen" + genCount + ".txt";
-			Output.writeln(fileName, ruleSetOffspring.get(i));
-		}
-
-	}
+//	public void outputIndividual(String populationDir, String offspringDir) {
+//		String sep = File.separator;
+//		String fileName;
+//
+//		//Population
+//		for(int i = 0; i < population.size(); i++) {
+//			int genCount = i * Setting.timingOutput;
+//			fileName = populationDir + sep + Consts.INDIVIDUAL + sep + "gen" + genCount + ".csv";
+//			Output.writeln(fileName, population.get(i));
+//			fileName = populationDir + sep + Consts.RULESET + sep + "gen" + genCount + ".txt";
+//			Output.writeln(fileName, ruleSetPopulation.get(i));
+//		}
+//
+//		//Offspring
+//		for(int i = 0; i < offspring.size(); i++) {
+//			int genCount = (i+1) * Setting.timingOutput;
+//			fileName = offspringDir + sep + Consts.INDIVIDUAL + sep + "gen" + genCount + ".csv";
+//			Output.writeln(fileName, offspring.get(i));
+//			fileName = offspringDir + sep + Consts.RULESET + sep + "gen" + genCount + ".txt";
+//			Output.writeln(fileName, ruleSetOffspring.get(i));
+//		}
+//
+//	}
 
 	public void addTraAve(double tra) {
 		this.traAve.add(tra);
@@ -114,22 +110,22 @@ public class ResultMaster {
 	public void addEvaTimes(double evaTime) {
 		evaTimes.add(evaTime);
 	}
-
-	public void addPopulation(String str) {
-		this.population.add(str);
-	}
-
-	public void addOffspring(String str) {
-		this.offspring.add(str);
-	}
-
-	public void addRuleSetPopulation(String str) {
-		this.ruleSetPopulation.add(str);
-	}
-
-	public void addRuleSetOffspring(String str) {
-		this.ruleSetOffspring.add(str);
-	}
+//
+//	public void addPopulation(String str) {
+//		this.population.add(str);
+//	}
+//
+//	public void addOffspring(String str) {
+//		this.offspring.add(str);
+//	}
+//
+//	public void addRuleSetPopulation(String str) {
+//		this.ruleSetPopulation.add(str);
+//	}
+//
+//	public void addRuleSetOffspring(String str) {
+//		this.ruleSetOffspring.add(str);
+//	}
 
 	public void setRootDir(String rootDir) {
 		this.rootDir = rootDir;

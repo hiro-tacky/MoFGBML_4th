@@ -2,23 +2,23 @@ package fuzzy.fml.params;
 
 public class homotrapezoid_takigawa {
 	static float[][] parms = new float[][] {
-//		//2
-//		new float[] {0f, 0f, 1f/4f, 3f/4f},
-//		new float[] {1f/4f, 3f/4f, 1f, 1f},
-//		//3
-//		new float[] {0f, 0f, 1f/8f, 3f/8f},
-//		new float[] {1f/8f, 3f/8f, 5f/8f, 7f/8f},
-//		new float[] {5f/8f, 7f/8f, 1f, 1f},
-//		//4
-//		new float[] {1f/12f, 1f/4f, 5f/12f, 7f/12f},
-//		new float[] {5f/12f, 7f/12f, 3f/4f, 11f/12f},
-//		new float[] {3f/4f, 11f/12f, 1f, 1f},
-//		//5
-//		new float[] {0f, 0f, 1f/16f, 3f/16f},
-//		new float[] {1f/16f, 3f/16f, 5f/16f, 7f/16f},
-//		new float[] {5f/16f, 7f/16f, 9f/16f, 11f/16f},
-//		new float[] {9f/16f, 11f/16f, 13f/16f, 15f/16f},
-//		new float[] {13f/16f, 15f/16f, 1f, 1f},
+		//2
+		new float[] {0f, 0f, 1f/4f, 3f/4f},
+		new float[] {1f/4f, 3f/4f, 1f, 1f},
+		//3
+		new float[] {0f, 0f, 1f/8f, 3f/8f},
+		new float[] {1f/8f, 3f/8f, 5f/8f, 7f/8f},
+		new float[] {5f/8f, 7f/8f, 1f, 1f},
+		//4
+		new float[] {1f/12f, 1f/4f, 5f/12f, 7f/12f},
+		new float[] {5f/12f, 7f/12f, 3f/4f, 11f/12f},
+		new float[] {3f/4f, 11f/12f, 1f, 1f},
+		//5
+		new float[] {0f, 0f, 1f/16f, 3f/16f},
+		new float[] {1f/16f, 3f/16f, 5f/16f, 7f/16f},
+		new float[] {5f/16f, 7f/16f, 9f/16f, 11f/16f},
+		new float[] {9f/16f, 11f/16f, 13f/16f, 15f/16f},
+		new float[] {13f/16f, 15f/16f, 1f, 1f},
 //		//6
 //		new float[] {0f, 0f, 1f/20f, 3f/20f},
 //		new float[] {1f/20f, 3f/20f, 1f/4f, 7f/20f},
