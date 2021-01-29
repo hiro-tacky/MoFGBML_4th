@@ -53,8 +53,12 @@ public class Partitions {
 				}
 				partition_list.add(partition);
 			}
+			partitions_set.add(partition_list);
 		}
 		this.partitions = partitions_set;
+		for(int dim_i=0; dim_i<this.Ndim; dim_i++) {
+			this.numPartitions[dim_i] = numPartitions(dim_i);
+		}
 	}
 
 	/**
@@ -162,7 +166,7 @@ public class Partitions {
 					}else if(i == partition_list.size()-2) {
 						params[dim_i][tmp+i] = new float[] {(float)(double)partition_list.get(i), 1f, 1f};
 					}else {
-						params[dim_i][tmp+i] = new float[] {(float)(double)partition_list.get(i), (float)(double)partition_list.get(i+1)};
+						params[dim_i][tmp+i] = new float[] {(float)(double)partition_list.get(i), ((float)(double)partition_list.get(i)+(float)(double)partition_list.get(i+1))/2, (float)(double)partition_list.get(i+1)};
 					}
 				}
 				tmp += partition_list.size()-1;

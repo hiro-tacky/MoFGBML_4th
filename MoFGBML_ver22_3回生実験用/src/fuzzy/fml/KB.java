@@ -141,54 +141,61 @@ public class KB {
 		Partitions partitions = new Partitions(tra.getNdim());
 		partitions.makePartition(tra, K);
 
+		Partitions partitions_homo = new Partitions(tra.getNdim());
+		partitions_homo.makeHomePartition(K);
+
 		this.Ndim = partitions.getNdim();
 
 		FSs = new FuzzySet[Ndim][];
 		float[] dontCare = new float[] {0f, 1f};
 
-		float[][][] params_gaussian = partitions.gaussian();
-		float[][][] params_rectangle = partitions.rectangle();
-		float[][][] params_trapezoid = FuzzyPartitioning.startPartition(tra, K, F);
+		float[][][][] params = new float[6][][][];
+		params[0] = partitions.gaussian();
+		params[1] = partitions.rectangle();
+		params[2] = FuzzyPartitioning.startPartition(tra, K, F);
+		params[3] = partitions_homo.gaussian();
+		params[4] = partitions_homo.rectangle();
+		params[5] = partitions_homo.triangle( );
+
 
 		for(int dim_i = 0; dim_i < Ndim; dim_i++) {
-			float[][] points_gaussian = new float[params_gaussian[dim_i].length][2];
-			for(int k = 0; k < points_gaussian.length; k++) {
-				for(int param_i = 0; param_i < points_gaussian[k].length; param_i++) {
-					points_gaussian[k][param_i] = params_gaussian[dim_i][k][param_i];
-				}
-			}
-			float[][] points_rectangle = new float[params_rectangle[dim_i].length][2];
-			for(int k = 0; k < points_rectangle.length; k++) {
-				for(int param_i = 0; param_i < points_rectangle[k].length; param_i++) {
-					points_rectangle[k][param_i] = params_rectangle[dim_i][k][param_i];
-				}
-			}
-			float[][] points_trapezoid = new float[params_trapezoid[dim_i].length][4];
-			for(int k = 0; k < points_trapezoid.length; k++) {
-				for(int param_i = 0; param_i < 4; param_i++) {
-					points_trapezoid[k][param_i] = params_trapezoid[dim_i][k][param_i];
-				}
+			int FuzzySetSize = 0;
+			for(float buf[][][] : params) {
+				FuzzySetSize += buf[dim_i].length;
 			}
 
-			int FuzzySetSize = points_gaussian.length + points_rectangle.length + points_trapezoid.length + 1;
+			FuzzySetSize++;
 			FSs[dim_i] = new FuzzySet[FuzzySetSize];
 			FSs[dim_i][0] = new FuzzySet("0", FuzzyTermType.TYPE_rectangularShape, dontCare);
 			FSs[dim_i][0].setShapeType(Consts.DONT_CARE_SHAPE_TYPE_ID);
-			int tmp = 0;
-			for(int k = 0; k < points_gaussian.length; k++) {
-				FSs[dim_i][tmp+k+1] = new FuzzySet( String.valueOf(k+tmp+1),FuzzyTermType.TYPE_gaussianShape,points_gaussian[k]);
-			}
-			tmp += points_gaussian.length;
 
-			for(int k = 0; k < points_rectangle.length; k++) {
-				FSs[dim_i][tmp+k+1] = new FuzzySet( String.valueOf(k+tmp+1),FuzzyTermType.TYPE_rectangularShape,points_rectangle[k]);
+			int tmp = 1;
+			for(int k=0; k<params[0][dim_i].length; k++) {
+				FSs[dim_i][tmp] = new FuzzySet( String.valueOf(tmp),FuzzyTermType.TYPE_gaussianShape,params[0][dim_i][k]);
+				tmp++;
 			}
-			tmp += points_rectangle.length;
-
-			for(int k = 0; k < points_trapezoid.length; k++) {
-				FSs[dim_i][tmp+k+1] = new FuzzySet( String.valueOf(k+tmp+1),FuzzyTermType.TYPE_trapezoidShape,points_trapezoid[k]);
+			for(int k=0; k<params[1][dim_i].length; k++) {
+				FSs[dim_i][tmp] = new FuzzySet( String.valueOf(tmp),FuzzyTermType.TYPE_rectangularShape,params[1][dim_i][k]);
+				tmp++;
+			}
+			for(int k=0; k<params[2][dim_i].length; k++) {
+				FSs[dim_i][tmp] = new FuzzySet( String.valueOf(tmp),FuzzyTermType.TYPE_trapezoidShape,params[2][dim_i][k]);
+				tmp++;
+			}
+			for(int k=0; k<params[3][dim_i].length; k++) {
+				FSs[dim_i][tmp] = new FuzzySet( "homo" + String.valueOf(tmp),FuzzyTermType.TYPE_gaussianShape,params[3][dim_i][k]);
+				tmp++;
+			}
+			for(int k=0; k<params[4][dim_i].length; k++) {
+				FSs[dim_i][tmp] = new FuzzySet( "homo" + String.valueOf(tmp),FuzzyTermType.TYPE_rectangularShape,params[4][dim_i][k]);
+				tmp++;
+			}
+			for(int k=0; k<params[5][dim_i].length; k++) {
+				FSs[dim_i][tmp] = new FuzzySet( "homo" + String.valueOf(tmp),FuzzyTermType.TYPE_trapezoidShape,params[5][dim_i][k]);
+				tmp++;
 			}
 		}
+		int N = 0;
 	}
 
 	public void threeTriangle(int Ndim) {
