@@ -191,7 +191,7 @@ public class KB {
 				tmp++;
 			}
 			for(int k=0; k<params[5][dim_i].length; k++) {
-				FSs[dim_i][tmp] = new FuzzySet( "homo" + String.valueOf(tmp),FuzzyTermType.TYPE_trapezoidShape,params[5][dim_i][k]);
+				FSs[dim_i][tmp] = new FuzzySet( "homo" + String.valueOf(tmp),FuzzyTermType.TYPE_triangularShape,params[5][dim_i][k]);
 				tmp++;
 			}
 		}

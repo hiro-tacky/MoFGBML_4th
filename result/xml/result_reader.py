@@ -176,7 +176,7 @@ class resultXML(XML):
             plt.show()
             
         
-    def setplotGenAve(self, gen, ax, label_name, title = None, isDtst = True):
+    def setplotGenAve(self, gen, ax, label_name, title = None, isDtst = True, marker = "o"):
         """指定した世代の平均の結果をaxesオブジェクトにセット
         gen:list型あるいはint型, isDtst:DtraかDtstの選択
         """
@@ -193,12 +193,12 @@ class resultXML(XML):
                     ave[buf['f1']] = [buf[y_ax], 1]
         x = [ruleNum for ruleNum, average in ave.items() if average[1] > trial_num/2]
         y = [average[0]/average[1] for average in ave.values() if average[1] > trial_num/2]
-        ax.scatter(x, y, label = label_name)
+        ax.scatter(x, y, label = label_name, marker = marker)
         ax.grid(True)
         if title is not None:
             ax.set_title(title)
 
-    def setplotGenBest(self, gen, ax, label_name, title = None, isDtst = True):
+    def setplotGenBest(self, gen, ax, label_name, title = None, isDtst = True, marker = "o"):
         """指定した世代の最良個体群の結果をaxesオブジェクトにセット
         genはlist型あるいはint型, isDtst:DtraかDtstの選択
         """
@@ -223,7 +223,7 @@ class resultXML(XML):
             del best_individuals
         x = [ruleNum for ruleNum, average in best.items() if average[1] > trial_num/2]
         y = [average[0]/average[1] for average in best.values() if average[1] > trial_num/2]
-        ax.scatter(x, y, label = label_name)
+        ax.scatter(x, y, label = label_name, marker = marker)
         ax.grid(True)
         if title is not None:
             ax.set_title(title)
@@ -265,70 +265,35 @@ class Result():
         #####################################################################
         
         #(Dtst or Dtrs) or (Ave or Best)の4つの場合でメソッドを実行
-        for tmp in [[True, True], [False, True], [True, False], [False, False]]:
+        for tmp in [[True, True], [False, True]]:#, [True, False], [False, False]]:
             self.plot_result(isDtst = tmp[0], isAve = tmp[1])
     
     def getResultXML(self, FuzzyType = "multi", folderName = "entropy"):
         return self.resultObj_set[FuzzyType][folderName]
-        
-        
-    def plot_individuals(self, gen = gen_list, trial = trial_list, title = "Result_individuals", filename = None):
-        """特定の個体の結果を出力する"""
-        if filename is None:
-            filename = self.datasetname + "_Result_individuals"
-
-        gen_tmp = [gen] if type(gen) is int else gen
-        trial_tmp = [trial] if type(trial) is int else trial
-        x_lim,y_lim  = [1000, -1], [1000, -1]
-        for i, gen_buf in enumerate(gen_tmp):
-            fig =  singleFig_set(title)
-            ax = fig.gca()
-            for FuzzySet_name, resultObj in self.resultObj_set.items():
-                self.setPopulation(trial_tmp, gen_tmp, ax, title, label_name = FuzzySet_name)
-            ax.legend(loc='upper right')
-            buf_x, buf_y = ax.get_xlim(), ax.get_ylim()
-            if buf_x[0] < x_lim[0]: x_lim[0] = buf_x[0] 
-            if buf_x[1] > x_lim[1]: x_lim[1] = buf_x[1]
-            if buf_y[0] < y_lim[0]: y_lim[0] = buf_y[0]
-            if buf_y[1] > y_lim[1]: y_lim[1] = buf_y[1]
-        
-        fignums = plt.get_fignums()
-        for i, fignum in enumerate(fignums):
-            plt.figure(fignum)
-            fig = plt.gcf()
-            ax = fig.gca()
-            ax.set_xlim(x_lim)
-            ax.set_ylim(y_lim)
-            ax.set_xticks(range(2, int(x_lim[1]), lim(x_lim[0], x_lim[1])))
-            ax.set_xlabel("number of rule")
-            ax.set_ylabel("error rate[%]") 
-            SaveFig(fig, self.savePath, filename + str(i).zfill(3), self.datasetname + '/ave')
-        plt.close()
-
 
     def plot_result(self, gen = gen_list, isDtst = True, isAve = True, title = None, filename = None):
         gen_tmp = [gen] if type(gen) is int else gen
         d_today = datetime.date.today()
         
         for ExperimentName, resultObj_dict in self.resultObj_set.items():
-            if title is None:
-                if isDtst and isAve:
-                    fig_title = self.datasetname + ": " + ExperimentName + " [Dtst's average of all individual of each gen]"
-                    filename = self.datasetname + "_" + ExperimentName + "_Result_AveDtst"
-                    savepath = self.savePath + "AveDtst/"
-                elif not isDtst and isAve:
-                    fig_title = self.datasetname + ": " + ExperimentName + " [Dtra's average of all individual of each gen]"
-                    filename = self.datasetname + "_" + ExperimentName + "_Result_AveDtra"
-                    savepath = self.savePath + "AveDtra/"
-                elif isDtst and not isAve:
-                    fig_title = self.datasetname + ": " + ExperimentName + " [Dtst's average of best individual of each gen]"
-                    filename = self.datasetname + "_" + ExperimentName + "_Result_Best_Dtst"
-                    savepath = self.savePath + "BestDtst/"
-                elif not isDtst and not isAve:
-                    fig_title = self.datasetname + ": " + ExperimentName + " [Dtra's average of best individual of each gen]"
-                    filename = self.datasetname + "_" + ExperimentName + "_Result_Best_Dtra"   
-                    savepath = self.savePath + "BestDtra/"
-            savepath = savepath + "{0:%Y%m%d}".format(d_today)+ "/"
+            
+            savepath = self.savePath + "{0:%Y%m%d}".format(d_today)+ "/"
+            if isDtst and isAve:
+                fig_title = self.datasetname + ": " + ExperimentName + " Dtst's average"
+                filename = self.datasetname + "_" + ExperimentName + "_Result_AveDtst"
+                savepath = savepath + "AveDtst/"
+            elif not isDtst and isAve:
+                fig_title = self.datasetname + ": " + ExperimentName + " Dtra's average"
+                filename = self.datasetname + "_" + ExperimentName + "_Result_AveDtra"
+                savepath = savepath + "AveDtra/"
+            elif isDtst and not isAve:
+                fig_title = self.datasetname + ": " + ExperimentName + " Dtst's average of PF"
+                filename = self.datasetname + "_" + ExperimentName + "_Result_Best_Dtst"
+                savepath = savepath + "BestDtst/"
+            elif not isDtst and not isAve:
+                fig_title = self.datasetname + ": " + ExperimentName + " Dtra's average of PF"
+                filename = self.datasetname + "_" + ExperimentName + "_Result_Best_Dtra"   
+                savepath = savepath + "BestDtra/"
             print(savepath)
             
             x_lim,y_lim  = [1000, -1], [1000, -1]

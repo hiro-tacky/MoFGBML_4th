@@ -162,11 +162,12 @@ public class Partitions {
 			for(ArrayList<Double> partition_list: this.partitions.get(dim_i)) {
 				for(int i=0; i<partition_list.size()-1; i++) {
 					if(i == 0) {
-						params[dim_i][tmp+i] = new float[] {0f, 0f, (float)(double)partition_list.get(i+1)};
+						params[dim_i][tmp+i] = new float[] {0f, 0f, 2*(float)(double)partition_list.get(i+1)};
 					}else if(i == partition_list.size()-2) {
-						params[dim_i][tmp+i] = new float[] {(float)(double)partition_list.get(i), 1f, 1f};
+						params[dim_i][tmp+i] = new float[] {2*(float)(double)partition_list.get(i) - 1f, 1f, 1f};
 					}else {
-						params[dim_i][tmp+i] = new float[] {(float)(double)partition_list.get(i), ((float)(double)partition_list.get(i)+(float)(double)partition_list.get(i+1))/2, (float)(double)partition_list.get(i+1)};
+						float left = (float)(double)partition_list.get(i), right = (float)(double)partition_list.get(i+1);
+						params[dim_i][tmp+i] = new float[] {left*3f/2f - right/2f, (left+right)/2f, right*3f/2f - left/2f};
 					}
 				}
 				tmp += partition_list.size()-1;

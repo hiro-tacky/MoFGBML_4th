@@ -449,7 +449,6 @@ public class toXML {
 						SingleRule SingleRule = micRules.get(l);
 						Element singlerule = addChildNode("SingleRule", singleruleset);
 						singlerule.setAttribute("ID", String.valueOf(l));
-						singlerule.setAttribute("Class", "SingleRule");
 
 						//rule
 						int Rule[] = SingleRule.getRule();

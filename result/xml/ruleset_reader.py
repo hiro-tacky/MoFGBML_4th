@@ -6,6 +6,7 @@ import os
 from datetime import datetime
 import glob
 from scipy.stats import gaussian_kde
+from sklearn import preprocessing
 
 #######  setting  #######
 ###############################################################################
@@ -37,7 +38,7 @@ DatasetList = {
 
 
 #plotするデフォルト設定
-trial_plot = 1 #plotするtriaslのID
+trial_plot = 0 #plotするtriaslのID
 gen_plot = 5000 #plotする世代数
 attri_plot = 0
 #scatterの基本設定
@@ -165,7 +166,7 @@ class detaset_df:
             kde_model = gaussian_kde(self.dfByClass[className][dim])
             x_grid = np.linspace(0, max(self.dfByClass[className][dim]), num=100)
             y = kde_model(x_grid)
-            ax2.plot(x_grid, y)
+            ax2.plot(x_grid, y, linestyle = "--")
     
     def setAxHist(self, dim, ax):
         ax2 = ax.twinx()
@@ -186,7 +187,7 @@ class FuzzyTerm:
         for buf in fuzzyterm.find('parameters'):
             self.parameters[int(buf.get('id'))] = float(buf.text)
     
-    def setAx(self, ax, alpha = 1.0, color = "black"):
+    def setAx(self, ax, alpha = 1.0, alpha_between = 0.1, color = "black", color_between = "blue"):
         """Ax にメンバシップ関数をプロットする"""
         color_buf = "C{}".format(color) if type(color) is int else color
         
@@ -196,7 +197,7 @@ class FuzzyTerm:
             y = np.array([0, 0, 1, 0, 0])
             ax.plot(x, y, alpha = alpha, color = color_buf)
             y_bottom = [0, 0, 0, 0, 0]
-            ax.fill_between(x, y, y_bottom, facecolor="blue", alpha=0.1)
+            ax.fill_between(x, y, y_bottom, facecolor=color_between, alpha = alpha_between)
         if self.typeID == 4:
             mu = self.parameters[0]
             sigma = self.parameters[1]
@@ -204,25 +205,25 @@ class FuzzyTerm:
             y = 1 * np.exp(-(x - mu)**2 / (2*sigma**2))
             ax.plot(x, y, alpha = alpha, color = color_buf)
             y_bottom = [0] * 100
-            ax.fill_between(x, y, y_bottom, facecolor="blue", alpha=0.1)
+            ax.fill_between(x, y, y_bottom, facecolor = color_between, alpha = alpha_between)
         if self.typeID == 7:
             x = np.array([0, self.parameters[0], self.parameters[1], self.parameters[2], self.parameters[3], 1])
             y = np.array([0, 0, 1, 1, 0, 0])
             ax.plot(x, y, alpha = alpha, color = color_buf)
             y_bottom = [0, 0, 0, 0, 0, 0]
-            ax.fill_between(x, y, y_bottom, facecolor="blue", alpha=0.1)
+            ax.fill_between(x, y, y_bottom, facecolor = color_between, alpha = alpha_between)
         if self.typeID == 9:
             x = np.array([0, self.parameters[0], self.parameters[0], self.parameters[1], self.parameters[1], 1])
             y = np.array([0, 0, 1, 1, 0, 0])
             ax.plot(x, y, alpha = alpha, color = color_buf)
             y_bottom = [0, 0, 0, 0, 0, 0]
-            ax.fill_between(x, y, y_bottom, facecolor="blue", alpha=0.1)
+            ax.fill_between(x, y, y_bottom, facecolor = color_between, alpha = alpha_between)
         if self.typeID == 99:
             x = np.array([0, 0, 1, 1])
             y = np.array([0, 1, 1, 0])
             ax.plot(x, y, alpha = alpha, color = color_buf)
             y_bottom = [0, 0, 0, 0]
-            ax.fill_between(x, y, y_bottom, facecolor="blue", alpha=0.1)
+            ax.fill_between(x, y, y_bottom, facecolor = color_between, alpha = alpha_between)
         
 class KB:
     """Knowledge bas用のクラス"""
@@ -285,8 +286,8 @@ class KB:
                         fig.show()
                     plt.close("all")
         
-    def setFuzzyTerm(self, ax, dimension = attri_plot, ID = 0, alpha = 1.0, color = "black"):
-        self.fuzzySets[dimension][ID].setAx(ax, alpha = alpha, color = color)
+    def setFuzzyTerm(self, ax, dimension = attri_plot, ID = 0, alpha = 1.0, alpha_between = 0.1, color = "black", color_between = "blue"):
+        self.fuzzySets[dimension][ID].setAx(ax, alpha = alpha, color = color, alpha_between = alpha_between, color_between = color_between)
         
     def getFuzzyTermID(self, dimension = attri_plot, ID = 0):
         return self.fuzzySets[dimension][ID]
@@ -317,7 +318,7 @@ class Individual(RuleSetInfo):
         super().__init__(population, datasetName)
         self.ID = i
         self.rules = {i: SingleRule(singleRule, population, datasetName, i) for i, singleRule in enumerate(individual.find('ruleSet'))}
-        self.ruleNum = individual.get("ruleNum")
+        self.ruleNum = int(individual.get("ruleNum"))
    
     def isCoverAllClasses(self):
         """この個体について，この個体が持つ各ルールの結論部が全てのクラスを持つか確認する"""
@@ -384,44 +385,133 @@ class RuleSetXML(XML):
                 for generationID in generation_list:
                     self.ruleset[trialID][generationID].kb.plot(self.savePath + "trial_" + str(trialID) + "/generation_" + str(generation) + "/", isSave = True, inOneFig = inOneFig, Dataset_df = None, ByPartitoinNum = ByPartitoinNum, df = df)
            
-                
-    def IndividualsCoverAllclasses(self):
+    def IndividualsCoverAllclasses(self, gen = gen_plot):
         buf = {}
         for trialKey, trial in self.ruleset.items():
-            population = trial[gen_plot]
-            buf_population = (trialKey, gen_plot)
-            buf_individual = set()
+            buf[trialKey] = {gen : []}
+            population = trial[gen]
             for individualID, individual in population.individuals.items():
-                if individual.isCoverAllClasses():
-                    buf_individual.add(individualID)
-            buf[buf_population] = buf_individual
+                if individual.ruleNum >= DatasetList[self.datasetName]["Attribute"] and individual.isCoverAllClasses():
+                    buf[trialKey][gen].append(individualID)
         return buf   
                     
-    def CoverAllClasses(self, saveFilePath, isDontCare = False):
-        data = {shapeID: [0] * self.attributeNum for shapeID in FuzzyTypeID.keys()}
-        for populationID, individualID in self.IndividualsCoverAllclasses().items():
-            population = self.getPopulation(populationID)
-            for ID in individualID:
-                individual = population.getIndividual(ID)
-                for singleRule in individual.rules.values():
-                    for atrriID, fuzzyTermID in singleRule.rule.items():
-                        tmp = population.kb.getShapeID(fuzzyTermID)
-                        data[tmp][atrriID] += 1
+    def UsedMenbership(self, gen = gen_plot, isDontCare = False, df = None, isCoverAllClasses = True):
+        savePath = self.savePath + "/usedMenbership/CoverAllClasses/" if isCoverAllClasses else self.savePath + "/usedMenbership/AllIndividuals/"
+        for trialKey, trial in self.ruleset.items():
+            population = trial[gen]
+            kb = population.kb
+            uesdFuzzyTerms = [[0]*len(kb.fuzzySets[dimension]) for dimension in kb.fuzzySets.keys()]
+            for individualID, individual in population.individuals.items():
+                if not isCoverAllClasses or (individual.ruleNum >= DatasetList[self.datasetName]["Class"] and individual.isCoverAllClasses()):
+                    for ruleID, SingleRule in individual.rules.items():
+                        for dim, FuzzyTermID in SingleRule.rule.items():
+                            if FuzzyTermID != 0 or (FuzzyTermID == 0 and isDontCare):
+                                uesdFuzzyTerms[dim][FuzzyTermID] += 1
+            for dim in range(self.attributeNum):
+                fig = singleFig_set(self.datasetName + " dim:" + str(dim) + " used menbership (cover all classes)")
+                ax = fig.gca()
+                ax.set_ylim(-0.05, 1.05)
+                ax.set_xlim(-0.05, 1.05)
+                buf = preprocessing.minmax_scale(uesdFuzzyTerms, axis=1)
+                if df is not None:
+                    df.setAx(dim, ax)
+                for fuzzyTermID, alpha in enumerate(buf[dim]):
+                    if alpha > 0:
+                        color = "navy" if fuzzyTermID > 42 else "red"                               #######要修正(ファジィ集合変更時)######
+                        color_between = "cyan" if fuzzyTermID > 42 else "orange"                    #######要修正(ファジィ集合変更時)######
+                        kb.setFuzzyTerm(ax, dim, fuzzyTermID, alpha = alpha, alpha_between = alpha*0.1, color = color, color_between = color_between)
+                SaveFig(fig, savePath + "trial_" + str(trialKey), self.datasetName + "_dim" + str(dim) + "_usedMenbership")
+                plt.close("all")
+
+    def UsedMenbershipRate(self, gen = gen_plot, isDontCare = False, df = None, isCoverAllClasses = True):
+        savePath = self.savePath + "/UsedMenbershipRate/CoverAllClasses/" if isCoverAllClasses else self.savePath + "/UsedMenbershipRate/AllIndividuals/"
+        uesdFuzzyTerms = [[0]*(1+6) for i in range(self.attributeNum)]                           #######要修正(ファジィ集合変更時)######
+        for trialKey, trial in self.ruleset.items():
+            population = trial[gen]
+            kb = population.kb
+            for individualID, individual in population.individuals.items():
+                if not isCoverAllClasses or (individual.ruleNum >= DatasetList[self.datasetName]["Class"] and individual.isCoverAllClasses()):
+                    for ruleID, SingleRule in individual.rules.items():
+                        for dim, FuzzyTermID in SingleRule.rule.items():
+                            if FuzzyTermID != 0:
+                                tmp = (FuzzyTermID-1) // 14                                              #######要修正(ファジィ集合変更時)######
+                                uesdFuzzyTerms[dim][tmp+1] += 1
+                            elif FuzzyTermID == 0:
+                                uesdFuzzyTerms[dim][0] += 1
+                
+        label_sample = ["Do'nt Care","gaussian_entropy", "rectangle_entropy", "trapezoid_entropy", "gaussian_default", "rectangular_default", "triangle_default"]
+        color_sample = ["C{}".format(i) for i in range(len(label_sample))]
+        for dim in range(self.attributeNum):
+            fig = singleFig_set(self.datasetName + " dim:" + str(dim) + " used menbership rate (cover all classes)")
+            ax = fig.gca()
+            data_buf, label_buf, color_buf = [], [], []
+            for index, tmp in enumerate(uesdFuzzyTerms[dim]): #要素数0を除外
+                if (index != 0 and tmp != 0) or (index == 0 and isDontCare and tmp != 0):
+                    data_buf.append(uesdFuzzyTerms[dim][index])
+                    label_buf.append(label_sample[index])
+                    color_buf.append(color_sample[index])
+            ax.pie(data_buf, labels = label_buf, startangle=90, colors = color_buf, counterclock = False)
+            SaveFig(fig, savePath + "dim_" + str(dim) +"/", self.datasetName + "_dim" + str(dim) + "_usedMenbershipRate")
+            plt.close("all")
             
-        fig = singleFig_set(self.datasetName + " [used manbership that cover all classes]")
+        for dim in range(self.attributeNum):
+            fig = singleFig_set(self.datasetName + " dim:" + str(dim) + " used menbership rate (cover all classes)")
+            ax = fig.gca()
+            data_buf, label_buf, color_buf = [], ["Do'nt Care", "entropy", "default"], ["gray", "orange", "blue"]
+            data_buf.append(uesdFuzzyTerms[dim][0])
+            data_buf.append(uesdFuzzyTerms[dim][1] + uesdFuzzyTerms[dim][2] + uesdFuzzyTerms[dim][3])
+            data_buf.append(uesdFuzzyTerms[dim][4] + uesdFuzzyTerms[dim][5] + uesdFuzzyTerms[dim][6])
+            ax.pie(data_buf, labels = label_buf, startangle=90, colors = color_buf, counterclock = False)
+            SaveFig(fig, savePath + "dim_" + str(dim) + "/", self.datasetName + "_dim" + str(dim) + "_usedFuzzyTypeRate")
+            plt.close("all")
+            
+        for dim in range(self.attributeNum):
+            fig = singleFig_set(self.datasetName + " dim:" + str(dim) + " used menbership rate (cover all classes)")
+            ax = fig.gca()
+            data_buf, label_buf, color_buf = [], ["gaussian", "rectangular", "trapezoid"], ["red", "purple", "green"]
+            data_buf.append(uesdFuzzyTerms[dim][1] + uesdFuzzyTerms[dim][4])
+            data_buf.append(uesdFuzzyTerms[dim][2] + uesdFuzzyTerms[dim][5])
+            data_buf.append(uesdFuzzyTerms[dim][3] + uesdFuzzyTerms[dim][6])
+            ax.pie(data_buf, labels = label_buf, startangle=90, colors = color_buf, counterclock = False)
+            SaveFig(fig, savePath + "dim_" + str(dim) + "/", self.datasetName + "_dim" + str(dim) + "_usedFuzzyTypeRate")
+            plt.close("all")
+            
+        data_buf = [0]*7
+        label_buf = label_sample[1:]
+        fig = singleFig_set(self.datasetName + " dim:" + str(dim) + " used menbership rate (cover all classes)")
         ax = fig.gca()
-        x = [i+1 for i in range(self.attributeNum)]
-        buf = [0]*self.attributeNum
-        for shapeID, dataList in data.items():
-            if isDontCare and shapeID == DontCareID:
-                continue
-            ax.bar(x, dataList, bottom = buf, label = FuzzyTypeID[shapeID])
-            for i, data_i in enumerate(dataList):
-                buf[i] += data_i
-        ax.legend()
-        ax.set_xlabel('Attribute')
-        ax.set_ylabel('num of manbership')
-        SaveFig(fig, saveFilePath, self.datasetName + "_CoverAllClasses")
+        for dim in range(self.attributeNum):
+            for index, tmp in enumerate(uesdFuzzyTerms[dim]): #要素数0を除外
+                if (index != 0 and tmp != 0) or (index == 0 and isDontCare and tmp != 0):
+                    data_buf[index] += uesdFuzzyTerms[dim][index]
+        if not isDontCare: data_buf.remove(0)
+        ax.pie(data_buf, labels = label_buf, startangle=90, colors = color_sample, counterclock = False)
+        SaveFig(fig, savePath + "all/", self.datasetName + "_dim" + str(dim) + "_usedMenbershipRate")
+        plt.close("all")
+            
+        data_buf, label_buf, color_buf = [0]*3, ["Do'nt Care", "entropy", "default"], ["gray", "orange", "blue"]
+        fig = singleFig_set(self.datasetName + " dim:" + str(dim) + " used menbership rate (cover all classes)")
+        ax = fig.gca()
+        for dim in range(self.attributeNum):
+            data_buf[0] += uesdFuzzyTerms[dim][0]
+            data_buf[1] += (uesdFuzzyTerms[dim][1] + uesdFuzzyTerms[dim][2] + uesdFuzzyTerms[dim][3])
+            data_buf[2] += (uesdFuzzyTerms[dim][4] + uesdFuzzyTerms[dim][5] + uesdFuzzyTerms[dim][6])
+        ax.pie(data_buf, labels = label_buf, startangle=90, colors = color_buf, counterclock = False)
+        SaveFig(fig, savePath + "all/", self.datasetName + "_dim" + str(dim) + "_usedFuzzyTypeRate")
+        plt.close("all")
+            
+        data_buf, label_buf, color_buf = [0]*3, ["gaussian", "rectangular", "trapezoid"], ["red", "purple", "green"]
+        fig = singleFig_set(self.datasetName + " dim:" + str(dim) + " used menbership rate (cover all classes)")
+        ax = fig.gca()
+        for dim in range(self.attributeNum):
+            data_buf[0] += (uesdFuzzyTerms[dim][1] + uesdFuzzyTerms[dim][4])
+            data_buf[1] += (uesdFuzzyTerms[dim][2] + uesdFuzzyTerms[dim][5])
+            data_buf[2] += (uesdFuzzyTerms[dim][3] + uesdFuzzyTerms[dim][6])
+        ax.pie(data_buf, labels = label_buf, startangle=90, colors = color_buf, counterclock = False)
+        SaveFig(fig, savePath + "all/", self.datasetName + "_dim" + str(dim) + "_usedFuzzyTypeRate")
+        plt.close("all")
+            
+        
         
     def ByConclusion(self, saveFilePath):
         fuzzyTerm_list = {}
@@ -463,8 +553,8 @@ class RuleSet:
         print("RULESET\n dataset name:")
         self.datasetName = input()
         self.detaset_df = detaset_df(self.datasetName)
-        self.FuzzyTypeList = ["rectangular", "trapezoid", "gaussian"]
-        self.folderList = ["entropy"] #["default", "entropy"]
+        self.FuzzyTypeList = ["multi"] #["rectangular", "trapezoid", "gaussian"]
+        self.folderList = ["default_entropy"] #["default", "entropy"]
         self.pathList = []
         self.RuleSetObj = {} #[FuzzyTypeList][folderList] = RuleSetXMLオブジェクト
         for fuzzyType in self.FuzzyTypeList:
@@ -479,9 +569,10 @@ class RuleSet:
                     RuleSetObj_buf[folderName] = RuleSetXML(path, self.savePath, self.datasetName)
             self.RuleSetObj[fuzzyType] = RuleSetObj_buf
             
-        self.KBplot(inOneFig = True, ByPartitoinNum = True)                
+        # self.KBplot(inOneFig = True, ByPartitoinNum = True)
+        self.UsedMenbershipRatePlot()  
             
-    def getRuleSetXML(self, fuzzyType = "multi", folderName = "default"):
+    def getRuleSetXML(self, fuzzyType = "multi", folderName = "default_entropy"):
         return self.RuleSetObj[fuzzyType][folderName]
                 
     def RuleSetPlot(self):
@@ -496,3 +587,15 @@ class RuleSet:
             for folderName, RuleSet in RuleSetObj_dict.items():
                 print(RuleSet.savePath)
                 RuleSet.KBplot(0, 5000, inOneFig = inOneFig, ByPartitoinNum = ByPartitoinNum, df = self.detaset_df)
+  
+    def UsedMenbershipPlot(self, gen = 5000, isCoverAllClasses = True):
+        for fuzzyType, RuleSetObj_dict in self.RuleSetObj.items():
+            for folderName, RuleSet in RuleSetObj_dict.items():
+                print(RuleSet.savePath)
+                RuleSet.UsedMenbership(gen = gen, df = self.detaset_df, isCoverAllClasses = isCoverAllClasses)
+
+    def UsedMenbershipRatePlot(self, gen = 5000, isCoverAllClasses = True):
+        for fuzzyType, RuleSetObj_dict in self.RuleSetObj.items():
+            for folderName, RuleSet in RuleSetObj_dict.items():
+                print(RuleSet.savePath)
+                RuleSet.UsedMenbershipRate(gen = gen, df = self.detaset_df, isCoverAllClasses = isCoverAllClasses)
