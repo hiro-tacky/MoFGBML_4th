@@ -49,7 +49,7 @@ public class Partitions {
 			for(int k: K) {
 				ArrayList<Double> partition = new ArrayList<Double>();
 				for(int i=0; i<=k; i++) {
-					partition.add(((double)i)/k);
+					partition.add( (double)(2*i-1)/((k-1)*2) );
 				}
 				partition_list.add(partition);
 			}

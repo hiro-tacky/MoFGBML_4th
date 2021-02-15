@@ -9,6 +9,7 @@ print("class data must be most right column")
 print("make 'dataset_view' class Obuject, and call menber func you need")
 
 cmap = plt.get_cmap("tab10") # 色のlist
+my_path = os.getcwd()
 
 def figSave(fig, filename = None, datesetname = "others"):
     if filename == None:
@@ -19,39 +20,55 @@ def figSave(fig, filename = None, datesetname = "others"):
     os.makedirs(dirname, exist_ok=True)
     now = datetime.now()
     buf = filename + "_{0:%Y%m%d%H%M%S}.png".format(now)
-    fig.savefig(os.path.join(my_path + '\\' + datesetname, buf), transparent=False)     
+    fig.savefig(os.path.join(my_path + '\\' + datesetname, buf), transparent=False)
+    
+def SaveFig(fig, filePath, filename = None):
+    """画像を保存する
+    入力:figureオブジェクト, ファイル名, データセット名"""
+    if filename == None:
+        print("image file name:")
+        filename = input()
+    os.makedirs(filePath, exist_ok=True)
+    now = datetime.now()
+    imageName = filename + "_{0:%Y%m%d%H%M%S}_{1:%f}.png".format(now, now)
+    fig.savefig(my_path + "/" + filePath + "/" + imageName, transparent=False)     
 
 class dataset_view():
     def __init__(self):
         print('dataset name:')
         self.filename = input()
-        self.df = pd.read_csv("./datsename/" + self.filename + ".csv", header=None)
-        self.attribute_num = len(self.df.columns) - 1
+        df_original = pd.read_csv("./dataset/" + self.filename + ".csv", header=None)
+        self.attributeNum = len(df_original.columns) - 1
         self.classname = {}
-        for name in self.df[self.attribute_num]:
+        for name in df_original[self.attributeNum]:
             try:
                 self.classname[name] += 1
             except:
                 self.classname[name] = 1
-        self.plot1()
-        self.plot2()
-        self.plot3()
+                
+        classList_buf = df_original.iloc[:, self.attributeNum]
+        df_buf = df_original.iloc[:, 0:self.attributeNum]
+        self.df = pd.concat([(df_buf - df_buf.min()) / (df_buf.max() - df_buf.min()), classList_buf], axis=1, join='inner') #正規化されたdetaframe
+        
+        # self.plot1()
+        # self.plot2()
+        # self.plot3()
         self.plot4()
-        self.plot5()
+        # self.plot5()
                 
     #積み上げ棒グラフ
     def plot1(self):
-        fig = plt.figure(figsize = (24, ((self.attribute_num+2)/3)*6))
+        fig = plt.figure(figsize = (24, ((self.attributeNum+2)/3)*6))
         fig.suptitle(self.filename, size = 24)        
         ax = []
         labels = self.classname.keys()
         #ヒストグラム分割数
         bins_num = 20
-        for i in range(self.attribute_num):
-            ax = fig.add_subplot((self.attribute_num+2)/3, 3, i+1)
+        for i in range(self.attributeNum):
+            ax = fig.add_subplot((self.attributeNum+2)/3, 3, i+1)
             df_each_class = []
             for name in self.classname.keys():
-                df_each_class.append(self.df[self.df[self.attribute_num] == name][i])
+                df_each_class.append(self.df[self.df[self.attributeNum] == name][i])
             ax.hist(df_each_class, bins = bins_num, stacked=True, label = labels)
             ax.set_title("attribute dim: " + str(i))
             ax.grid(True)
@@ -63,15 +80,15 @@ class dataset_view():
     
     #重ね棒グラフ
     def plot2(self):
-        fig = plt.figure(figsize = (24, ((self.attribute_num+2)/3)*6))
+        fig = plt.figure(figsize = (24, ((self.attributeNum+2)/3)*6))
         fig.suptitle(self.filename, size = 24)        
         ax = []
         #ヒストグラム分割数
         bins_num = 15
-        for i in range(self.attribute_num):
-            ax = fig.add_subplot((self.attribute_num+2)/3, 3, i+1)
+        for i in range(self.attributeNum):
+            ax = fig.add_subplot((self.attributeNum+2)/3, 3, i+1)
             for name in self.classname.keys():
-                buf= self.df[self.df[self.attribute_num] == name][i]
+                buf= self.df[self.df[self.attributeNum] == name][i]
                 ax.hist(buf, bins = bins_num, label = name, alpha = 0.5, histtype="stepfilled")
             ax.set_title("attribute dim: " + str(i))
             ax.grid(True)
@@ -86,12 +103,12 @@ class dataset_view():
         #ヒストグラム分割数
         bins_num = 15
         for c, name in enumerate(self.classname.keys()):
-            fig = plt.figure(figsize = (24, ((self.attribute_num+2)/3)*6))
+            fig = plt.figure(figsize = (24, ((self.attributeNum+2)/3)*6))
             fig.suptitle(self.filename, size = 24)        
             ax = []
-            for i in range(self.attribute_num):
-                ax = fig.add_subplot((self.attribute_num+2)/3, 3, i+1)
-                buf= self.df[self.df[self.attribute_num] == name][i]
+            for i in range(self.attributeNum):
+                ax = fig.add_subplot((self.attributeNum+2)/3, 3, i+1)
+                buf= self.df[self.df[self.attributeNum] == name][i]
                 ax.hist(buf, bins = bins_num, label = name, color = cmap(c))
                 ax.set_title("class name: " + str(name) + "  attribute dim: " + str(i))
                 ax.grid(True)
@@ -103,21 +120,25 @@ class dataset_view():
         
     #各クラスについてグラフ カーネル密度推定
     def plot4(self):
-        fig = plt.figure(figsize = (24, ((self.attribute_num+2)/3)*6))
-        fig.suptitle(self.filename, size = 24)        
-        ax = []
-        for i in range(self.attribute_num):
-            ax = fig.add_subplot((self.attribute_num+2)/3, 3, i+1)
+        for i in range(self.attributeNum):
+            fig = plt.figure(figsize = (8,6))
+            ax = fig.add_subplot(1, 1, 1)
+            fig.suptitle(self.filename, size = 24)        
+            ax = []
+            ax = fig.add_subplot(1,1,1)
             for c, name in enumerate(self.classname.keys()):
-                buf= self.df[self.df[self.attribute_num] == name][i]
+                buf= self.df[self.df[self.attributeNum] == name][i]
                 buf.plot(kind='kde', color = cmap(c), label = name)
-            ax.set_title("attribute dim: " + str(i))
+            ax.set_title("attribute dim: " + str(i), fontsize = 22)
             ax.grid(True)
-            ax.set_xlabel("value")
-            ax.set_ylabel("number")            
-            ax.legend()
-        figname =  self.filename.replace(".csv", "")
-        figSave(fig, filename = figname + "_P4",  datesetname = figname)
+            ax.set_xlim(-0.05, 1.05)
+            ax.set_xlabel("value", fontsize = 22)
+            ax.set_ylabel("Density", fontsize = 22)            
+            ax.legend(loc='upper right', fontsize='x-large')
+            ax.tick_params(axis="x", labelsize=16)
+            ax.tick_params(axis="y", labelsize=16)  
+            SaveFig(fig, "./" + self.filename + "/dim/",  filename = self.filename + "dim_" + str(i))
+            plt.close('all')
         
     def plot5(self):
         fig = plt.figure(figsize = (8, 6))

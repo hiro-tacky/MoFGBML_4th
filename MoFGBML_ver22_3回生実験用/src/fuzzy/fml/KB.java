@@ -195,7 +195,6 @@ public class KB {
 				tmp++;
 			}
 		}
-		int N = 0;
 	}
 
 	public void threeTriangle(int Ndim) {

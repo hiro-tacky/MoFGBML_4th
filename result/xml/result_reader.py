@@ -227,6 +227,37 @@ class resultXML(XML):
         ax.grid(True)
         if title is not None:
             ax.set_title(title)
+            
+    def setPlotDtraBest(self, gen, ax, label_name, title = None, marker = "o"):
+        best = {}
+        for i, trial in enumerate(self.data.values()):
+            data = trial[gen]
+            df = data[data['f1'] != 1]
+            best_individuals_Dtra = {}
+            best_individuals_Dtst = {}
+            for i, buf in df.iterrows():
+                try:
+                    if best_individuals_Dtra[buf['f1']] > buf['Dtra'] or (best_individuals_Dtra[buf['f1']] == buf['Dtra'] and best_individuals_Dtst[buf['f1']] > buf['Dtst']):
+                        best_individuals_Dtra[buf['f1']] = buf['Dtra']                      
+                        best_individuals_Dtst[buf['f1']] = buf['Dtst']
+                except:
+                    best_individuals_Dtra[buf['f1']] = buf['Dtra']
+                    best_individuals_Dtst[buf['f1']] = buf['Dtst']
+            for RuleNum, bestValue in best_individuals_Dtst.items():
+                try:
+                    best[RuleNum][0] += bestValue
+                    best[RuleNum][1] += 1                    
+                except:
+                    best[RuleNum] = [bestValue, 1]
+            del best_individuals_Dtra, best_individuals_Dtst
+        x = [ruleNum for ruleNum, average in best.items() if average[1] > trial_num/2]
+        y = [average[0]/average[1] for average in best.values() if average[1] > trial_num/2]
+        print(x, y)
+        ax.scatter(x, y, label = label_name, marker = marker)
+        ax.grid(True)
+        if title is not None:
+            ax.set_title(title)
+        
         
         
 ###################################################################################################
@@ -238,8 +269,9 @@ class Result():
         print("RESULT\n dataset name:")
         self.datasetname = input()
         self.resultObj_set = {} #[FuzzyTypeList][folderList] = RuleSetXMLオブジェクト
-        self.FuzzyTypeList = ["rectangular", "trapezoid", "gaussian"] #比較されるファジィタイプ"multi"
-        self.folderList = ["default", "entropy"] #比較するxmlファイルが存在するフォルダ
+        self.FuzzyTypeList = ["triangular"]#["rectangular", "trapezoid", "gaussian"] #比較されるファジィタイプ"multi"
+        self.folderList = ["default", "entropy", "default_entropy"] #比較するxmlファイルが存在するフォルダ
+        label_name = "             "
         for fuzzyType in self.FuzzyTypeList:
             for folderName in self.folderList:
                 self.fileName = "*" + fuzzyType + "_result.xml"
@@ -248,6 +280,7 @@ class Result():
                 #ラベルネーム変更忘れるな
                 ExperimentName = fuzzyType   #比較される(同一画像に描写される)xmlファイルのネームラベル
                 label_name = folderName  #生成される複数の画像のネームラベル
+                # label_name += " "
                 ############################################
                 for path in self.pathList:
                     print(path)
@@ -261,12 +294,22 @@ class Result():
             # self.resultObj_set[figFileList] = resultObj_buf
         
         #####################################################################
-        self.savePath = "result/" + self.datasetname + "/entropy-based/" #変更忘れるな 
+        self.savePath = "result/" + self.datasetname + "/entropy-based-com/" #変更忘れるな 
         #####################################################################
         
         #(Dtst or Dtrs) or (Ave or Best)の4つの場合でメソッドを実行
-        for tmp in [[True, True], [False, True]]:#, [True, False], [False, False]]:
-            self.plot_result(isDtst = tmp[0], isAve = tmp[1])
+        # for tmp in [[True, True], [False, True], [True, False], [False, False]]:
+        #     self.plot_result(isDtst = tmp[0], isAve = tmp[1])
+        
+        self.plot_resultDtraBest()
+        
+    def down(self, x):
+        i = 0
+        for ExperimentName, resultObj_set_Experiment in self.resultObj_set.items():
+            for label_name, resultObj in resultObj_set_Experiment.items():
+                if i == x:
+                    return resultObj
+                i += 1
     
     def getResultXML(self, FuzzyType = "multi", folderName = "entropy"):
         return self.resultObj_set[FuzzyType][folderName]
@@ -306,7 +349,7 @@ class Result():
                 elif not isAve:
                     for label_name, resultObj in resultObj_dict.items():
                         resultObj.setplotGenBest(gen_buf, ax, label_name = label_name, title = "gen:" + str(gen_buf), isDtst = isDtst)                  
-                ax.legend(loc='upper right')
+                ax.legend(loc='upper right', fontsize='xx-large')
                 buf_x, buf_y = ax.get_xlim(), ax.get_ylim()
                 if buf_x[0] < x_lim[0]: x_lim[0] = buf_x[0] 
                 if buf_x[1] > x_lim[1]: x_lim[1] = buf_x[1]
@@ -320,10 +363,54 @@ class Result():
                 ax = fig.gca()
                 ax.set_xlim(x_lim)
                 ax.set_ylim(y_lim)
-                ax.set_xticks(range(2, int(x_lim[1]), lim(x_lim[0], x_lim[1])))
-                ax.set_xlabel("number of rule")
-                ax.set_ylabel("error rate[%]")
+                ax.set_xticks(range(2, int(x_lim[1])+1, lim(x_lim[0], x_lim[1]+1)))
+                ax.tick_params(axis="x", labelsize=16)
+                ax.tick_params(axis="y", labelsize=16)
+                ax.set_xlabel("number of rule", fontsize = 20)
+                ax.set_ylabel("error rate[%]", fontsize = 20)
                 SaveFig(fig, savepath + ExperimentName + "/", filename + str(i).zfill(3))
             plt.close('all')
         print("fin")
+
+    def plot_resultDtraBest(self, gen = gen_list, title = None, filename = None):
+        gen_tmp = [gen] if type(gen) is int else gen
+        d_today = datetime.date.today()
+        
+        for ExperimentName, resultObj_dict in self.resultObj_set.items():
+            
+            savepath = self.savePath + "{0:%Y%m%d}".format(d_today)+ "/DtarBest/"
+            fig_title = self.datasetname + ": " + ExperimentName + " Dtra Best's Dtst"
+            filename = self.datasetname + "_" + ExperimentName + "_Result_DtraBest"
+            print(savepath)
+            
+            x_lim,y_lim  = [1000, -1], [1000, -1]
+            for gen_buf in gen_tmp:
+                fig =  singleFig_set(fig_title)
+                ax = fig.gca()
+                for label_name, resultObj in resultObj_dict.items():
+                    resultObj.setPlotDtraBest(gen_buf, ax, label_name = label_name, title = "gen:" + str(gen_buf)) 
+                ax.legend(loc='upper right', fontsize='xx-large')
+                buf_x, buf_y = ax.get_xlim(), ax.get_ylim()
+                if buf_x[0] < x_lim[0]: x_lim[0] = buf_x[0] 
+                if buf_x[1] > x_lim[1]: x_lim[1] = buf_x[1]
+                if buf_y[0] < y_lim[0]: y_lim[0] = buf_y[0]
+                if buf_y[1] > y_lim[1]: y_lim[1] = buf_y[1]
+                
+            fignums = plt.get_fignums()
+            for i, fignum in enumerate(fignums):
+                plt.figure(fignum)
+                fig = plt.gcf()
+                ax = fig.gca()
+                ax.set_xlim(x_lim)
+                ax.set_ylim(y_lim)
+                ax.set_xticks(range(2, int(x_lim[1])+1, lim(x_lim[0], x_lim[1]+1)))
+                ax.tick_params(axis="x", labelsize=16)
+                ax.tick_params(axis="y", labelsize=16)
+                ax.set_xlabel("number of rule", fontsize = 20)
+                ax.set_ylabel("error rate[%]", fontsize = 20)
+                SaveFig(fig, savepath + ExperimentName + "/", filename + str(i).zfill(3))
+            plt.close('all')
+        print("fin")
+        
+        
 

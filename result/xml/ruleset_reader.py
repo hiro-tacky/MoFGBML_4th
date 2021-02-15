@@ -57,6 +57,7 @@ def singleFig_set(title = None):
         入力:ファイル名
         返り値:figureオブジェクト"""
         fig = plt.figure(figsize = default_figsize)
+        # fig.subplots_adjust(left=0.125, right=0.72, bottom=0.1, top=0.9)
         ax = fig.add_subplot(1, 1, 1)
         if title is not None:
             fig.suptitle(title, size = default_titlesize)        
@@ -166,7 +167,9 @@ class detaset_df:
             kde_model = gaussian_kde(self.dfByClass[className][dim])
             x_grid = np.linspace(0, max(self.dfByClass[className][dim]), num=100)
             y = kde_model(x_grid)
-            ax2.plot(x_grid, y, linestyle = "--")
+            ax2.plot(x_grid, y, linestyle = "--", label = className)
+            ax2.tick_params(axis="y", labelsize=16)
+            ax2.legend(bbox_to_anchor=(1.12, 1), loc='upper left', fontsize=18)
     
     def setAxHist(self, dim, ax):
         ax2 = ax.twinx()
@@ -175,6 +178,7 @@ class detaset_df:
             ax2.hist(self.dfByClass[className][dim], bins = 15, range = (0.0, 1.0), histtype="step", color = cmap(c))
             ylim = ax2.get_ylim();
             ax2.set_ylim(-0.05*ylim[1], ylim[1]*1.05)
+            ax2.tick_params(axis="y", labelsize=16)
         
 class FuzzyTerm:
     """Fuzzy Termのためのクラス"""
@@ -246,6 +250,8 @@ class KB:
                     for partiton_num in partiton_num_set:
                         fig = singleFig_set("KB_trial" + str(self.trial) + "_gen" + str(self.gen) + "_Attribute" + str(dimension) + "_Partition" + str(partiton_num))
                         ax = fig.gca()
+                        ax.tick_params(axis="x", labelsize=16)
+                        ax.tick_params(axis="y", labelsize=16)
                         if df is not None:
                             df.setAx(dimension, ax)
                         for i in range(partiton_num):
@@ -261,6 +267,8 @@ class KB:
             for dimension, FuzzySet in self.fuzzySets.items():
                 fig = singleFig_set("KnowledgeBase_trial" + str(self.trial) + "_gen" + str(self.gen) + "_Attribute" + str(dimension))
                 ax = fig.gca()
+                ax.tick_params(axis="x", labelsize=16)
+                ax.tick_params(axis="y", labelsize=16)                
                 if df is not None:
                     df.setAx(dimension, ax)
                 for FuzzyTermID, FuzzyTerm in FuzzySet.items():
@@ -276,6 +284,8 @@ class KB:
                 for FuzzyTermID, FuzzyTerm in FuzzySet.items():
                     fig = singleFig_set("KnowledgeBase_trial" + str(self.trial) + "_gen" + str(self.gen) + "_Attribute" + str(dimension) + "_FuzzyTermID" + str(FuzzyTermID))
                     ax = fig.gca()
+                    ax.tick_params(axis="x", labelsize=16)
+                    ax.tick_params(axis="y", labelsize=16)
                     if df is not None:
                         df.setAx(dimension, ax)
                     self.fuzzySets[dimension][FuzzyTermID].setAx(ax)
@@ -439,7 +449,7 @@ class RuleSetXML(XML):
                             elif FuzzyTermID == 0:
                                 uesdFuzzyTerms[dim][0] += 1
                 
-        label_sample = ["Do'nt Care","gaussian_entropy", "rectangle_entropy", "trapezoid_entropy", "gaussian_default", "rectangular_default", "triangle_default"]
+        label_sample = ["Don't Care","gaussian_entropy", "rectangle_entropy", "triangle_entropy", "gaussian_default", "rectangular_default", "triangle_default"]
         color_sample = ["C{}".format(i) for i in range(len(label_sample))]
         for dim in range(self.attributeNum):
             fig = singleFig_set(self.datasetName + " dim:" + str(dim) + " used menbership rate (cover all classes)")
@@ -450,18 +460,22 @@ class RuleSetXML(XML):
                     data_buf.append(uesdFuzzyTerms[dim][index])
                     label_buf.append(label_sample[index])
                     color_buf.append(color_sample[index])
-            ax.pie(data_buf, labels = label_buf, startangle=90, colors = color_buf, counterclock = False)
+            patches, texts = ax.pie(data_buf, labels = label_buf, startangle=90, colors = color_buf, counterclock = False)
+            for t in texts:
+                t.set_size(20)
             SaveFig(fig, savePath + "dim_" + str(dim) +"/", self.datasetName + "_dim" + str(dim) + "_usedMenbershipRate")
             plt.close("all")
             
         for dim in range(self.attributeNum):
             fig = singleFig_set(self.datasetName + " dim:" + str(dim) + " used menbership rate (cover all classes)")
             ax = fig.gca()
-            data_buf, label_buf, color_buf = [], ["Do'nt Care", "entropy", "default"], ["gray", "orange", "blue"]
-            data_buf.append(uesdFuzzyTerms[dim][0])
+            data_buf, label_buf, color_buf = [], ["entropy", "default", "Don't Care"], ["orange", "blue", "gray"]
             data_buf.append(uesdFuzzyTerms[dim][1] + uesdFuzzyTerms[dim][2] + uesdFuzzyTerms[dim][3])
             data_buf.append(uesdFuzzyTerms[dim][4] + uesdFuzzyTerms[dim][5] + uesdFuzzyTerms[dim][6])
-            ax.pie(data_buf, labels = label_buf, startangle=90, colors = color_buf, counterclock = False)
+            data_buf.append(uesdFuzzyTerms[dim][0])
+            patches, texts = ax.pie(data_buf, labels = label_buf, startangle=90, colors = color_buf, counterclock = False)
+            for t in texts:
+                t.set_size(24)
             SaveFig(fig, savePath + "dim_" + str(dim) + "/", self.datasetName + "_dim" + str(dim) + "_usedFuzzyTypeRate")
             plt.close("all")
             
@@ -472,13 +486,15 @@ class RuleSetXML(XML):
             data_buf.append(uesdFuzzyTerms[dim][1] + uesdFuzzyTerms[dim][4])
             data_buf.append(uesdFuzzyTerms[dim][2] + uesdFuzzyTerms[dim][5])
             data_buf.append(uesdFuzzyTerms[dim][3] + uesdFuzzyTerms[dim][6])
-            ax.pie(data_buf, labels = label_buf, startangle=90, colors = color_buf, counterclock = False)
+            patches, texts = ax.pie(data_buf, labels = label_buf, startangle=90, colors = color_buf, counterclock = False)
+            for t in texts:
+                t.set_size(20)    
             SaveFig(fig, savePath + "dim_" + str(dim) + "/", self.datasetName + "_dim" + str(dim) + "_usedFuzzyTypeRate")
             plt.close("all")
             
         data_buf = [0]*7
         label_buf = label_sample[1:]
-        fig = singleFig_set(self.datasetName + " dim:" + str(dim) + " used menbership rate (cover all classes)")
+        fig = singleFig_set(self.datasetName + " used menbership rate (cover all classes)")
         ax = fig.gca()
         for dim in range(self.attributeNum):
             for index, tmp in enumerate(uesdFuzzyTerms[dim]): #要素数0を除外
@@ -489,19 +505,19 @@ class RuleSetXML(XML):
         SaveFig(fig, savePath + "all/", self.datasetName + "_dim" + str(dim) + "_usedMenbershipRate")
         plt.close("all")
             
-        data_buf, label_buf, color_buf = [0]*3, ["Do'nt Care", "entropy", "default"], ["gray", "orange", "blue"]
-        fig = singleFig_set(self.datasetName + " dim:" + str(dim) + " used menbership rate (cover all classes)")
+        data_buf, label_buf, color_buf = [0]*3, ["entropy", "default", "Don't Care"], ["orange", "blue", "gray"]
+        fig = singleFig_set(self.datasetName + " used menbership rate (cover all classes)")
         ax = fig.gca()
         for dim in range(self.attributeNum):
-            data_buf[0] += uesdFuzzyTerms[dim][0]
-            data_buf[1] += (uesdFuzzyTerms[dim][1] + uesdFuzzyTerms[dim][2] + uesdFuzzyTerms[dim][3])
-            data_buf[2] += (uesdFuzzyTerms[dim][4] + uesdFuzzyTerms[dim][5] + uesdFuzzyTerms[dim][6])
+            data_buf[0] += (uesdFuzzyTerms[dim][1] + uesdFuzzyTerms[dim][2] + uesdFuzzyTerms[dim][3])
+            data_buf[1] += (uesdFuzzyTerms[dim][4] + uesdFuzzyTerms[dim][5] + uesdFuzzyTerms[dim][6])
+            data_buf[2] += uesdFuzzyTerms[dim][0]
         ax.pie(data_buf, labels = label_buf, startangle=90, colors = color_buf, counterclock = False)
         SaveFig(fig, savePath + "all/", self.datasetName + "_dim" + str(dim) + "_usedFuzzyTypeRate")
         plt.close("all")
             
         data_buf, label_buf, color_buf = [0]*3, ["gaussian", "rectangular", "trapezoid"], ["red", "purple", "green"]
-        fig = singleFig_set(self.datasetName + " dim:" + str(dim) + " used menbership rate (cover all classes)")
+        fig = singleFig_set(self.datasetName + " used menbership rate (cover all classes)")
         ax = fig.gca()
         for dim in range(self.attributeNum):
             data_buf[0] += (uesdFuzzyTerms[dim][1] + uesdFuzzyTerms[dim][4])
@@ -510,8 +526,6 @@ class RuleSetXML(XML):
         ax.pie(data_buf, labels = label_buf, startangle=90, colors = color_buf, counterclock = False)
         SaveFig(fig, savePath + "all/", self.datasetName + "_dim" + str(dim) + "_usedFuzzyTypeRate")
         plt.close("all")
-            
-        
         
     def ByConclusion(self, saveFilePath):
         fuzzyTerm_list = {}
@@ -553,8 +567,8 @@ class RuleSet:
         print("RULESET\n dataset name:")
         self.datasetName = input()
         self.detaset_df = detaset_df(self.datasetName)
-        self.FuzzyTypeList = ["multi"] #["rectangular", "trapezoid", "gaussian"]
-        self.folderList = ["default_entropy"] #["default", "entropy"]
+        self.FuzzyTypeList = ["multi"]#["rectangular", "trapezoid", "gaussian", "triangular"]
+        self.folderList = ["default_entropy"]
         self.pathList = []
         self.RuleSetObj = {} #[FuzzyTypeList][folderList] = RuleSetXMLオブジェクト
         for fuzzyType in self.FuzzyTypeList:
@@ -569,7 +583,7 @@ class RuleSet:
                     RuleSetObj_buf[folderName] = RuleSetXML(path, self.savePath, self.datasetName)
             self.RuleSetObj[fuzzyType] = RuleSetObj_buf
             
-        # self.KBplot(inOneFig = True, ByPartitoinNum = True)
+        self.KBplot(inOneFig = True, ByPartitoinNum = True)
         self.UsedMenbershipRatePlot()  
             
     def getRuleSetXML(self, fuzzyType = "multi", folderName = "default_entropy"):

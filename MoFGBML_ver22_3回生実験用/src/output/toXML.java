@@ -380,28 +380,28 @@ public class toXML {
 						addChildNode_value("name", ft, vv.getName());
 						//type
 						addChildNode_value("Shape_Type_ID", ft, String.valueOf(vv.getShapeType()));
-						String ShapeName = null;
-						switch(vv.getShapeType()) {
-							case 0: ShapeName = "rightLinearShape"; break;
-							case 1: ShapeName = "leftLinearShape"; break;
-							case 2: ShapeName = "piShape"; break;
-							case 3: ShapeName = "triangularShape"; break;
-							case 4: ShapeName = "gaussianShape"; break;
-							case 5: ShapeName = "rightGaussianShape"; break;
-							case 6: ShapeName = "leftGaussianShape"; break;
-							case 7: ShapeName = "trapezoidShape"; break;
-							case 8: ShapeName = "singletonShape"; break;
-							case 9: ShapeName = "rectangularShape"; break;
-							case 10: ShapeName = "zShape"; break;
-							case 11: ShapeName = "sShape"; break;
-							case 12: ShapeName = "pointSetShape"; break;
-							case 13: ShapeName = "pointSetMonotonicShape"; break;
-							case 14: ShapeName = "circularDefinition"; break;
-							case 15: ShapeName = "customShape"; break;
-							case 16: ShapeName = "customMonotonicShape"; break;
-							case 99: ShapeName = "DontCare"; break;
-						}
-						addChildNode_value("Shape_Type", ft, ShapeName);
+//						String ShapeName = null;
+//						switch(vv.getShapeType()) {
+//							case 0: ShapeName = "rightLinearShape"; break;
+//							case 1: ShapeName = "leftLinearShape"; break;
+//							case 2: ShapeName = "piShape"; break;
+//							case 3: ShapeName = "triangularShape"; break;
+//							case 4: ShapeName = "gaussianShape"; break;
+//							case 5: ShapeName = "rightGaussianShape"; break;
+//							case 6: ShapeName = "leftGaussianShape"; break;
+//							case 7: ShapeName = "trapezoidShape"; break;
+//							case 8: ShapeName = "singletonShape"; break;
+//							case 9: ShapeName = "rectangularShape"; break;
+//							case 10: ShapeName = "zShape"; break;
+//							case 11: ShapeName = "sShape"; break;
+//							case 12: ShapeName = "pointSetShape"; break;
+//							case 13: ShapeName = "pointSetMonotonicShape"; break;
+//							case 14: ShapeName = "circularDefinition"; break;
+//							case 15: ShapeName = "customShape"; break;
+//							case 16: ShapeName = "customMonotonicShape"; break;
+//							case 99: ShapeName = "DontCare"; break;
+//						}
+//						addChildNode_value("Shape_Type", ft, ShapeName);
 						//parameters
 						FuzzyTermType ftt = vv.getTerm();
 						float[] param = ftt.getParam();
@@ -413,7 +413,7 @@ public class toXML {
 							parameter.appendChild(textContents);
 							params.appendChild(parameter);
 						}
-						addChildNode_value("weight", ft, String.valueOf(vv.getWeight()));
+//						addChildNode_value("weight", ft, String.valueOf(vv.getWeight()));
 					}
 				}
 
@@ -483,6 +483,8 @@ public class toXML {
 			trial.setAttribute("trial", String.valueOf(Trial.getTrial()));
 
 			for(int population_j=0; population_j<Trial.getResult().size(); population_j++) {
+				//出力を最終世代に限定
+				population_j = Trial.getResult().size() - 1;
 				Element pop = addChildNode("population", trial);
 				Result_population Pop = Trial.getResultPopulation(population_j);
 				pop.setAttribute("ID", String.valueOf(population_j));
