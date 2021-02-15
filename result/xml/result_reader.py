@@ -14,7 +14,7 @@ trial_num = 30 #試行回数
 gen_num = 5000 #世代数
 my_path = os.getcwd()
 FuzzyTypeID = {9:"rectangle", 7:"trapezoid", 3:"triangle", 4:"gaussian", 99:"multi"}
-gen_list = range(500, 5000+1, 500)
+gen_list = [5000]#range(1000, 5000+1, 1000)
 trial_list = range(30)
 
 DatasetList = {
@@ -38,7 +38,7 @@ attri_plot = 0
 default_size = 50
 default_alpha = 0.01
 #figureの基本設定
-default_figsize = (8, 6)
+default_figsize = (16, 9)
 default_titlesize = 18
 ###############################################################################
 
@@ -58,6 +58,7 @@ def singleFig_set(title = None):
         入力:ファイル名
         返り値:figureオブジェクト"""
         fig = plt.figure(figsize = default_figsize)
+        fig.subplots_adjust(left=0.08, right=0.95, bottom=0.1, top=0.92)
         ax = fig.add_subplot(1, 1, 1)
         if title is not None:
             fig.suptitle(title, size = default_titlesize)        
@@ -252,8 +253,9 @@ class resultXML(XML):
             del best_individuals_Dtra, best_individuals_Dtst
         x = [ruleNum for ruleNum, average in best.items() if average[1] > trial_num/2]
         y = [average[0]/average[1] for average in best.values() if average[1] > trial_num/2]
-        print(x, y)
+        # print(x, y)
         ax.scatter(x, y, label = label_name, marker = marker)
+        
         ax.grid(True)
         if title is not None:
             ax.set_title(title)
@@ -270,7 +272,7 @@ class Result():
         self.datasetname = input()
         self.resultObj_set = {} #[FuzzyTypeList][folderList] = RuleSetXMLオブジェクト
         self.FuzzyTypeList = ["triangular"]#["rectangular", "trapezoid", "gaussian"] #比較されるファジィタイプ"multi"
-        self.folderList = ["default", "entropy", "default_entropy"] #比較するxmlファイルが存在するフォルダ
+        self.folderList = ["default", "entropy", "default_entropy_triagluar"] #比較するxmlファイルが存在するフォルダ
         label_name = "             "
         for fuzzyType in self.FuzzyTypeList:
             for folderName in self.folderList:
@@ -401,13 +403,14 @@ class Result():
                 plt.figure(fignum)
                 fig = plt.gcf()
                 ax = fig.gca()
+                ax.legend(loc='upper right', fontsize='xx-large')
                 ax.set_xlim(x_lim)
                 ax.set_ylim(y_lim)
                 ax.set_xticks(range(2, int(x_lim[1])+1, lim(x_lim[0], x_lim[1]+1)))
-                ax.tick_params(axis="x", labelsize=16)
-                ax.tick_params(axis="y", labelsize=16)
-                ax.set_xlabel("number of rule", fontsize = 20)
-                ax.set_ylabel("error rate[%]", fontsize = 20)
+                ax.tick_params(axis="x", labelsize=24)
+                ax.tick_params(axis="y", labelsize=24)
+                ax.set_xlabel("number of rule", fontsize = 36)
+                ax.set_ylabel("error rate[%]", fontsize = 36)
                 SaveFig(fig, savepath + ExperimentName + "/", filename + str(i).zfill(3))
             plt.close('all')
         print("fin")

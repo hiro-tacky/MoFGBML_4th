@@ -45,7 +45,7 @@ attri_plot = 0
 default_size = 50
 default_alpha = 0.01
 #figureの基本設定
-default_figsize = (8, 6)
+default_figsize = (16, 9)
 default_titlesize = 18
 ###############################################################################
 
@@ -57,7 +57,8 @@ def singleFig_set(title = None):
         入力:ファイル名
         返り値:figureオブジェクト"""
         fig = plt.figure(figsize = default_figsize)
-        # fig.subplots_adjust(left=0.125, right=0.72, bottom=0.1, top=0.9)
+        # fig.subplots_adjust(left=0.06, right=0.94, bottom=0.06, top=0.92)
+        fig.subplots_adjust(left=0, right=1, bottom=0, top=0.95)
         ax = fig.add_subplot(1, 1, 1)
         if title is not None:
             fig.suptitle(title, size = default_titlesize)        
@@ -168,7 +169,7 @@ class detaset_df:
             x_grid = np.linspace(0, max(self.dfByClass[className][dim]), num=100)
             y = kde_model(x_grid)
             ax2.plot(x_grid, y, linestyle = "--", label = className)
-            ax2.tick_params(axis="y", labelsize=16)
+            ax2.tick_params(axis="y", labelsize=24)
             ax2.legend(bbox_to_anchor=(1.12, 1), loc='upper left', fontsize=18)
     
     def setAxHist(self, dim, ax):
@@ -178,7 +179,7 @@ class detaset_df:
             ax2.hist(self.dfByClass[className][dim], bins = 15, range = (0.0, 1.0), histtype="step", color = cmap(c))
             ylim = ax2.get_ylim();
             ax2.set_ylim(-0.05*ylim[1], ylim[1]*1.05)
-            ax2.tick_params(axis="y", labelsize=16)
+            ax2.tick_params(axis="y", labelsize=24)
         
 class FuzzyTerm:
     """Fuzzy Termのためのクラス"""
@@ -250,8 +251,8 @@ class KB:
                     for partiton_num in partiton_num_set:
                         fig = singleFig_set("KB_trial" + str(self.trial) + "_gen" + str(self.gen) + "_Attribute" + str(dimension) + "_Partition" + str(partiton_num))
                         ax = fig.gca()
-                        ax.tick_params(axis="x", labelsize=16)
-                        ax.tick_params(axis="y", labelsize=16)
+                        ax.tick_params(axis="x", labelsize=24)
+                        ax.tick_params(axis="y", labelsize=24)
                         if df is not None:
                             df.setAx(dimension, ax)
                         for i in range(partiton_num):
@@ -267,8 +268,8 @@ class KB:
             for dimension, FuzzySet in self.fuzzySets.items():
                 fig = singleFig_set("KnowledgeBase_trial" + str(self.trial) + "_gen" + str(self.gen) + "_Attribute" + str(dimension))
                 ax = fig.gca()
-                ax.tick_params(axis="x", labelsize=16)
-                ax.tick_params(axis="y", labelsize=16)                
+                ax.tick_params(axis="x", labelsize=24)
+                ax.tick_params(axis="y", labelsize=24)                
                 if df is not None:
                     df.setAx(dimension, ax)
                 for FuzzyTermID, FuzzyTerm in FuzzySet.items():
@@ -284,8 +285,8 @@ class KB:
                 for FuzzyTermID, FuzzyTerm in FuzzySet.items():
                     fig = singleFig_set("KnowledgeBase_trial" + str(self.trial) + "_gen" + str(self.gen) + "_Attribute" + str(dimension) + "_FuzzyTermID" + str(FuzzyTermID))
                     ax = fig.gca()
-                    ax.tick_params(axis="x", labelsize=16)
-                    ax.tick_params(axis="y", labelsize=16)
+                    ax.tick_params(axis="x", labelsize=24)
+                    ax.tick_params(axis="y", labelsize=24)
                     if df is not None:
                         df.setAx(dimension, ax)
                     self.fuzzySets[dimension][FuzzyTermID].setAx(ax)
@@ -462,7 +463,7 @@ class RuleSetXML(XML):
                     color_buf.append(color_sample[index])
             patches, texts = ax.pie(data_buf, labels = label_buf, startangle=90, colors = color_buf, counterclock = False)
             for t in texts:
-                t.set_size(20)
+                t.set_size(36)
             SaveFig(fig, savePath + "dim_" + str(dim) +"/", self.datasetName + "_dim" + str(dim) + "_usedMenbershipRate")
             plt.close("all")
             
@@ -475,7 +476,7 @@ class RuleSetXML(XML):
             data_buf.append(uesdFuzzyTerms[dim][0])
             patches, texts = ax.pie(data_buf, labels = label_buf, startangle=90, colors = color_buf, counterclock = False)
             for t in texts:
-                t.set_size(24)
+                t.set_size(36)
             SaveFig(fig, savePath + "dim_" + str(dim) + "/", self.datasetName + "_dim" + str(dim) + "_usedFuzzyTypeRate")
             plt.close("all")
             
@@ -488,7 +489,7 @@ class RuleSetXML(XML):
             data_buf.append(uesdFuzzyTerms[dim][3] + uesdFuzzyTerms[dim][6])
             patches, texts = ax.pie(data_buf, labels = label_buf, startangle=90, colors = color_buf, counterclock = False)
             for t in texts:
-                t.set_size(20)    
+                t.set_size(36)    
             SaveFig(fig, savePath + "dim_" + str(dim) + "/", self.datasetName + "_dim" + str(dim) + "_usedFuzzyTypeRate")
             plt.close("all")
             
@@ -567,7 +568,7 @@ class RuleSet:
         print("RULESET\n dataset name:")
         self.datasetName = input()
         self.detaset_df = detaset_df(self.datasetName)
-        self.FuzzyTypeList = ["multi"]#["rectangular", "trapezoid", "gaussian", "triangular"]
+        self.FuzzyTypeList = ["triangular"]#["rectangular", "trapezoid", "gaussian", "triangular"]
         self.folderList = ["default_entropy"]
         self.pathList = []
         self.RuleSetObj = {} #[FuzzyTypeList][folderList] = RuleSetXMLオブジェクト
@@ -583,7 +584,7 @@ class RuleSet:
                     RuleSetObj_buf[folderName] = RuleSetXML(path, self.savePath, self.datasetName)
             self.RuleSetObj[fuzzyType] = RuleSetObj_buf
             
-        self.KBplot(inOneFig = True, ByPartitoinNum = True)
+        # self.KBplot(inOneFig = True, ByPartitoinNum = True)
         self.UsedMenbershipRatePlot()  
             
     def getRuleSetXML(self, fuzzyType = "multi", folderName = "default_entropy"):

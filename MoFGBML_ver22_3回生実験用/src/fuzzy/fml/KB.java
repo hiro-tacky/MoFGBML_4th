@@ -149,13 +149,13 @@ public class KB {
 		FSs = new FuzzySet[Ndim][];
 		float[] dontCare = new float[] {0f, 1f};
 
-		float[][][][] params = new float[6][][][];
-		params[0] = partitions.gaussian();
-		params[1] = partitions.rectangle();
-		params[2] = FuzzyPartitioning.startPartition(tra, K, F);
-		params[3] = partitions_homo.gaussian();
-		params[4] = partitions_homo.rectangle();
-		params[5] = partitions_homo.triangle( );
+		float[][][][] params = new float[2][][][];
+//		params[0] = partitions.gaussian();
+//		params[1] = partitions.rectangle();
+		params[0] = FuzzyPartitioning.startPartition(tra, K, F);
+//		params[3] = partitions_homo.gaussian();
+//		params[4] = partitions_homo.rectangle();
+		params[1] = partitions_homo.triangle( );
 
 
 		for(int dim_i = 0; dim_i < Ndim; dim_i++) {
@@ -170,28 +170,28 @@ public class KB {
 			FSs[dim_i][0].setShapeType(Consts.DONT_CARE_SHAPE_TYPE_ID);
 
 			int tmp = 1;
+//			for(int k=0; k<params[0][dim_i].length; k++) {
+//				FSs[dim_i][tmp] = new FuzzySet( String.valueOf(tmp),FuzzyTermType.TYPE_gaussianShape,params[0][dim_i][k]);
+//				tmp++;
+//			}
+//			for(int k=0; k<params[1][dim_i].length; k++) {
+//				FSs[dim_i][tmp] = new FuzzySet( String.valueOf(tmp),FuzzyTermType.TYPE_rectangularShape,params[1][dim_i][k]);
+//				tmp++;
+//			}
 			for(int k=0; k<params[0][dim_i].length; k++) {
-				FSs[dim_i][tmp] = new FuzzySet( String.valueOf(tmp),FuzzyTermType.TYPE_gaussianShape,params[0][dim_i][k]);
+				FSs[dim_i][tmp] = new FuzzySet( String.valueOf(tmp),FuzzyTermType.TYPE_trapezoidShape,params[0][dim_i][k]);
 				tmp++;
 			}
+//			for(int k=0; k<params[3][dim_i].length; k++) {
+//				FSs[dim_i][tmp] = new FuzzySet( "homo" + String.valueOf(tmp),FuzzyTermType.TYPE_gaussianShape,params[3][dim_i][k]);
+//				tmp++;
+//			}
+//			for(int k=0; k<params[4][dim_i].length; k++) {
+//				FSs[dim_i][tmp] = new FuzzySet( "homo" + String.valueOf(tmp),FuzzyTermType.TYPE_rectangularShape,params[4][dim_i][k]);
+//				tmp++;
+//			}
 			for(int k=0; k<params[1][dim_i].length; k++) {
-				FSs[dim_i][tmp] = new FuzzySet( String.valueOf(tmp),FuzzyTermType.TYPE_rectangularShape,params[1][dim_i][k]);
-				tmp++;
-			}
-			for(int k=0; k<params[2][dim_i].length; k++) {
-				FSs[dim_i][tmp] = new FuzzySet( String.valueOf(tmp),FuzzyTermType.TYPE_trapezoidShape,params[2][dim_i][k]);
-				tmp++;
-			}
-			for(int k=0; k<params[3][dim_i].length; k++) {
-				FSs[dim_i][tmp] = new FuzzySet( "homo" + String.valueOf(tmp),FuzzyTermType.TYPE_gaussianShape,params[3][dim_i][k]);
-				tmp++;
-			}
-			for(int k=0; k<params[4][dim_i].length; k++) {
-				FSs[dim_i][tmp] = new FuzzySet( "homo" + String.valueOf(tmp),FuzzyTermType.TYPE_rectangularShape,params[4][dim_i][k]);
-				tmp++;
-			}
-			for(int k=0; k<params[5][dim_i].length; k++) {
-				FSs[dim_i][tmp] = new FuzzySet( "homo" + String.valueOf(tmp),FuzzyTermType.TYPE_triangularShape,params[5][dim_i][k]);
+				FSs[dim_i][tmp] = new FuzzySet( "homo" + String.valueOf(tmp),FuzzyTermType.TYPE_triangularShape,params[1][dim_i][k]);
 				tmp++;
 			}
 		}

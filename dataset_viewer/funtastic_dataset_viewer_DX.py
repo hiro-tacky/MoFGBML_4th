@@ -121,7 +121,8 @@ class dataset_view():
     #各クラスについてグラフ カーネル密度推定
     def plot4(self):
         for i in range(self.attributeNum):
-            fig = plt.figure(figsize = (8,6))
+            fig = plt.figure(figsize = (16,9))
+            fig.subplots_adjust(left=0.08, right=0.95, bottom=0.11, top=0.92)
             ax = fig.add_subplot(1, 1, 1)
             fig.suptitle(self.filename, size = 24)        
             ax = []
@@ -132,12 +133,12 @@ class dataset_view():
             ax.set_title("attribute dim: " + str(i), fontsize = 22)
             ax.grid(True)
             ax.set_xlim(-0.05, 1.05)
-            ax.set_xlabel("value", fontsize = 22)
-            ax.set_ylabel("Density", fontsize = 22)            
+            ax.set_xlabel("value", fontsize = 36)
+            ax.set_ylabel("Density", fontsize = 36)            
             ax.legend(loc='upper right', fontsize='x-large')
-            ax.tick_params(axis="x", labelsize=16)
-            ax.tick_params(axis="y", labelsize=16)  
-            SaveFig(fig, "./" + self.filename + "/dim/",  filename = self.filename + "dim_" + str(i))
+            ax.tick_params(axis="x", labelsize=24)
+            ax.tick_params(axis="y", labelsize=24)  
+            SaveFig(fig, "./" + self.filename + "/dim/",  filename = self.filename + "_dim_" + str(i))
             plt.close('all')
         
     def plot5(self):
