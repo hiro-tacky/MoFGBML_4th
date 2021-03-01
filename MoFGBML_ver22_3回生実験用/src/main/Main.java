@@ -149,7 +149,7 @@ public class Main {
 
 
 		//ファイル名構築
-		String resultRoot = dir_path + sep + Setting.dataName + "_" + ExperimentInfo.FuzzyTypeName + "_" + id;
+		String resultRoot = dir_path + sep + ExperimentInfo.saveDir + sep + Setting.dataName + "_" + id;
 		Output.mkdirs(resultRoot);
 
 		/* ********************************************************* */

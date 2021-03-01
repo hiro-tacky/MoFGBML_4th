@@ -1,11 +1,15 @@
-/jfml/
-/main/
+/.classpath
+/.project
+/consts.properties
 /data/
 /emo/
 /fgbml/
 /fuzzy/
 /ga/
 /gui/
+/jfml/
+/main/
 /method/
 /output/
+/setting.properties
 /time/
