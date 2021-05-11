@@ -35,7 +35,7 @@ public class StaticFuzzyFunc {
 
 	@SuppressWarnings("rawtypes")
 	public static void initfuzzy_multi(DataSetInfo Dtra) {
-		if(Consts.FUZZY_SET_INITIALIZE == 0) {
+		if(ExperimentInfo.FUZZY_SET_INITIALIZE == 0) {
 			switch(ExperimentInfo.FuzzySetType) {
 				case 99: multiInit(Dtra.getNdim()); break;
 				case 3: triangleInit(Dtra.getNdim()); break;
@@ -43,12 +43,12 @@ public class StaticFuzzyFunc {
 				case 7: trapezoidInit(Dtra.getNdim()); break;
 				case 9: rectangleInit(Dtra.getNdim()); break;
 			}
-		} else if(Consts.FUZZY_SET_INITIALIZE == 1) {
+		} else if(ExperimentInfo.FUZZY_SET_INITIALIZE == 1) {
 			//Input FML file
 			String sep = File.separator;
 			String fileName = System.getProperty("user.dir") + sep + "dataset" + sep + Consts.XML_FILE;
 			initFML(fileName);
-		} else if(Consts.FUZZY_SET_INITIALIZE == 2) {
+		} else if(ExperimentInfo.FUZZY_SET_INITIALIZE == 2) {
 			switch(ExperimentInfo.FuzzySetType) {
 				case 99:
 					kb = new KB();
@@ -74,14 +74,14 @@ public class StaticFuzzyFunc {
 
 	@SuppressWarnings("rawtypes")
 	public static void initFuzzy(DataSetInfo Dtra) {
-		if(Consts.FUZZY_SET_INITIALIZE == 0) {
+		if(ExperimentInfo.FUZZY_SET_INITIALIZE == 0) {
 			homogeneousInit(Dtra.getNdim());
-		} else if(Consts.FUZZY_SET_INITIALIZE == 1) {
+		} else if(ExperimentInfo.FUZZY_SET_INITIALIZE == 1) {
 			//Input FML file
 			String sep = File.separator;
 			String fileName = System.getProperty("user.dir") + sep + "dataset" + sep + Consts.XML_FILE;
 			initFML(fileName);
-		} else if(Consts.FUZZY_SET_INITIALIZE == 2) {
+		} else if(ExperimentInfo.FUZZY_SET_INITIALIZE == 2) {
 			//Inhomogeneous
 			classEntropyInit((SingleDataSetInfo)Dtra, Setting.PatitionNumSet, Consts.FUZZY_GRADE);
 		}

@@ -20,6 +20,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Text;
 
+import data.SingleDataSetInfo;
+import data.SinglePattern;
 import fgbml.Michigan;
 import fgbml.SinglePittsburgh;
 import fuzzy.Rule;
@@ -29,6 +31,7 @@ import fuzzy.fml.FuzzySet;
 import fuzzy.fml.KB;
 import jfml.term.FuzzyTermType;
 import output.result.Result_MoFGBML;
+import output.result.Result_dataset;
 import output.result.Result_individual;
 import output.result.Result_population;
 import output.result.Result_trial;
@@ -380,28 +383,28 @@ public class toXML {
 						addChildNode_value("name", ft, vv.getName());
 						//type
 						addChildNode_value("Shape_Type_ID", ft, String.valueOf(vv.getShapeType()));
-//						String ShapeName = null;
-//						switch(vv.getShapeType()) {
-//							case 0: ShapeName = "rightLinearShape"; break;
-//							case 1: ShapeName = "leftLinearShape"; break;
-//							case 2: ShapeName = "piShape"; break;
-//							case 3: ShapeName = "triangularShape"; break;
-//							case 4: ShapeName = "gaussianShape"; break;
-//							case 5: ShapeName = "rightGaussianShape"; break;
-//							case 6: ShapeName = "leftGaussianShape"; break;
-//							case 7: ShapeName = "trapezoidShape"; break;
-//							case 8: ShapeName = "singletonShape"; break;
-//							case 9: ShapeName = "rectangularShape"; break;
-//							case 10: ShapeName = "zShape"; break;
-//							case 11: ShapeName = "sShape"; break;
-//							case 12: ShapeName = "pointSetShape"; break;
-//							case 13: ShapeName = "pointSetMonotonicShape"; break;
-//							case 14: ShapeName = "circularDefinition"; break;
-//							case 15: ShapeName = "customShape"; break;
-//							case 16: ShapeName = "customMonotonicShape"; break;
-//							case 99: ShapeName = "DontCare"; break;
-//						}
-//						addChildNode_value("Shape_Type", ft, ShapeName);
+						String ShapeName = null;
+						switch(vv.getShapeType()) {
+							case 0: ShapeName = "rightLinearShape"; break;
+							case 1: ShapeName = "leftLinearShape"; break;
+							case 2: ShapeName = "piShape"; break;
+							case 3: ShapeName = "triangularShape"; break;
+							case 4: ShapeName = "gaussianShape"; break;
+							case 5: ShapeName = "rightGaussianShape"; break;
+							case 6: ShapeName = "leftGaussianShape"; break;
+							case 7: ShapeName = "trapezoidShape"; break;
+							case 8: ShapeName = "singletonShape"; break;
+							case 9: ShapeName = "rectangularShape"; break;
+							case 10: ShapeName = "zShape"; break;
+							case 11: ShapeName = "sShape"; break;
+							case 12: ShapeName = "pointSetShape"; break;
+							case 13: ShapeName = "pointSetMonotonicShape"; break;
+							case 14: ShapeName = "circularDefinition"; break;
+							case 15: ShapeName = "customShape"; break;
+							case 16: ShapeName = "customMonotonicShape"; break;
+							case 99: ShapeName = "DontCare"; break;
+						}
+						addChildNode_value("Shape_Type", ft, ShapeName);
 						//parameters
 						FuzzyTermType ftt = vv.getTerm();
 						float[] param = ftt.getParam();
@@ -413,6 +416,7 @@ public class toXML {
 							parameter.appendChild(textContents);
 							params.appendChild(parameter);
 						}
+						if(vv.getPartitonNum() >= 0)addChildNode_value("PartitionNum", ft, String.valueOf(vv.getPartitonNum()));
 //						addChildNode_value("weight", ft, String.valueOf(vv.getWeight()));
 					}
 				}
@@ -517,6 +521,45 @@ public class toXML {
 
 //					addChildNode_value("crowding", individual, String.valueOf(Individual.getCrowding()));
 
+				}
+			}
+		}
+	}
+
+
+	public void classifyResultToXML(Result_dataset input) {
+		//全体
+		Element master=document.getDocumentElement();
+
+		for(int trial_i=0; trial_i<input.getTrialNum(); trial_i++) {
+			Element trial = addChildNode("trial", master);
+			trial.setAttribute("trial", String.valueOf(trial_i));
+			//データセット
+			Element dataset_node = addChildNode("dataseet", trial);
+			SingleDataSetInfo Dtst = input.getDtst().get(trial_i);
+			//データセットの各パターン
+			for(SinglePattern pattern: Dtst.getPatterns()) {
+				Element pattern_node = addChildNode("pattern", dataset_node);
+				pattern_node.setAttribute("ID", String.valueOf(pattern.getID()));
+				//各属性値
+				for(int dim_i=0; dim_i<pattern.getX().length; dim_i++) {
+					Element attribute_node = addChildNode_value("attribute", pattern_node, String.valueOf(pattern.getDimValue(dim_i)));
+					attribute_node.setAttribute("dim", String.valueOf(dim_i));
+				}
+			}
+			//識別結果
+			Element classifyResult_node = addChildNode("classifyResult", trial);
+			for(int individual_i=0; individual_i<input.getClassifyResult().get(trial_i).size(); individual_i++) {
+				//個体別
+				Element individual_node = addChildNode("individual", classifyResult_node);
+				individual_node.setAttribute("ID", String.valueOf(individual_i));
+				//各パターン
+				for(int pattern_i=0; pattern_i<input.getClassifyResult().get(trial_i).get(individual_i).length; pattern_i++) {
+					int[] classifyResult_tmp = input.getClassifyResult().get(trial_i).get(individual_i)[pattern_i];
+					Element pattern_node = addChildNode("pattern", individual_node);
+					pattern_node.setAttribute("patternID", String.valueOf(pattern_i));
+					addChildNode_value("classifiedClass", pattern_node, String.valueOf(classifyResult_tmp[0]));
+					addChildNode_value("classifiedResult", pattern_node, String.valueOf(classifyResult_tmp[1]));
 				}
 			}
 		}

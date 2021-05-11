@@ -1,6 +1,3 @@
-/.classpath
-/.project
-/consts.properties
 /data/
 /emo/
 /fgbml/
@@ -11,5 +8,4 @@
 /main/
 /method/
 /output/
-/setting.properties
 /time/

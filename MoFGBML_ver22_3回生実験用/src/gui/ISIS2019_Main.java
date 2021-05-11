@@ -56,7 +56,7 @@ public class ISIS2019_Main {
 		for(int k = 0; k < K.length; k++) {
 
 			//Step 1. Initialize Fuzzy Sets
-			StaticFuzzyFunc.classEntropyInit(Dtra, K[k], F);
+			StaticFuzzyFunc.classEntropyInit(Dtra, K, F);
 
 			//Step 2. Output Knowledge Base as XML.
 			String fileName = xmlDir + sep + Setting.dataName + "-" + nowRep + nowCV + "_K" + K[k] + ".xml";

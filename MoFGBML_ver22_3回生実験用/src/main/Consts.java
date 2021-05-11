@@ -119,7 +119,7 @@ public class Consts {
      * 1: Input XML file<br>
      * 2: Inhomogeneous<br>
      */
-    public static int FUZZY_SET_INITIALIZE = 0;
+//    public static int FUZZY_SET_INITIALIZE = 0;
     /** Input XML file name */
     public static String XML_FILE = "a.xml";
     /** #of Inhomogeneous Partitions */
@@ -247,7 +247,7 @@ public class Consts {
 		if(bundle.containsKey("IS_BIAS_VECTOR")) { IS_BIAS_VECTOR = Boolean.parseBoolean(bundle.getString("IS_BIAS_VECTOR")); }
 		if(bundle.containsKey("IS_FIRST_IDEAL_DOWN")) { IS_FIRST_IDEAL_DOWN = Double.parseDouble(bundle.getString("IS_FIRST_IDEAL_DOWN")); }
 		if(bundle.containsKey("IS_WS_FROM_NADIA")) { IS_WS_FROM_NADIA = Boolean.parseBoolean(bundle.getString("IS_WS_FROM_NADIA")); }
-		if(bundle.containsKey("FUZZY_SET_INITIALIZE")) { FUZZY_SET_INITIALIZE = Integer.parseInt(bundle.getString("FUZZY_SET_INITIALIZE")); }
+//		if(bundle.containsKey("FUZZY_SET_INITIALIZE")) { FUZZY_SET_INITIALIZE = Integer.parseInt(bundle.getString("FUZZY_SET_INITIALIZE")); }
 		if(bundle.containsKey("XML_FILE")) { XML_FILE = bundle.getString("XML_FILE"); }
 		if(bundle.containsKey("PARTITION_NUM")) { PARTITION_NUM = Integer.parseInt(bundle.getString("PARTITION_NUM")); }
 		if(bundle.containsKey("FUZZY_GRADE")) { FUZZY_GRADE = Double.parseDouble(bundle.getString("FUZZY_GRADE")); }

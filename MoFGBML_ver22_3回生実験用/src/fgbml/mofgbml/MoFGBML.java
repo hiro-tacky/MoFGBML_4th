@@ -11,7 +11,6 @@ import main.Consts;
 import main.Experiment;
 import main.Setting;
 import method.MersenneTwisterFast;
-import method.ResultMaster;
 import output.result.Result_MoFGBML;
 import time.TimeWatcher;
 
@@ -19,7 +18,7 @@ public class MoFGBML implements Experiment {
 
 	public void startExperiment(String[] args,
 								String traFile, String tstFile,
-								MersenneTwisterFast rnd, ResultMaster resultMaster, Result_MoFGBML master) {
+								MersenneTwisterFast rnd, Result_MoFGBML master) {
 		/* ********************************************************* */
 		//START:
 		/* ********************************************************* */
@@ -73,8 +72,7 @@ public class MoFGBML implements Experiment {
 		//GA Start
 		if(Setting.emoType == Consts.NSGA2) {
 			algorithm = new NSGA2<SinglePittsburgh>();
-			algorithm.main( mop, /*output,*/ instance,
-							resultMaster, rnd,
+			algorithm.main( mop, /*output,*/ instance, rnd,
 							timeWatcher, evaWatcher, master);
 		}
 		else if(Setting.emoType == Consts.WS ||
@@ -82,8 +80,7 @@ public class MoFGBML implements Experiment {
 				Setting.emoType == Consts.PBI ||
 				Setting.emoType == Consts.AOF) {
 			algorithm = new MOEA_D<SinglePittsburgh>();
-			algorithm.main( mop, /*output,*/ instance,
-							resultMaster, rnd,
+			algorithm.main( mop, /*output,*/ instance, rnd,
 							timeWatcher, evaWatcher, master);
 		}
 		/* ********************************************************* */
@@ -91,8 +88,8 @@ public class MoFGBML implements Experiment {
 
 		//GA End
 		timeWatcher.stop();
-		resultMaster.addTimes( timeWatcher.getSec() );
-		resultMaster.addEvaTimes( evaWatcher.getSec() );
+		master.addTimes( timeWatcher.getSec() );
+		master.addEvaTimes( evaWatcher.getSec() );
 
 		System.out.println();
 	}

@@ -243,6 +243,31 @@ public class SingleRuleSet extends RuleSet<SingleRule>{
 		return ( missNums / (double)dataSetInfo.getDataSize() ) * 100.0;
 	}
 
+
+	/**
+	 * データセットに対する識別結果を出力<br>
+	 * Note: 並列計算を行わない．<br>
+	 * @param dataSetInfo : DataSetInfo
+	 * @param forkJoinPool
+	 * @return int[][] : 識別結果[パターンID][0]=識別結果クラス | 識別結果[パターンID][1]=識別結果の是非 1=識別成功 0=識別失敗
+	 */
+	@SuppressWarnings("rawtypes")
+	public int[][] classifyResult(DataSetInfo dataset) {
+		SingleDataSetInfo dataSetInfo = (SingleDataSetInfo)dataset;
+		int[][] buf = new int[dataSetInfo.getDataSize()][2];
+		for(int p = 0; p < dataSetInfo.getDataSize(); p++) {
+			int answerClass = classify(dataSetInfo.getPattern(p), false)[0];
+			buf[p][0] = answerClass;
+			if(answerClass != dataSetInfo.getPattern(p).getConClass()) {
+				buf[p][1] = 0;
+			}else {
+				buf[p][1] = 1;
+			}
+		}
+		return buf;
+	}
+
+
 	/**
 	 * データセットに対する誤識別率を計算<br>
  	 * Note: ルールごとに並列計算を行う

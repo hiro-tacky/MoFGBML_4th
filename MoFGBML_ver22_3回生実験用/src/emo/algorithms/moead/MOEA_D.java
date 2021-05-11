@@ -16,7 +16,6 @@ import main.Consts;
 import main.Setting;
 import method.MersenneTwisterFast;
 import method.Output;
-import method.ResultMaster;
 import method.StaticFunction;
 import output.result.Result_MoFGBML;
 import time.TimeWatcher;
@@ -40,21 +39,21 @@ public class MOEA_D<T extends Pittsburgh> extends Algorithm<T>{
 	 *   Year: 2007<br>
 	 *
 	 * @param mop
-	 * @param resultMaster
+	 * @param master
 	 * @param rnd
 	 * @param timeWatcher
 	 * @param evaWatcher
 	 */
 	@Override
 	public void main(	FGBML mop, /*OutputClass output,*/ T instance,
-						ResultMaster resultMaster, MersenneTwisterFast rnd,
+						MersenneTwisterFast rnd,
 						TimeWatcher timeWatcher, TimeWatcher evaWatcher, Result_MoFGBML master) {
 		/* ********************************************************* */
 		//START:
 
 		//For output directories.
 		String sep = File.separator;
-		String EPDir = resultMaster.getTrialRoot() + sep + "EP";
+		String EPDir = master.getTrialRoot() + sep + "EP";
 		Output.mkdirs(EPDir);
 		Output.makeDir(EPDir, Consts.INDIVIDUAL);
 		Output.makeDir(EPDir, Consts.RULESET);
@@ -169,7 +168,7 @@ public class MOEA_D<T extends Pittsburgh> extends Algorithm<T>{
 		//Save Initial Population
 		timeWatcher.stop();
 		mop.setAppendix(manager.getPopulation());
-		output.savePopulationOrOffspring(manager, resultMaster, true);
+		output.savePopulationOrOffspring(manager, master, true);
 		timeWatcher.start();
 
 		//Step 1.5. EP Initialization
@@ -300,8 +299,8 @@ public class MOEA_D<T extends Pittsburgh> extends Algorithm<T>{
 				mop.setAppendix(EP);
 
 				//Save
-				output.savePopulationOrOffspring(manager, resultMaster, true);
-				output.savePopulationOrOffspring(manager, resultMaster, false);
+				output.savePopulationOrOffspring(manager, master, true);
+				output.savePopulationOrOffspring(manager, master, false);
 				detail = transformStrings(output, EP);
 				individualEP.add(detail[0]);
 				ruleSetEP.add(detail[1]);
@@ -313,7 +312,7 @@ public class MOEA_D<T extends Pittsburgh> extends Algorithm<T>{
 		timeWatcher.stop();
 		//Output method for EP.
 		outputEP(EPDir, individualEP, ruleSetEP);
-		String fileName = resultMaster.getTrialRoot() + sep + "ideal.csv";
+		String fileName = master.getTrialRoot() + sep + "ideal.csv";
 		Output.writeln(fileName, saveZ);
 		timeWatcher.start();
 

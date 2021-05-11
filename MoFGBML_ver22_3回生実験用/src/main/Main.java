@@ -17,7 +17,6 @@ import fgbml.multilabel_ver3.MultiLabel_ver3;
 import fgbml.subdivision_ver2.Subdivision_ver2;
 import method.MersenneTwisterFast;
 import method.Output;
-import method.ResultMaster;
 import output.toXML;
 import output.result.Result_MoFGBML;
 
@@ -145,7 +144,6 @@ public class Main {
 		SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd-HHmm");
 		String sep = File.separator;
 		String id = format.format(calendar.getTime());
-		/*format: ".\result\iris_20191021-1255"*/
 
 
 		//ファイル名構築
@@ -156,14 +154,17 @@ public class Main {
 		//Output "Experimental Settings"
 		String consts = (new Consts()).getStaticValues();
 		String settings = (new Setting()).getStaticValues();
+		String ExperimentInfo = (new ExperimentInfo()).getStaticValues();
 		String fileName = resultRoot + sep + "Consts_" + id + ".txt";
 		Output.writeln(fileName, consts);
 		fileName = resultRoot + sep + "Setting_" + id + ".txt";
 		Output.writeln(fileName, settings);
+		fileName = resultRoot + sep + "ExperimentInfo_" + id + ".txt";
+		Output.writeln(fileName, ExperimentInfo);
 
 		/* ********************************************************* */
 		//Result Master
-		ResultMaster resultMaster = new ResultMaster(resultRoot, id);
+//		ResultMaster resultMaster = new ResultMaster(resultRoot, id);
 
 		/* ********************************************************* */
 		//Experiment
@@ -174,17 +175,18 @@ public class Main {
 		for(int rep_i = 0; rep_i < Setting.repeatTimes; rep_i++) {
 			for(int cv_i = 0; cv_i < Setting.crossValidationNum; cv_i++) {
 				//make now trial Directory
-				resultMaster.setNowRep(rep_i);
-				resultMaster.setNowCV(cv_i);
-				resultMaster.setTrialRoot(resultRoot + sep + "trial" + rep_i+cv_i);
-				resultMaster.setNowTrial(count);
+				master.setNowRep(rep_i);
+				master.setNowCV(cv_i);
+				master.setTrialRoot(resultRoot + sep + "trial" + rep_i+cv_i);
+				master.setNowTrial(count);
+				master.setDataset(tstFiles[rep_i][cv_i]);
 				count++;
 
 				System.out.println(Setting.dataName + " : TRIAL: " + rep_i + cv_i);
 
 				main.startExperiment(args,
 									 traFiles[rep_i][cv_i], tstFiles[rep_i][cv_i],
-									 rnd, resultMaster, master);
+									 rnd, master);
 
 				System.out.println();
 			}
@@ -192,15 +194,18 @@ public class Main {
 		/* ********************************************************* */
 		//Output Times
 		fileName = resultRoot + sep + "Times_" + id + ".csv";
-		resultMaster.outputTimes(fileName);
+		master.outputTimes(fileName);
 
 		try {
 			toXML result = new toXML("result");
 			toXML ruleset = new toXML("ruleset");
+			toXML ClassifyResult = new toXML("classifyResult");
 			result.ResultToXML(master);
 			ruleset.RuleSetToXML(master);
-			result.output(args[3] + "_" +  ExperimentInfo.FuzzyTypeName + "_result", resultRoot);
-			ruleset.output(args[3] + "_" + ExperimentInfo.FuzzyTypeName + "_ruleset", resultRoot);
+			ClassifyResult.classifyResultToXML(master.getResultDataset());
+			result.output(args[3] + "_result", resultRoot);
+			ruleset.output(args[3] + "_ruleset", resultRoot);
+			ClassifyResult.output(args[3] + "_classifyResult", resultRoot);
 		} catch (TransformerConfigurationException | ParserConfigurationException e) {
 			// TODO 自動生成された catch ブロック
 			e.printStackTrace();

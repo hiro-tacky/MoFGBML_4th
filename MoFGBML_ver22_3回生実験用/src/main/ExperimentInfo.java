@@ -47,8 +47,16 @@ public class ExperimentInfo {
 	/** num of experimentInfoSet */
 	public static int experimentInfoSetNum = 5;
 
+    /**
+     * <h1>ファジィ集合の初期化方法</h1>
+     * 0: 2-5分割 homogeneous triangle fuzzy partitions.<br>
+     * 1: Input XML file<br>
+     * 2: Inhomogeneous<br>
+     */
+	public static int FUZZY_SET_INITIALIZE = 0;
+
 	/** 比較実験のセットのリスト．experimentInfoSet()のswitch関数のindexに対応 */
-	public static int[] experimentInfoSetList = {0};
+	public static int[] experimentInfoSetList = {0, 1, 2, 3, 4};
 
 	/** 比較実験のセットのリストから実行中の実験セットの"リスト"のindex．最初からやる場合は-1に設定*/
 	public static int experimentInfoSetListIndex = -1;
@@ -71,32 +79,36 @@ public class ExperimentInfo {
 			ExperimentInfo.setSaveDir("default_entropy_mixed" + sep + "multi");
 			ExperimentInfo.setFuzzySetType(99);
 			ExperimentInfo.setFuzzyTypeName("multi");
+			ExperimentInfo.FUZZY_SET_INITIALIZE = 2;
 			break;
 
 		case 1:
 			ExperimentInfo.setSaveDir("default" + sep + "triangle");
 			ExperimentInfo.setFuzzySetType(3);
-			ExperimentInfo.setFuzzyTypeName("triangular");
+			ExperimentInfo.setFuzzyTypeName("triangle");
+			ExperimentInfo.FUZZY_SET_INITIALIZE = 0;
 			break;
 
 		case 2:
 			ExperimentInfo.setSaveDir("default" + sep + "gaussian");
 			ExperimentInfo.setFuzzySetType(4);
 			ExperimentInfo.setFuzzyTypeName("gaussian");
+			ExperimentInfo.FUZZY_SET_INITIALIZE = 0;
 			break;
 
 		case 3:
 			ExperimentInfo.setSaveDir("default" + sep + "trapezoid");
 			ExperimentInfo.setFuzzySetType(7);
 			ExperimentInfo.setFuzzyTypeName("trapezoid");
+			ExperimentInfo.FUZZY_SET_INITIALIZE = 0;
 			break;
 
 		case 4:
 			ExperimentInfo.setSaveDir("default" + sep + "rectangle");
 			ExperimentInfo.setFuzzySetType(9);
-			ExperimentInfo.setFuzzyTypeName("rectangular");
+			ExperimentInfo.setFuzzyTypeName("rectangle");
+			ExperimentInfo.FUZZY_SET_INITIALIZE = 0;
 			break;
-
 		}
 	}
 	/** 次の実験セットに行く<br>

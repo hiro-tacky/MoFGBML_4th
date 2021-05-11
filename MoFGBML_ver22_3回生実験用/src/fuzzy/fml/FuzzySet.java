@@ -14,10 +14,19 @@ public class FuzzySet {
 	int shapeType;
 	double weight = 1.0;
 	FuzzyTermType term;
+	int partitonNum = -1;
 
 	float[] params;
 
 	// ************************************************************
+	public FuzzySet(String name, int shapeType, float[] params, int partitonNum) {
+		this.name = name;
+		this.shapeType = shapeType;
+		this.params = params.clone();
+		this.partitonNum = partitonNum;
+		make();
+	}
+
 	public FuzzySet(String name, int shapeType, float[] params) {
 		this.name = name;
 		this.shapeType = shapeType;
@@ -73,6 +82,22 @@ public class FuzzySet {
 
 	public void setParams(float[] params) {
 		this.params = params.clone();
+	}
+
+	public int getPartitonNum() {
+		return partitonNum;
+	}
+
+	public void setPartitonNum(int partitonNum) {
+		this.partitonNum = partitonNum;
+	}
+
+	public float[] getParams() {
+		return params;
+	}
+
+	public void setTerm(FuzzyTermType term) {
+		this.term = term;
 	}
 
 }

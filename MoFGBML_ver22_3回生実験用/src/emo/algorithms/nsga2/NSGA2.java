@@ -18,7 +18,6 @@ import main.Consts;
 import main.ExperimentInfo;
 import main.Setting;
 import method.MersenneTwisterFast;
-import method.ResultMaster;
 import method.Sort;
 import method.StaticFunction;
 import output.result.Result_MoFGBML;
@@ -42,8 +41,7 @@ public class NSGA2<T extends Pittsburgh> extends Algorithm<T>{
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public void main(	FGBML mop, /*OutputClass output,*/ T instance,
-						ResultMaster resultMaster, MersenneTwisterFast rnd,
+	public void main(	FGBML mop, /*OutputClass output,*/ T instance, MersenneTwisterFast rnd,
 						TimeWatcher timeWatcher, TimeWatcher evaWatcher, Result_MoFGBML master) {
 		/* ********************************************************* */
 		//START:
@@ -216,10 +214,11 @@ public class NSGA2<T extends Pittsburgh> extends Algorithm<T>{
 //				output.savePopulationOrOffspring(manager, resultMaster, true);
 				//Save Offspring
 //				output.savePopulationOrOffspring(manager, resultMaster, false);
-				master.setPopulation((Population<SinglePittsburgh>) manager.getPopulation(), StaticFuzzyFunc.kb, resultMaster.getNowTrial(), genCount);
+				master.setPopulation((Population<SinglePittsburgh>) manager.getPopulation(), StaticFuzzyFunc.kb, genCount);
 			}
 			timeWatcher.start();
 		}
+		master.addClassifyResult((Population<SinglePittsburgh>) manager.getPopulation());
 	}
 
 	/**

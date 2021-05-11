@@ -123,6 +123,25 @@ public class Partitions {
 	}
 
 	/**
+	 * 区間型のパラメータを生成する．
+	 *
+	 * @return パラメータ[次元][ファジイセット][パラメータ]
+	 */
+	public float[][][] rectangle(int[] K){
+		float[][][] params = new float[this.Ndim][][];
+		for(int dim_i=0; dim_i<this.partitions.size(); dim_i++) {
+			params[dim_i] = new float[this.numPartitions[dim_i]][2];
+			int tmp = 0;
+			for(int k : K) {
+				for(int i=0; i<k; i++) {
+					params[dim_i][tmp+i] = new float[] {(float)i*(1f/k), (float)(i+1)*(1f/k)};
+				}
+				tmp += k;
+			}
+		}
+		return params;
+	}
+	/**
 	 * 平均 mean の正規分布(係数なし，x=meanのときvalue=1)について，
 	 * 引数に与えられた，(x, value)を通る平均meanの正規分布の標準偏差を計算するメソッド
 	 * @param mean
@@ -168,6 +187,33 @@ public class Partitions {
 					}else {
 						float left = (float)(double)partition_list.get(i), right = (float)(double)partition_list.get(i+1);
 						params[dim_i][tmp+i] = new float[] {left*3f/2f - right/2f, (left+right)/2f, right*3f/2f - left/2f};
+					}
+				}
+				tmp += partition_list.size()-1;
+			}
+		}
+		return params;
+	}
+
+	/**
+	 * 台形型のパラメータを生成する．
+	 *
+	 * @return パラメータ[次元][ファジイセット][パラメータ]
+	 */
+	public float[][][] trapezoid(){
+		float[][][] params = new float[this.Ndim][][];
+		for(int dim_i=0; dim_i<this.partitions.size(); dim_i++) {
+			params[dim_i] = new float[this.numPartitions[dim_i]][4];
+			int tmp = 0;
+			for(ArrayList<Double> partition_list: this.partitions.get(dim_i)) {
+				for(int i=0; i<partition_list.size()-1; i++) {
+					if(i == 0) {
+						params[dim_i][tmp+i] = new float[] {0f, 0f, (float)0.5*(float)(double)partition_list.get(i+1), (float)1.5*(float)(double)partition_list.get(i+1)};
+					}else if(i == partition_list.size()-2) {
+						params[dim_i][tmp+i] = new float[] {(float)1.5*(float)(double)partition_list.get(i) - 0.5f, (float)0.5*(float)(double)partition_list.get(i) + 0.5f, 1f, 1f};
+					}else {
+						float left = (float)(double)partition_list.get(i), right = (float)(double)partition_list.get(i+1);
+						params[dim_i][tmp+i] = new float[] {left*5f/4f - right/4f, left*3f/4f + right/4f, right*3f/4f + left/4f, right*5f/4f - left/4f};
 					}
 				}
 				tmp += partition_list.size()-1;

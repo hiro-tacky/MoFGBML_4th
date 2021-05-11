@@ -429,7 +429,7 @@ public class test {
 		String fileName = "dataset" + sep + "iris" + sep + "a0_0_iris-10tra.dat";
 		Input.inputFile(tra, fileName);
 
-		int K = 4;
+		int K[] = {4};
 		double F = 1.0;
 		StaticFuzzyFunc.classEntropyInit(tra, K, F);
 
@@ -461,7 +461,7 @@ public class test {
 //		String fileName = "dataset" + sep + "partition" + sep + "duplicate.dat";
 		Input.inputFile(tra, fileName);
 
-		int K = 5;
+		int K[] = {5};
 		double F = 0.5;
 		FuzzyPartitioning.startPartition(tra, K, F);
 

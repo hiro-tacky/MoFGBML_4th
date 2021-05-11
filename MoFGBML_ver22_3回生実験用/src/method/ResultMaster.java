@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 /**
  * 一試行分 各世代の現個体群を保持
+ * 使っていない．(2021/04/25)
  *
  * @author hirot
  *

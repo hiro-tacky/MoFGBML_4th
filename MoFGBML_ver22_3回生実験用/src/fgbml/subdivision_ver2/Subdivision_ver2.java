@@ -16,7 +16,6 @@ import main.Experiment;
 import main.Setting;
 import method.MersenneTwisterFast;
 import method.Output;
-import method.ResultMaster;
 import output.result.Result_MoFGBML;
 import time.TimeWatcher;
 
@@ -60,7 +59,7 @@ import time.TimeWatcher;
 public class Subdivision_ver2 implements Experiment {
 
 	public void startExperiment( String[] args, String traFile, String tstFile,
-										MersenneTwisterFast rnd, ResultMaster resultMaster, Result_MoFGBML master) {
+										MersenneTwisterFast rnd, Result_MoFGBML master) {
 		/* ********************************************************* */
 		//START:
 
@@ -73,7 +72,7 @@ public class Subdivision_ver2 implements Experiment {
 
 		//Dividing Dataset
 		SingleDataSetInfo[] trainDataInfos = null;
-		String now = String.valueOf(resultMaster.getNowRep()) + String.valueOf(resultMaster.getNowCV());
+		String now = String.valueOf(master.getNowRep()) + String.valueOf(master.getNowCV());
 		//Load divided sub-datasets.
 		if(Consts.LOAD_SUBDATASET) {
 			String sep = File.separator;
@@ -99,16 +98,16 @@ public class Subdivision_ver2 implements Experiment {
 		/* ********************************************************* */
 		//Make result directry
 		String sep = File.separator;
-		String resultRoot = resultMaster.getRootDir();
+		String resultRoot = master.getRootDir();
 		Output.makeDir(resultRoot, Consts.SUBDATA);
-		String subdataDir = resultMaster.getRootDir() + sep + Consts.SUBDATA;
+		String subdataDir = master.getRootDir() + sep + Consts.SUBDATA;
 
-		String trialRoot = resultMaster.getTrialRoot();
+		String trialRoot = master.getTrialRoot();
 		Output.makeDir(trialRoot, Consts.POPULATION);
 		Output.makeDir(trialRoot, Consts.OFFSPRING);
 
-		String populationDir = resultMaster.getTrialRoot() + sep + Consts.POPULATION;
-		String offspringDir = resultMaster.getTrialRoot() + sep + Consts.OFFSPRING;
+		String populationDir = master.getTrialRoot() + sep + Consts.POPULATION;
+		String offspringDir = master.getTrialRoot() + sep + Consts.OFFSPRING;
 		Output.makeDir(populationDir, Consts.INDIVIDUAL);
 		Output.makeDir(populationDir, Consts.RULESET);
 		Output.makeDir(offspringDir, Consts.INDIVIDUAL);
@@ -130,7 +129,7 @@ public class Subdivision_ver2 implements Experiment {
 		/* ********************************************************* */
 		//Generate Problem
 		Problem_Subdivision mop = getMOP(mopNo, Dtra, Dtst, Dsubtra, Dvalid);
-		mop.outputDividedData(subdataDir, resultMaster.getNowCV(), resultMaster.getNowRep());
+		mop.outputDividedData(subdataDir, master.getNowCV(), master.getNowRep());
 
 		/* ********************************************************* */
 		//Generate Algorithm
@@ -155,8 +154,8 @@ public class Subdivision_ver2 implements Experiment {
 		//GA Start
 		if(Setting.emoType == Consts.NSGA2) {
 			algorithm = new NSGA2<SinglePittsburgh>();
-			algorithm.main( mop, output, instance,
-							resultMaster, rnd,
+			algorithm.main( mop, instance,
+							rnd,
 							timeWatcher, evaWatcher, master);
 		}
 		else if(Setting.emoType == Consts.WS ||
@@ -164,8 +163,8 @@ public class Subdivision_ver2 implements Experiment {
 				Setting.emoType == Consts.PBI ||
 				Setting.emoType == Consts.AOF) {
 			algorithm = new MOEA_D<SinglePittsburgh>();
-			algorithm.main( mop, output, instance,
-							resultMaster, rnd,
+			algorithm.main( mop, instance,
+							rnd,
 							timeWatcher, evaWatcher, master);
 		}
 		/* ********************************************************* */
@@ -173,15 +172,15 @@ public class Subdivision_ver2 implements Experiment {
 
 		//GA End
 		timeWatcher.stop();
-		resultMaster.addTimes( timeWatcher.getSec() );
-		resultMaster.addEvaTimes( evaWatcher.getSec() );
+		master.addTimes( timeWatcher.getSec() );
+		master.addEvaTimes( evaWatcher.getSec() );
 
 		//Output One Trial Information
-		resultMaster.outputIndividual(populationDir, offspringDir);
-		resultMaster.population.clear();
-		resultMaster.ruleSetPopulation.clear();
-		resultMaster.offspring.clear();
-		resultMaster.ruleSetOffspring.clear();
+//		master.outputIndividual(populationDir, offspringDir);
+//		master.population.clear();
+//		master.ruleSetPopulation.clear();
+//		master.offspring.clear();
+//		master.ruleSetOffspring.clear();
 
 		System.out.println();
 	}
