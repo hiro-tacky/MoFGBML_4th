@@ -20,7 +20,7 @@ public class Result_population {
 			result.add(new Result_individual(population.getIndividual(i)));
 		}
 	}
-
+	
 	public ArrayList<Result_individual> getResult() {
 		return result;
 	}

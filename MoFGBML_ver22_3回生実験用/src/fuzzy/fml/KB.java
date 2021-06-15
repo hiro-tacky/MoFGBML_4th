@@ -1,6 +1,7 @@
 package fuzzy.fml;
 
 import java.io.File;
+import java.util.Objects;
 
 import data.SingleDataSetInfo;
 import fuzzy.FuzzyPartitioning;
@@ -11,6 +12,8 @@ import jfml.knowledgebase.variable.FuzzyVariableType;
 import jfml.term.FuzzyTermType;
 import main.Consts;
 import main.Setting;
+import main.ExperimentInfo.ExperimentInfo;
+import main.ExperimentInfo.designedFuzzySet;
 
 /**
  * Fuzzy Markup LanguageのKnowledgeBaseを扱うクラス
@@ -134,6 +137,7 @@ public class KB {
 		}
 	}
 
+
 	public void classEntropyMultiInit(SingleDataSetInfo tra, int[] K, double F) {
 		Partitions partitions = new Partitions(tra.getNdim());
 		partitions.makePartition(tra, K);
@@ -195,6 +199,57 @@ public class KB {
 	}
 
 	/**
+	 *
+	 *
+	 * @param tra
+	 * @param K
+	 * @param F
+	 */
+	public void designedInit(SingleDataSetInfo tra, double F) {
+		this.Ndim = tra.getNdim();
+		FSs = new FuzzySet[Ndim][];
+		float[] dontCare = new float[] {0f, 1f};
+		for(int dim_i = 0; dim_i<this.Ndim; dim_i++){
+			designedFuzzySet DesignedFS = ExperimentInfo.getDesignedFuzzySet(dim_i);
+			FSs[dim_i] = new FuzzySet[DesignedFS.getParitionSum() + 1];
+			FSs[dim_i][0] = new FuzzySet("DontCare", FuzzyTermType.TYPE_rectangularShape, dontCare, 0);
+			FSs[dim_i][0].setShapeType(Consts.DONT_CARE_SHAPE_TYPE_ID);
+			Partitions partitions = new Partitions(tra.getNdim());
+			for(int FuzzySet_i=0; FuzzySet_i<DesignedFS.getFuzzySetTypeNum(); FuzzySet_i++) {
+				float[][][] pamras = null;
+				if(DesignedFS.getPartitonType(FuzzySet_i) == 0) { //等分割
+					partitions.makeHomePartition(DesignedFS.getParitionNumList(FuzzySet_i));
+					switch(DesignedFS.getFuzzyTypeID(FuzzySet_i)) {
+					case FuzzyTermType.TYPE_gaussianShape:
+						pamras = partitions.gaussian();
+						break;
+					case FuzzyTermType.TYPE_rectangularShape:
+						pamras = partitions.rectangle(DesignedFS.getParitionNumList(FuzzySet_i));
+						break;
+					case FuzzyTermType.TYPE_triangularShape:
+						pamras = partitions.triangle();
+						break;
+					}
+				}else if(DesignedFS.getPartitonType(FuzzySet_i) == 1){ //エントロピー導出分割
+					partitions.makePartition(tra, DesignedFS.getParitionNumList(FuzzySet_i));
+					switch(DesignedFS.getFuzzyTypeID(FuzzySet_i)) {
+					case FuzzyTermType.TYPE_gaussianShape:
+						pamras = partitions.gaussian();
+						break;
+					case FuzzyTermType.TYPE_rectangularShape:
+						pamras = partitions.rectangle();
+						break;
+					case FuzzyTermType.TYPE_trapezoidShape:
+						pamras = FuzzyPartitioning.startPartition(tra, DesignedFS.getParitionNumList(FuzzySet_i), F);
+						break;
+					}
+				}
+				addFuzzySet(DesignedFS.getFuzzyTypeName(FuzzySet_i), DesignedFS.getFuzzyTypeID(FuzzySet_i), pamras[dim_i], DesignedFS.getParitionNumList(FuzzySet_i), dim_i);
+			}
+		}
+	}
+
+	/**
 	 * kがK分割の集合のうち，何番目の分割数の集合に属するかを返す．
 	 * ex) k=7, K={2, 3, 4, 5}の場合，kの分割数は4．
 	 * @param k k番目のファジィセット
@@ -237,6 +292,98 @@ public class KB {
 					FSs[dim_i][k+1] = new FuzzySet( FuzzySetName + "_" + String.valueOf(k+1),
 							FuzzyTermTypeID, params[dim_i][k], getPartitonNum(k, K));
 				}
+			}
+		}
+	}
+
+	/**
+	 * 与えられたファジィタイプとパラメータから，ファジィセットをセットする．但し，単一の名前．
+	 *
+	 * @param FuzzySetName ファジィセットの名前
+	 * @param FuzzyTermTypeID ファジィセットの形状のID FuzzyTermType.TYPE_****Shapeに準拠．
+	 * @param params パラメータの集合[次元数][ファジィセットの数][パラメータ数]
+	 * @param K 分割数集合
+	 * @param hasDontCare Don't Careを含むか否か．
+	 */
+	public void setFuzzySet(String FuzzySetName, int FuzzyTermTypeID, int dim, float[][] params, int[] K, boolean hasDontCare) {
+		if(hasDontCare) {
+			float[] dontCare = new float[] {0f, 1f};
+			this.FSs[dim] = new FuzzySet[params.length + 1];
+			this.FSs[dim][0] = new FuzzySet("DontCare", FuzzyTermType.TYPE_rectangularShape, dontCare, 0);
+			for(int k=0; k<params.length; k++) {
+				FSs[dim][k+1] = new FuzzySet( FuzzySetName + "_" + String.valueOf(k+1),
+						FuzzyTermTypeID, params[k], getPartitonNum(k, K));
+			}
+		}else {
+			this.FSs[dim] = new FuzzySet[params.length + 1];
+			for(int k=0; k<params.length; k++) {
+				FSs[dim][k+1] = new FuzzySet( FuzzySetName + "_" + String.valueOf(k+1),
+						FuzzyTermTypeID, params[k], getPartitonNum(k, K));
+			}
+		}
+	}
+
+	/**
+	 * 与えられたファジィタイプとパラメータから，ファジィセットをセットする．但し，単一の名前．
+	 *
+	 * @param FuzzySetName ファジィセットの名前
+	 * @param FuzzyTermTypeID ファジィセットの形状のID FuzzyTermType.TYPE_****Shapeに準拠．
+	 * @param params パラメータの集合[次元数][ファジィセットの数][パラメータ数]
+	 * @param K 分割数集合
+	 * @return 次のindex(埋まってる部分の最終index+1)
+	 */
+	public void addFuzzySet(String FuzzySetName, int FuzzyTermTypeID, int dim, float[][] params, int[] K) {
+		for(int i=0; i<this.FSs[dim].length; i++) {
+			if(Objects.isNull(this.FSs[dim][i])){
+				for(int k=0; k<params.length; k++) {
+					FSs[dim][k+i] = new FuzzySet( FuzzySetName + "_" + String.valueOf(k+i),
+							FuzzyTermTypeID, params[k], getPartitonNum(k, K));
+				}
+				break;
+			}
+		}
+	}
+
+	/**
+	 * 与えられたファジィタイプとパラメータから，ファジィセットをセットする．但し，単一の名前．
+	 *
+	 * @param FuzzySetName ファジィセットの名前
+	 * @param FuzzyTermTypeID ファジィセットの形状のID FuzzyTermType.TYPE_****Shapeに準拠．
+	 * @param params パラメータの集合[次元数][ファジィセットの数][パラメータ数]
+	 * @param K 分割数集合
+	 * @return 次のindex(埋まってる部分の最終index+1)
+	 */
+	public void addFuzzySet(String FuzzySetName, int FuzzyTermTypeID, float[][][] params, int[] K) {
+		for(int dim=0; dim<params.length; dim++) {
+			for(int i=0; i<this.FSs[dim].length; i++) {
+				if(Objects.isNull(this.FSs[dim][i])){
+					for(int k=0; k<params[dim].length; k++) {
+						FSs[dim][k+i] = new FuzzySet( FuzzySetName + "_" + String.valueOf(k+i),
+								FuzzyTermTypeID, params[dim][k], getPartitonNum(k, K));
+					}
+					break;
+				}
+			}
+		}
+	}
+
+	/**
+	 * 与えられたファジィタイプとパラメータから，ファジィセットをセットする．但し，単一の名前．
+	 *
+	 * @param FuzzySetName ファジィセットの名前
+	 * @param FuzzyTermTypeID ファジィセットの形状のID FuzzyTermType.TYPE_****Shapeに準拠．
+	 * @param params パラメータの集合[ファジィセットの数][パラメータ数]
+	 * @param K 分割数集合
+	 * @return 次のindex(埋まってる部分の最終index+1)
+	 */
+	public void addFuzzySet(String FuzzySetName, int FuzzyTermTypeID, float[][] params, int[] K, int dim) {
+		for(int i=0; i<this.FSs[dim].length; i++) {
+			if(Objects.isNull(this.FSs[dim][i])){
+				for(int k=0; k<params.length; k++) {
+					FSs[dim][k+i] = new FuzzySet( FuzzySetName + "_" + String.valueOf(k+i),
+							FuzzyTermTypeID, params[k], getPartitonNum(k, K));
+				}
+				break;
 			}
 		}
 	}
@@ -433,6 +580,14 @@ public class KB {
 
 	public int getFSsnum(int dim) {
 		return this.FSs[dim].length;
+	}
+
+	public int getNdim() {
+		return Ndim;
+	}
+
+	public void setNdim(int ndim) {
+		Ndim = ndim;
 	}
 
 }

@@ -12,8 +12,8 @@ import data.Pattern;
 import data.SingleDataSetInfo;
 import fuzzy.fml.KB;
 import main.Consts;
-import main.ExperimentInfo;
 import main.Setting;
+import main.ExperimentInfo.ExperimentInfo;
 import method.MersenneTwisterFast;
 
 /**
@@ -68,8 +68,14 @@ public class StaticFuzzyFunc {
 					kb.classEntropyRectangleInit((SingleDataSetInfo)Dtra, Setting.PatitionNumSet);
 					break;
 			}
+		} else if(ExperimentInfo.FUZZY_SET_INITIALIZE == 3) {
+			kb = new KB();
+			kb.designedInit((SingleDataSetInfo)Dtra, Consts.FUZZY_GRADE);
 		}
-		Consts.FUZZY_SET_NUM = kb.getFSs(0).length - 1;
+		ExperimentInfo.FUZZY_SET_NUM = new ArrayList<Integer>();
+		for(int dim_i=0; dim_i<kb.getNdim(); dim_i++) {
+			ExperimentInfo.FUZZY_SET_NUM.add(kb.getFSs(dim_i).length - 1);
+		}
 	}
 
 	@SuppressWarnings("rawtypes")
@@ -412,8 +418,8 @@ public class StaticFuzzyFunc {
 			dcRate = (double)(((double)line.getNdim() - (double)Consts.ANTECEDENT_LEN)/(double)line.getNdim());
 		}
 
-		double[] membershipValueRoulette = new double[Consts.FUZZY_SET_NUM];
 		for(int n = 0; n < line.getNdim(); n++) {
+			double[] membershipValueRoulette = new double[ExperimentInfo.FUZZY_SET_NUM.get(n)];
 			if(rnd.nextDouble() < dcRate) {
 				rule[n] = 0;
 			}
@@ -426,13 +432,13 @@ public class StaticFuzzyFunc {
 					//Numerical Dimension
 					double sumMembershipValue = 0.0;
 					membershipValueRoulette[0] = 0;
-					for(int f = 0; f < Consts.FUZZY_SET_NUM; f++) {
+					for(int f = 0; f < ExperimentInfo.FUZZY_SET_NUM.get(n); f++) {
 						sumMembershipValue += calcMembership(n, f+1, line.getDimValue(n));
 						membershipValueRoulette[f] = sumMembershipValue;
 					}
 
 					double rr = rnd.nextDouble() * sumMembershipValue;
-					for(int f = 0; f < Consts.FUZZY_SET_NUM; f++) {
+					for(int f = 0; f < ExperimentInfo.FUZZY_SET_NUM.get(n); f++) {
 						if(rr < membershipValueRoulette[f]) {
 							rule[n] = f+1;
 							break;

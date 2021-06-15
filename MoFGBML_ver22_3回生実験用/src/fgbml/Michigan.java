@@ -8,6 +8,7 @@ import emo.algorithms.nsga2.Individual_nsga2;
 import fuzzy.Rule;
 import fuzzy.StaticFuzzyFunc;
 import main.Consts;
+import main.ExperimentInfo.ExperimentInfo;
 import method.MersenneTwisterFast;
 
 @SuppressWarnings("rawtypes")
@@ -84,7 +85,7 @@ public abstract class Michigan<T extends Rule> extends Individual_nsga2<Integer>
 				setGene(n, 0);
 			} else {
 				//Fuzzy Set
-				setGene(n, uniqueRnd.nextInt(Consts.FUZZY_SET_NUM) + 1);
+				setGene(n, uniqueRnd.nextInt(ExperimentInfo.FUZZY_SET_NUM.get(n)) + 1);
 			}
 		}
 	}

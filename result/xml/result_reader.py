@@ -11,10 +11,10 @@ import glob
 ###############################################################################
 #数値実験基本設定
 trial_num = 30 #試行回数
-gen_num = 5000 #世代数
+gen_num = 10000 #世代数
 my_path = os.getcwd()
 FuzzyTypeID = {9:"rectangle", 7:"trapezoid", 3:"triangle", 4:"gaussian", 99:"multi"}
-gen_list = [5000]#range(1000, 5000+1, 1000)
+gen_list = range(1000, 10000+1, 1000)
 trial_list = range(30)
 
 DatasetList = {
@@ -90,44 +90,76 @@ class XML:
     """xmlファイルを読み込むためのスーパークラス"""
     def __init__(self, filename):
         self.tree = ET.parse(filename)
-        self.root = self.tree.getroot()
-        nodelist(self.root)
+        self.rootNode = self.tree.getroot()
+        self.nodelist(self.rootNode)
         self.CurrentElement = [] #木構造の現在参照しているノードの位置を保存する
+
+    def nodelist(self, root):
+        for i, child in enumerate(root):
+            if i<5 or i>len(list(root))-3:
+                txt = "node" if child.text == None else str(child.text)
+                print("{:3d}: {:20}{:10}{}".format(i, child.tag, str(txt), child.attrib))
+            elif i>9 and i<13:
+                print("         .")
         
     def down(self, id):
         """指定したIDの子要素を参照する"""
         self.CurrentElement.append(id)
-        buf = self.root
+        buf = self.rootNode
         for i in self.CurrentElement:
             if not list(buf):
                 print("NULL")
                 self.up()
                 return
             buf = buf[i]
-        print("current node:" + buf.tag + "\n")
-        nodelist(buf)
+        print("current node:" + buf.tag)
+        print(buf.attrib)
+        print("\n")
+        self.nodelist(buf)
             
     def up(self):
         """指定したIDの親要素を参照する"""
         self.CurrentElement.pop(-1)
-        buf = self.root
+        buf = self.rootNode
         for i in self.CurrentElement:
             buf = buf[i]
-        print("current node:" + buf.tag + "\n")
-        nodelist(buf)
+        print("current node:" + buf.tag)
+        print(buf.attrib)
+        print("\n")
+        self.nodelist(buf)
             
     def root(self):
         """木の根にもどる"""
         self.CurrentElement.clear()
-        nodelist(self.root)
+        self.nodelist(self.rootNode)
+        
+    def showAll(self):
+        buf = self.rootNode
+        for i in self.CurrentElement:
+            buf = buf[i]
+        for i, child in enumerate(buf):
+            txt = "node" if child.text == None else str(child.text)
+            print("{:3d}: {:20}{:10}{}".format(i, child.tag, str(txt), child.attrib))
+            
+    def show(self):
+        buf = self.rootNode
+        for i in self.CurrentElement:
+            buf = buf[i]
+        for i, child in enumerate(buf):
+            if i<5 or i>len(list(buf))-3:
+                txt = "node" if child.text == None else str(child.text)
+                print("{:3d}: {:20}{:10}{}".format(i, child.tag, str(txt), child.attrib))
+            elif i>9 and i<13:
+                print("         .")
         
         
 class resultXML(XML):
     """1つのxmlファイル(実験結果)用クラス"""
-    def __init__(self, filePath):
+    def __init__(self, filePath, savePath):
         super(resultXML, self).__init__(filePath)
         self.data = {}
-        for i, trial in enumerate(self.root.findall('trial')):
+        self.savePath = savePath
+        for i, trial in enumerate(self.rootNode.findall('trial')):
             trial_buf = {}
             for population in trial:
                 df = []
@@ -172,7 +204,7 @@ class resultXML(XML):
         ax = fig.gca()
         self.setPopulation(trial, gen, ax, "Population", True)
         if isSave:
-            SaveFig(fig, filename)
+            SaveFig(fig, self.savePath, filename)
         else:
             plt.show()
             
@@ -229,7 +261,7 @@ class resultXML(XML):
         if title is not None:
             ax.set_title(title)
             
-    def setPlotDtraBest(self, gen, ax, label_name, title = None, marker = "o"):
+    def setPlotDtraBest(self, gen, ax, label_name, title = None, isDtst = True, marker = "o"):
         best = {}
         for i, trial in enumerate(self.data.values()):
             data = trial[gen]
@@ -244,17 +276,24 @@ class resultXML(XML):
                 except:
                     best_individuals_Dtra[buf['f1']] = buf['Dtra']
                     best_individuals_Dtst[buf['f1']] = buf['Dtst']
-            for RuleNum, bestValue in best_individuals_Dtst.items():
-                try:
-                    best[RuleNum][0] += bestValue
-                    best[RuleNum][1] += 1                    
-                except:
-                    best[RuleNum] = [bestValue, 1]
+            if isDtst:
+                for RuleNum, bestValue in best_individuals_Dtst.items():
+                    try:
+                        best[RuleNum][0] += bestValue
+                        best[RuleNum][1] += 1                    
+                    except:
+                        best[RuleNum] = [bestValue, 1]
+            else:
+                for RuleNum, bestValue in best_individuals_Dtra.items():
+                    try:
+                        best[RuleNum][0] += bestValue
+                        best[RuleNum][1] += 1                    
+                    except:
+                        best[RuleNum] = [bestValue, 1]
             del best_individuals_Dtra, best_individuals_Dtst
         x = [ruleNum for ruleNum, average in best.items() if average[1] > trial_num/2]
         y = [average[0]/average[1] for average in best.values() if average[1] > trial_num/2]
-        # print(x, y)
-        ax.scatter(x, y, label = label_name, marker = marker)
+        ax.scatter(x, y, label = label_name, marker = marker, s=100)
         
         ax.grid(True)
         if title is not None:
@@ -269,41 +308,33 @@ class Result():
     """データセットに対する全タイプの識別器の結果用クラス"""
     def __init__(self):
         print("RESULT\n dataset name:")
-        self.datasetname = input()
+        self.datasetName = input()
         self.resultObj_set = {} #[FuzzyTypeList][folderList] = RuleSetXMLオブジェクト
-        self.FuzzyTypeList = ["triangular"]#["rectangular", "trapezoid", "gaussian"] #比較されるファジィタイプ"multi"
-        self.folderList = ["default", "entropy", "default_entropy_triagluar"] #比較するxmlファイルが存在するフォルダ
+        self.FuzzyTypeList = ["default", "default_entropy_mixed", "samePartitionNum", "diffPartitionNum"]#["triangle", "rectangle", "trapezoid", "gaussian", "multi"] #比較されるファジィタイプ"multi"
+        self.folderList = ["designedFuzzySet"]#["default", "default_entropy_mixed", "designedFuzzySet"] #比較するxmlファイルが存在するフォルダ
+        self.savePath = "result/" + self.datasetName + "/result/" #変更忘れるな 
         label_name = "             "
         for fuzzyType in self.FuzzyTypeList:
             for folderName in self.folderList:
-                self.fileName = "*" + fuzzyType + "_result.xml"
-                self.pathList = glob.glob(folderName + "/" + self.datasetname + "*/" + self.datasetname + "_" + fuzzyType + "*/" + self.fileName)
+                self.fileName = self.datasetName + "_result.xml"
+                self.pathList = glob.glob("xml/" + self.datasetName + "/" + folderName + "/" + fuzzyType + "/" + self.datasetName + "*/" + self.fileName)
                 ############################################
                 #ラベルネーム変更忘れるな
-                ExperimentName = fuzzyType   #比較される(同一画像に描写される)xmlファイルのネームラベル
-                label_name = folderName  #生成される複数の画像のネームラベル
-                # label_name += " "
+                ExperimentName = folderName   #比較される(同一画像に描写される)xmlファイルのネームラベル
+                label_name = fuzzyType  #生成される複数の画像のネームラベル
                 ############################################
                 for path in self.pathList:
                     print(path)
                     print(ExperimentName, label_name)
-                    tmp = resultXML(path)
+                    tmp = resultXML(path, self.savePath + label_name + "/")
                     try:
                         self.resultObj_set[ExperimentName][label_name] = tmp
                     except:
                         self.resultObj_set[ExperimentName] = {label_name: tmp}
-                    
-            # self.resultObj_set[figFileList] = resultObj_buf
         
-        #####################################################################
-        self.savePath = "result/" + self.datasetname + "/entropy-based-com/" #変更忘れるな 
-        #####################################################################
-        
-        #(Dtst or Dtrs) or (Ave or Best)の4つの場合でメソッドを実行
-        # for tmp in [[True, True], [False, True], [True, False], [False, False]]:
-        #     self.plot_result(isDtst = tmp[0], isAve = tmp[1])
-        
-        self.plot_resultDtraBest()
+        # (Dtst or Dtrs) or (Ave or Best)の4つの場合でメソッドを実行
+        for tmp in [[True, True], [False, True], [True, False], [False, False]]:
+            self.plot_result(isDtst = tmp[0], isAve = tmp[1])
         
     def down(self, x):
         i = 0
@@ -313,44 +344,71 @@ class Result():
                     return resultObj
                 i += 1
     
-    def getResultXML(self, FuzzyType = "multi", folderName = "entropy"):
-        return self.resultObj_set[FuzzyType][folderName]
+    def getRuleSetXML(self):
+        i = 0
+        for folderName, ResultObj_buf1 in self.resultObj_set.items():
+            for fuzzyType, ResultObj_buf2 in ResultObj_buf1.items():
+                print("ID:" + str(i) + " | fuzzyType = " + fuzzyType, "| folderName = " + folderName)
+                i += 1
+        print("type ID")
+        ID = int(input())
+        i = 0
+        for folderName, ResultObj_buf1 in self.resultObj_set.items():
+            for fuzzyType, ResultObj_buf2 in ResultObj_buf1.items():
+                if i == ID:
+                    ResultObj_buf2.show()
+                    return ResultObj_buf2
+                i += 1
 
-    def plot_result(self, gen = gen_list, isDtst = True, isAve = True, title = None, filename = None):
+    def plot_result(self, gen = gen_list, isDtst = True, isAve = True, title = None, filename = None, isDtraBest = False):
         gen_tmp = [gen] if type(gen) is int else gen
         d_today = datetime.date.today()
         
         for ExperimentName, resultObj_dict in self.resultObj_set.items():
             
             savepath = self.savePath + "{0:%Y%m%d}".format(d_today)+ "/"
-            if isDtst and isAve:
-                fig_title = self.datasetname + ": " + ExperimentName + " Dtst's average"
-                filename = self.datasetname + "_" + ExperimentName + "_Result_AveDtst"
-                savepath = savepath + "AveDtst/"
-            elif not isDtst and isAve:
-                fig_title = self.datasetname + ": " + ExperimentName + " Dtra's average"
-                filename = self.datasetname + "_" + ExperimentName + "_Result_AveDtra"
-                savepath = savepath + "AveDtra/"
-            elif isDtst and not isAve:
-                fig_title = self.datasetname + ": " + ExperimentName + " Dtst's average of PF"
-                filename = self.datasetname + "_" + ExperimentName + "_Result_Best_Dtst"
-                savepath = savepath + "BestDtst/"
-            elif not isDtst and not isAve:
-                fig_title = self.datasetname + ": " + ExperimentName + " Dtra's average of PF"
-                filename = self.datasetname + "_" + ExperimentName + "_Result_Best_Dtra"   
-                savepath = savepath + "BestDtra/"
-            print(savepath)
+            if not isDtraBest:
+                if isDtst and isAve:
+                    fig_title = self.datasetName + ": " + ExperimentName + " Dtst's average"
+                    filename = self.datasetName + "_" + ExperimentName + "_Result_Ave_Dtst"
+                    savepath = savepath + "AveDtst/"
+                elif not isDtst and isAve:
+                    fig_title = self.datasetName + ": " + ExperimentName + " Dtra's average"
+                    filename = self.datasetName + "_" + ExperimentName + "_Result_Ave_Dtra"
+                    savepath = savepath + "AveDtra/"
+                elif isDtst and not isAve:
+                    fig_title = self.datasetName + ": " + ExperimentName + " Dtst's average of PF"
+                    filename = self.datasetName + "_" + ExperimentName + "_Result_Best_Dtst"
+                    savepath = savepath + "BestDtst/"
+                elif not isDtst and not isAve:
+                    fig_title = self.datasetName + ": " + ExperimentName + " Dtra's average of PF"
+                    filename = self.datasetName + "_" + ExperimentName + "_Result_Best_Dtra"   
+                    savepath = savepath + "BestDtra/"
+            elif isDtraBest:
+                if isDtst:
+                    fig_title = self.datasetName + ": " + ExperimentName + " Dtst's average of Dtra Best"
+                    filename = self.datasetName + "_" + ExperimentName + "_Result_DtraBest_Dtst"
+                    savepath = savepath + "BestDtst/"
+                elif not isDtst:
+                    fig_title = self.datasetName + ": " + ExperimentName + " Dtra's average of Dtra vest"
+                    filename = self.datasetName + "_" + ExperimentName + "_Result_DtraBest_Dtra"   
+                    savepath = savepath + "BestDtra/"
+                
             
             x_lim,y_lim  = [1000, -1], [1000, -1]
             for gen_buf in gen_tmp:
                 fig =  singleFig_set(fig_title)
                 ax = fig.gca()
-                if isAve:
-                    for label_name, resultObj in resultObj_dict.items():
-                        resultObj.setplotGenAve(gen_buf, ax, label_name = label_name, title = "gen:" + str(gen_buf), isDtst = isDtst) 
-                elif not isAve:
-                    for label_name, resultObj in resultObj_dict.items():
-                        resultObj.setplotGenBest(gen_buf, ax, label_name = label_name, title = "gen:" + str(gen_buf), isDtst = isDtst)                  
+                if not isDtraBest:
+                    if isAve:
+                        for label_name, resultObj in resultObj_dict.items():
+                            resultObj.setplotGenAve(gen_buf, ax, label_name = label_name, title = "gen:" + str(gen_buf), isDtst = isDtst) 
+                    elif not isAve:
+                        for label_name, resultObj in resultObj_dict.items():
+                            resultObj.setplotGenBest(gen_buf, ax, label_name = label_name, title = "gen:" + str(gen_buf), isDtst = isDtst)                  
+                elif isDtraBest:
+                        for label_name, resultObj in resultObj_dict.items():
+                            resultObj.setPlotDtraBest(gen_buf, ax, label_name = label_name, title = "gen:" + str(gen_buf), isDtst = isDtst)                  
                 ax.legend(loc='upper right', fontsize='xx-large')
                 buf_x, buf_y = ax.get_xlim(), ax.get_ylim()
                 if buf_x[0] < x_lim[0]: x_lim[0] = buf_x[0] 
@@ -371,6 +429,7 @@ class Result():
                 ax.set_xlabel("number of rule", fontsize = 20)
                 ax.set_ylabel("error rate[%]", fontsize = 20)
                 SaveFig(fig, savepath + ExperimentName + "/", filename + str(i).zfill(3))
+            print(savepath + ExperimentName)
             plt.close('all')
         print("fin")
 
@@ -381,8 +440,8 @@ class Result():
         for ExperimentName, resultObj_dict in self.resultObj_set.items():
             
             savepath = self.savePath + "{0:%Y%m%d}".format(d_today)+ "/DtarBest/"
-            fig_title = self.datasetname + ": " + ExperimentName + " Dtra Best's Dtst"
-            filename = self.datasetname + "_" + ExperimentName + "_Result_DtraBest"
+            fig_title = self.datasetName + ": " + ExperimentName + " Dtra Best's Dtst"
+            filename = self.datasetName + "_" + ExperimentName + "_Result_DtraBest"
             print(savepath)
             
             x_lim,y_lim  = [1000, -1], [1000, -1]

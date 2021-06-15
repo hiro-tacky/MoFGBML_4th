@@ -43,6 +43,7 @@ public class Partitions {
 	 * @param K 分割数のリスト
 	 */
 	public void makeHomePartition(int[] K) {
+		this.partitions.clear();
 		ArrayList<ArrayList<ArrayList<Double>>> partitions_set = new ArrayList<ArrayList<ArrayList<Double>>>();
 		for(int i_dim=0; i_dim<this.Ndim; i_dim++) {
 			ArrayList<ArrayList<Double>> partition_list = new ArrayList<ArrayList<Double>>();

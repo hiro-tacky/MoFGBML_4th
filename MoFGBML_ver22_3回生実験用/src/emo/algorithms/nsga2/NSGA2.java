@@ -1,9 +1,15 @@
 package emo.algorithms.nsga2;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.concurrent.ForkJoinPool;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
 
 import emo.algorithms.Algorithm;
 import fgbml.Pittsburgh;
@@ -15,12 +21,16 @@ import ga.Individual;
 import ga.Population;
 import ga.PopulationManager;
 import main.Consts;
-import main.ExperimentInfo;
 import main.Setting;
+import main.ExperimentInfo.ExperimentInfo;
 import method.MersenneTwisterFast;
+import method.Output;
 import method.Sort;
 import method.StaticFunction;
+import output.toXML;
 import output.result.Result_MoFGBML;
+import output.result.Result_dataset;
+import output.result.Result_population;
 import time.TimeWatcher;
 
 /**
@@ -209,6 +219,30 @@ public class NSGA2<T extends Pittsburgh> extends Algorithm<T>{
 				mop.setAppendix(manager.getPopulation());
 				//Offspring
 				mop.setAppendix(manager.getOffspring());
+
+				Result_population result_population = new Result_population((Population<SinglePittsburgh>) manager.getPopulation(), StaticFuzzyFunc.kb, genCount);
+				Result_dataset result_dataset = new Result_dataset();
+				try {
+					String sep = File.separator;
+					toXML result = new toXML("result");
+					toXML ruleset = new toXML("ruleset");
+					toXML ClassifyResult = new toXML("classifyResult");
+					result.ResultToXML(result_population);
+					ruleset.RuleSetToXML(result_population, master.getNowTrial());
+					result_dataset.setDataset(master.getTstFile());
+					result_dataset.addClassifyResult((Population<SinglePittsburgh>) manager.getPopulation());
+					ClassifyResult.classifyResultToXML(result_dataset);
+					Output.mkdirs(ExperimentInfo.resultRoot + sep + "trial_" + String.valueOf(master.getNowTrial()) + sep + "gen_" + String.valueOf(genCount));
+					result.output(ExperimentInfo.dataName + "_result", ExperimentInfo.resultRoot + sep + "trial_" + String.valueOf(master.getNowTrial()) + sep + "gen_" + String.valueOf(genCount));
+					ruleset.output(ExperimentInfo.dataName + "_ruleset", ExperimentInfo.resultRoot + sep + "trial_" + String.valueOf(master.getNowTrial()) + sep + "gen_" + String.valueOf(genCount));
+					ClassifyResult.output(ExperimentInfo.dataName + "_classifyResult", ExperimentInfo.resultRoot + sep + "trial_" + String.valueOf(master.getNowTrial()) + sep + "gen_" + String.valueOf(genCount));
+				} catch (TransformerConfigurationException | ParserConfigurationException e) {
+					// TODO 自動生成された catch ブロック
+					e.printStackTrace();
+				} catch (FileNotFoundException | TransformerException e) {
+					// TODO 自動生成された catch ブロック
+					e.printStackTrace();
+				}
 
 				//Save Current Population
 //				output.savePopulationOrOffspring(manager, resultMaster, true);

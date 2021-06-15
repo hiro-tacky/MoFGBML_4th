@@ -487,14 +487,10 @@ public class toXML {
 			trial.setAttribute("trial", String.valueOf(Trial.getTrial()));
 
 			for(int population_j=0; population_j<Trial.getResult().size(); population_j++) {
-				//出力を最終世代に限定
-				population_j = Trial.getResult().size() - 1;
+//				population_j = Trial.getResult().size() - 1; //出力を最終世代に限定
 				Element pop = addChildNode("population", trial);
 				Result_population Pop = Trial.getResultPopulation(population_j);
-				pop.setAttribute("ID", String.valueOf(population_j));
 				pop.setAttribute("generation", String.valueOf(Pop.getGen()));
-				pop.setAttribute("trial", String.valueOf(Trial.getTrial()));
-
 
 				int popSize = Pop.getResult().size();
 				for(int individual_k=0; individual_k<popSize; individual_k++) {
@@ -502,8 +498,6 @@ public class toXML {
 					Result_individual Individual = Pop.getIindividual(individual_k);
 					Element individual = addChildNode("individual", pop);
 					individual.setAttribute("ID", String.valueOf(individual_k));
-					individual.setAttribute("generation", String.valueOf(Pop.getGen()));
-					individual.setAttribute("trial", String.valueOf(Trial.getTrial()));
 
 					for(int l=0; l<Individual.getF().size(); l++) {
 						addChildNode_value("f"+String.valueOf(l), individual, String.valueOf(Individual.getF().get(l)));
@@ -564,6 +558,162 @@ public class toXML {
 			}
 		}
 	}
+
+	/** 一時的 **/
+	public void ResultToXML(Result_population input) {
+		//全体
+		Element master=document.getDocumentElement();
+			Element pop = addChildNode("population", master);
+			Result_population Pop = input;
+			pop.setAttribute("generation", String.valueOf(Pop.getGen()));
+
+			int popSize = Pop.getResult().size();
+			for(int individual_k=0; individual_k<popSize; individual_k++) {
+
+				Result_individual Individual = Pop.getIindividual(individual_k);
+				Element individual = addChildNode("individual", pop);
+				individual.setAttribute("ID", String.valueOf(individual_k));
+
+				for(int l=0; l<Individual.getF().size(); l++) {
+					addChildNode_value("f"+String.valueOf(l), individual, String.valueOf(Individual.getF().get(l)));
+				}
+
+				addChildNode_value("Dtra", individual, String.valueOf(Individual.getDtra()));
+
+				addChildNode_value("Dtst", individual, String.valueOf(Individual.getDtst()));
+
+				addChildNode_value("ruleNum", individual, String.valueOf(Individual.getRuleNum()));
+
+				addChildNode_value("ruleLength", individual, String.valueOf(Individual.getRuleLength()));
+
+//					addChildNode_value("rank", individual, String.valueOf(Individual.getRank()));
+
+//					addChildNode_value("crowding", individual, String.valueOf(Individual.getCrowding()));
+
+			}
+	}
+
+	/** 一時的**/
+	public void RuleSetToXML(Result_population input, int trial_i) {
+
+		//全体
+		Element master=document.getDocumentElement();
+
+				Element pop = addChildNode("population", master);
+				Result_population Pop = input;
+				pop.setAttribute("generation", String.valueOf(Pop.getGen()));
+				pop.setAttribute("trial", String.valueOf(trial_i));
+
+				KB kb = Pop.getKb();
+
+				FuzzySet[][] FSs = kb.getFSs();
+				Element fss = addChildNode("KnowledgeBase", pop);
+				fss.setAttribute("generation", String.valueOf(Pop.getGen()));
+				fss.setAttribute("trial", String.valueOf(trial_i));
+
+				for(int FuzzySetDim_k=0; FuzzySetDim_k<FSs.length; FuzzySetDim_k++) {
+					FuzzySet FS[] = FSs[FuzzySetDim_k];
+					Element fs = addChildNode("FuzzySet", fss);
+					fs.setAttribute("dimension", String.valueOf(FuzzySetDim_k));
+					for(int FuzzySet_l=0; FuzzySet_l<FS.length; FuzzySet_l++) {
+						Element ft = addChildNode("FuzzyTerm", fs);
+						ft.setAttribute("ID", String.valueOf(FuzzySet_l));
+						FuzzySet vv = FSs[FuzzySetDim_k][FuzzySet_l];
+						//name_fuzzytermtype
+						addChildNode_value("name", ft, vv.getName());
+						//type
+						addChildNode_value("Shape_Type_ID", ft, String.valueOf(vv.getShapeType()));
+						String ShapeName = null;
+						switch(vv.getShapeType()) {
+							case 0: ShapeName = "rightLinearShape"; break;
+							case 1: ShapeName = "leftLinearShape"; break;
+							case 2: ShapeName = "piShape"; break;
+							case 3: ShapeName = "triangularShape"; break;
+							case 4: ShapeName = "gaussianShape"; break;
+							case 5: ShapeName = "rightGaussianShape"; break;
+							case 6: ShapeName = "leftGaussianShape"; break;
+							case 7: ShapeName = "trapezoidShape"; break;
+							case 8: ShapeName = "singletonShape"; break;
+							case 9: ShapeName = "rectangularShape"; break;
+							case 10: ShapeName = "zShape"; break;
+							case 11: ShapeName = "sShape"; break;
+							case 12: ShapeName = "pointSetShape"; break;
+							case 13: ShapeName = "pointSetMonotonicShape"; break;
+							case 14: ShapeName = "circularDefinition"; break;
+							case 15: ShapeName = "customShape"; break;
+							case 16: ShapeName = "customMonotonicShape"; break;
+							case 99: ShapeName = "DontCare"; break;
+						}
+						addChildNode_value("Shape_Type", ft, ShapeName);
+						//parameters
+						FuzzyTermType ftt = vv.getTerm();
+						float[] param = ftt.getParam();
+						Element params = addChildNode("parameters", ft);
+						for(int m=0; m<param.length; m++) {
+							Element parameter = document.createElement("parameter");
+							parameter.setAttribute("id", String.valueOf(m));
+							Text textContents = document.createTextNode(String.valueOf(param[m]));
+							parameter.appendChild(textContents);
+							params.appendChild(parameter);
+						}
+						if(vv.getPartitonNum() >= 0)addChildNode_value("PartitionNum", ft, String.valueOf(vv.getPartitonNum()));
+//						addChildNode_value("weight", ft, String.valueOf(vv.getWeight()));
+					}
+				}
+
+				int popSize = Pop.getResult().size();
+				for(int individual_n=0; individual_n<popSize; individual_n++) {
+
+					Result_individual Individual = Pop.getIindividual(individual_n);
+					SinglePittsburgh singlePittsburg = Individual.getRule();
+
+					Element individual = addChildNode("individual", pop);
+					individual.setAttribute("generation", String.valueOf(Pop.getGen()));
+					individual.setAttribute("trial", String.valueOf(trial_i));
+					individual.setAttribute("ruleNum", String.valueOf(singlePittsburg.getRuleNum()));
+
+					for(int l=0; l<Individual.getF().size(); l++) {
+						addChildNode_value("f"+String.valueOf(l), individual, String.valueOf(Individual.getF().get(l)));
+					}
+
+					//rank
+//					addChildNode_value("rank", individual, String.valueOf(singlePittsburg.getRank()));
+
+					//crowding
+//					addChildNode_value("crowding", individual, String.valueOf(singlePittsburg.getCrowding()));
+
+					//ruleSet
+					SingleRuleSet ruleSet = singlePittsburg.getRuleSet();
+					Element singleruleset = addChildNode("ruleSet", individual);
+
+					//micRules
+					ArrayList<SingleRule> micRules = ruleSet.getMicRules();
+
+					for(int l=0; l<micRules.size(); l++) {
+						SingleRule SingleRule = micRules.get(l);
+						Element singlerule = addChildNode("SingleRule", singleruleset);
+						singlerule.setAttribute("ID", String.valueOf(l));
+
+						//rule
+						int Rule[] = SingleRule.getRule();
+						Element rule = addChildNode("rule", singlerule);
+						for(int m=0; m<Rule.length; m++) {
+							Element element = addChildNode_value("element", rule, String.valueOf(Rule[m]));
+							element.setAttribute("ID", String.valueOf(m));
+						}
+
+						//conclusion
+						addChildNode_value("conclusion", singlerule, String.valueOf(SingleRule.getConc()));
+
+						//cf
+						addChildNode_value("cf", singlerule, String.valueOf(SingleRule.getCf()));
+
+						//fitness
+						addChildNode_value("fitness", singlerule, String.valueOf(SingleRule.getFitness()));
+					}
+				}
+			}
+
 
 //	public void RBtoXML(RB rb) throws Exception{
 //		KB kb_buf = rb.kb;

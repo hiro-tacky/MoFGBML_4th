@@ -18,6 +18,7 @@ public class Result_MoFGBML {
 	String rootDir;
 	String id;
 	String trialRoot;
+	String tstFile;
 	int nowCV;
 	int nowRep;
 	int nowTrial;
@@ -42,6 +43,7 @@ public class Result_MoFGBML {
 	}
 
 	public void setDataset(String tstFile) {
+		this.tstFile = tstFile;
 		resultDataset.setDataset(tstFile);
 	}
 
@@ -111,6 +113,14 @@ public class Result_MoFGBML {
 
 	public void setResultDataset(Result_dataset resultDataset) {
 		this.resultDataset = resultDataset;
+	}
+
+	public String getTstFile() {
+		return tstFile;
+	}
+
+	public void setTstFile(String tstFile) {
+		this.tstFile = tstFile;
 	}
 
 	public void outputTimes(String fileName) {
