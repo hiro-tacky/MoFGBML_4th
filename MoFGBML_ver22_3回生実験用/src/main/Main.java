@@ -131,6 +131,8 @@ public class Main {
 			for(int cv_i = 0; cv_i < Setting.crossValidationNum; cv_i++) {
 				traFiles[rep_i][cv_i] = Input.makeFileNameOne(cv_i, rep_i, true);
 				tstFiles[rep_i][cv_i] = Input.makeFileNameOne(cv_i, rep_i, false);
+				System.out.println(traFiles[rep_i][cv_i]);
+				System.out.println(tstFiles[rep_i][cv_i]);
 			}
 		}
 
