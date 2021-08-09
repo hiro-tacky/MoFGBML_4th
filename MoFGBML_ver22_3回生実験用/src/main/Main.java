@@ -1,10 +1,15 @@
 package main;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.ForkJoinPool;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
 
 import data.Input;
 import fgbml.mofgbml.MoFGBML;
@@ -13,6 +18,7 @@ import fgbml.subdivision_ver2.Subdivision_ver2;
 import main.ExperimentInfo.ExperimentInfo;
 import method.MersenneTwisterFast;
 import method.Output;
+import output.toXML;
 import output.result.Result_MoFGBML;
 
 
@@ -131,8 +137,6 @@ public class Main {
 			for(int cv_i = 0; cv_i < Setting.crossValidationNum; cv_i++) {
 				traFiles[rep_i][cv_i] = Input.makeFileNameOne(cv_i, rep_i, true);
 				tstFiles[rep_i][cv_i] = Input.makeFileNameOne(cv_i, rep_i, false);
-				System.out.println(traFiles[rep_i][cv_i]);
-				System.out.println(tstFiles[rep_i][cv_i]);
 			}
 		}
 
@@ -149,7 +153,7 @@ public class Main {
 		String resultRoot = dir_path + sep + ExperimentInfo.saveDir + sep + Setting.dataName + "_" + id;
 		Output.mkdirs(resultRoot);
 		/** 一時的 **/
-		ExperimentInfo.setResultRoot(resultRoot);
+//		ExperimentInfo.setResultRoot(resultRoot);
 
 		/* ********************************************************* */
 		//Output "Experimental Settings"
@@ -197,23 +201,23 @@ public class Main {
 		fileName = resultRoot + sep + "Times_" + id + ".csv";
 		master.outputTimes(fileName);
 
-//		try {
-//			toXML result = new toXML("result");
-//			toXML ruleset = new toXML("ruleset");
-//			toXML ClassifyResult = new toXML("classifyResult");
-//			result.ResultToXML(master);
-//			ruleset.RuleSetToXML(master);
-//			ClassifyResult.classifyResultToXML(master.getResultDataset());
-//			result.output(args[3] + "_result", resultRoot);
-//			ruleset.output(args[3] + "_ruleset", resultRoot);
-//			ClassifyResult.output(args[3] + "_classifyResult", resultRoot);
-//		} catch (TransformerConfigurationException | ParserConfigurationException e) {
-//			// TODO 自動生成された catch ブロック
-//			e.printStackTrace();
-//		} catch (FileNotFoundException | TransformerException e) {
-//			// TODO 自動生成された catch ブロック
-//			e.printStackTrace();
-//		}
+		try {
+			toXML result = new toXML("result");
+			toXML ruleset = new toXML("ruleset");
+			toXML ClassifyResult = new toXML("classifyResult");
+			result.ResultToXML(master);
+			ruleset.RuleSetToXML(master);
+			ClassifyResult.classifyResultToXML(master.getResultDataset());
+			result.output(args[3] + "_result", resultRoot);
+			ruleset.output(args[3] + "_ruleset", resultRoot);
+			ClassifyResult.output(args[3] + "_classifyResult", resultRoot);
+		} catch (TransformerConfigurationException | ParserConfigurationException e) {
+			// TODO 自動生成された catch ブロック
+			e.printStackTrace();
+		} catch (FileNotFoundException | TransformerException e) {
+			// TODO 自動生成された catch ブロック
+			e.printStackTrace();
+		}
 	}
 
 	public static Experiment setExperiment() {

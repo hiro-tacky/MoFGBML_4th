@@ -429,9 +429,8 @@ public class KB {
 		float[] dontCare = new float[] {0f, 1f};
 		float[][][] params_triangle = partitions_homo.triangle();
 		float[][][] params_gaussian = partitions_homo.gaussian();
-		float[][][] params_trapezoid = partitions_homo.trapezoid();
 		float[][][] params_rectangle = partitions_homo.rectangle(K);
-		int FuzzySetNum = params_triangle.length + params_gaussian.length + params_trapezoid.length + params_rectangle.length;
+		int FuzzySetNum = params_triangle.length + params_gaussian.length + params_rectangle.length;
 		for(int i = 0; i < Ndim; i++) {
 			FSs[i] = new FuzzySet[FuzzySetNum + 1];
 			//Don't Care
@@ -448,10 +447,6 @@ public class KB {
 				FSs[i][k+j+1] = new FuzzySet(String.valueOf(j+1), FuzzyTermType.TYPE_gaussianShape, params_gaussian[i][j], getPartitonNum(k, K));
 			}
 			k += params_gaussian.length;
-			for(int j = 0; j < params_trapezoid.length; j++) {
-				FSs[i][k+j+1] = new FuzzySet(String.valueOf(j+1), FuzzyTermType.TYPE_trapezoidShape, params_trapezoid[i][j], getPartitonNum(k, K));
-			}
-			k += params_trapezoid.length;
 			for(int j = 0; j < params_rectangle.length; j++) {
 				FSs[i][k+j+1] = new FuzzySet(String.valueOf(j+1), FuzzyTermType.TYPE_rectangularShape, params_rectangle[i][j], getPartitonNum(k, K));
 			}
