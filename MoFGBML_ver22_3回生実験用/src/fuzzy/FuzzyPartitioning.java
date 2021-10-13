@@ -108,7 +108,6 @@ public class FuzzyPartitioning {
 			for(int k: K) {
 				// Optimal Splitting.
 				ArrayList<Double> partitions = optimalSplitting(patterns, k, tra.getCnum());
-
 				boundaries.get(dim_i).add(partitions);
 			}
 		}

@@ -46,7 +46,7 @@ attri_plot = 0
 default_size = 50
 default_alpha = 0.01
 #figureの基本設定
-default_figsize = (16, 16)
+default_figsize = (16, 9)
 default_titlesize = 18
 ###############################################################################
 
@@ -215,7 +215,7 @@ class FuzzyTerm:
         self.parameters = {}
         for buf in fuzzyterm.find('parameters'):
             self.parameters[int(buf.get('id'))] = float(buf.text)
-        self.PartitionNum = int(fuzzyterm.find("PartitionNum").text)
+        self.PartitionNum = int(fuzzyterm.find("PartitionNum").text) ###############################変更 
     
     def setAx(self, ax, alpha = 1.0, alpha_between = 0.1, color = "black", color_between = "blue"):
         """Ax にメンバシップ関数をプロットする"""
@@ -282,9 +282,9 @@ class KB:
                     if ClassifyResult is not None:
                         ClassifyResult.plot(ax, dimension)
                     if df is not None:
-                        df.setAx(dimension, ax, alpha_between = 0)
+                        df.setAx(dimension, ax, alpha_between = 0.1)
                     for i in range(partiton_num):
-                        FuzzySet[CurrentFuzzySetID + i].setAx(ax, alpha_between = 0)
+                        FuzzySet[CurrentFuzzySetID + i].setAx(ax, alpha_between = 0.1)
                     if isSave:
                         SaveFig(fig, savePath + "KnowledgeBase/FuzzySetByPartition/Attribute_" + str(dimension) + "/", \
                                 self.datasetName + "_KB_trial" + str(self.trial) + "_gen" + str(self.gen) + "_Attribute" + str(dimension) + "_partition" + str(CurrentFuzzySetID) + "-" + str(CurrentFuzzySetID + partiton_num - 1))
@@ -592,10 +592,11 @@ class RuleSetXML(XML):
             patches, texts = ax.pie(fuzzyTypePartitionData, startangle=90, colors = colorList_2, counterclock = False, labeldistance=1.4, radius=0.75, wedgeprops={'linewidth': 5, 'edgecolor':"black"})
             for t in texts:
                 t.set_size(36)
-            # SaveFig(fig, savePath + "all_Trial/", self.datasetName + "_dim" + str(dim) + "_usedMenbershipRate")
+            print(savePath)
+            SaveFig(fig, savePath + "all_Trial/", self.datasetName + "_dim" + str(dim) + "_usedMenbershipRate")
             plt.close("all")
             a = [fuzzyTypePartitionData[0]+fuzzyTypePartitionData[3], fuzzyTypePartitionData[1]+fuzzyTypePartitionData[4], fuzzyTypePartitionData[2]+fuzzyTypePartitionData[5]]
-            print(a[0]/sum(a), end = ',')
+            # print(a[0]/sum(a), end = ',')
             # print(fuzzyTypeData)
             # os.makedirs(savePath, exist_ok=True)
             # with open(savePath +'allTrial/result_dim_' + str(dim) + '.csv', 'a', newline="") as f:
@@ -710,12 +711,12 @@ class RuleSet:
         print("RULESET\n dataset name:")
         self.datasetName = input()
         self.detaset_df = detaset_df(self.datasetName)
-        self.experimentTittle = "default_entropy_mixed"#["samePartitionNum", "diffPartitionNum"]#["rectangular", "trapezoid", "gaussian", "triangle", "multi"]
-        self.antecedentTypeList = ["designedFuzzySet", "default", "default_entropy_mixed"]#["default", "default_entropy_mixed"]
+        self.experimentTittle = "FSS2021"#["samePartitionNum", "diffPartitionNum"]#["rectangular", "trapezoid", "gaussian", "triangle", "multi"]
+        self.antecedentTypeList = ["default_entropy_mixed"]#["default", "default_entropy_mixed"]
         self.ComparativeExperimentList = ["multi"]#["rectangular", "trapezoid", "gaussian", "triangle", "multi"]
         self.RuleSetObj = {} #[antecedentTypeList][ComparativeExperimentList] = RuleSetXMLオブジェクト
         self.RuleSetObj_ClassifyResult = {} #[antecedentTypeList][ComparativeExperimentList] = RuleSetXMLオブジェクト
-        dirPath = "xml/" + self.experimentTittle + "/" + self.datasetName + "*/"
+        dirPath = "xml/" + self.experimentTittle + "/" + self.datasetName + "/"
         for antecedentType in self.antecedentTypeList:
             for ComparativeExperiment in self.ComparativeExperimentList:
                 self.RuleSetObj[antecedentType] = {}
@@ -743,8 +744,8 @@ class RuleSet:
                                 s_buf2 = s_buf.split('=')
                                 self.gen_num = int(s_buf2[1])
         
-        # self.KBplot()
-        self.UsedMenbershipRatePlot()
+        self.KBplot()
+        # self.UsedMenbershipRatePlot()
             
     def getRuleSetXML(self):
         i = 0
