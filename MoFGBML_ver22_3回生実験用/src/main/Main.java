@@ -67,6 +67,9 @@ public class Main {
 			Setting.forkJoinPool = new ForkJoinPool(Setting.parallelCores);
 		}
 
+		/**一時的**/
+		ExperimentInfo.rep_i = Integer.valueOf(args[7]);
+		ExperimentInfo.cv_i = Integer.valueOf(args[8]);
 
 		/* ********************************************************* */
 		//基本データ出力
@@ -99,8 +102,11 @@ public class Main {
 
 
 		//ファイル名構築
+//		String resultRoot = System.getProperty("user.dir") + sep + "result" + sep
+//							+ Setting.saveDir + sep + Setting.dataName + "_" + id;
+		//一時的
 		String resultRoot = System.getProperty("user.dir") + sep + "result" + sep
-							+ Setting.saveDir + sep + Setting.dataName + "_" + id;
+				+ Setting.saveDir + sep + Setting.dataName + "_";
 
 
 		//実験試行
@@ -146,7 +152,9 @@ public class Main {
 
 
 		//ファイル名構築
-		String resultRoot = dir_path + sep + ExperimentInfo.saveDir + sep + Setting.dataName + "_" + id;
+		/** 一時的**/
+		String resultRoot = dir_path + sep + ExperimentInfo.saveDir + sep + Setting.dataName + "_"  + sep + "trial_" + ExperimentInfo.rep_i + ExperimentInfo.cv_i;
+//		String resultRoot = dir_path + sep + ExperimentInfo.saveDir + sep + Setting.dataName + "_" + id;
 		Output.mkdirs(resultRoot);
 		/** 一時的 **/
 		ExperimentInfo.setResultRoot(resultRoot);
@@ -155,13 +163,13 @@ public class Main {
 		//Output "Experimental Settings"
 		String consts = (new Consts()).getStaticValues();
 		String settings = (new Setting()).getStaticValues();
-		String ExperimentInfo = (new ExperimentInfo()).getStaticValues();
+		String ExperimentInfo_tmp = (new ExperimentInfo()).getStaticValues();
 		String fileName = resultRoot + sep + "Consts_" + id + ".txt";
 		Output.writeln(fileName, consts);
 		fileName = resultRoot + sep + "Setting_" + id + ".txt";
 		Output.writeln(fileName, settings);
 		fileName = resultRoot + sep + "ExperimentInfo_" + id + ".txt";
-		Output.writeln(fileName, ExperimentInfo);
+		Output.writeln(fileName, ExperimentInfo_tmp);
 
 		/* ********************************************************* */
 		//Result Master
@@ -176,9 +184,13 @@ public class Main {
 		for(int rep_i = 0; rep_i < Setting.repeatTimes; rep_i++) {
 			for(int cv_i = 0; cv_i < Setting.crossValidationNum; cv_i++) {
 				//make now trial Directory
+
+				rep_i = ExperimentInfo.rep_i;
+				cv_i = ExperimentInfo.cv_i;
+
 				master.setNowRep(rep_i);
 				master.setNowCV(cv_i);
-				master.setTrialRoot(resultRoot + sep + "trial" + rep_i+cv_i);
+				master.setTrialRoot(resultRoot + sep + "trial" + rep_i + cv_i);
 				master.setNowTrial(count);
 				master.setDataset(tstFiles[rep_i][cv_i]);
 				count++;
@@ -190,7 +202,9 @@ public class Main {
 									 rnd, master);
 
 				System.out.println();
+				break;
 			}
+			break;
 		}
 		/* ********************************************************* */
 		//Output Times
