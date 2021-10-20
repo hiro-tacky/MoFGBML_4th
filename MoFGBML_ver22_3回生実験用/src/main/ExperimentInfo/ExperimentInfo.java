@@ -9,8 +9,6 @@ import java.util.ArrayList;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
-import jfml.term.FuzzyTermType;
-
 
 /**
  * 比較実験用に変更するパラメータを保持する．
@@ -67,7 +65,7 @@ public class ExperimentInfo {
 	public static int FUZZY_SET_INITIALIZE = 0;
 
 	/** 比較実験のセットのリスト．experimentInfoSet()のswitch関数のindexに対応 */
-	public static int[] experimentInfoSetList = {0};
+	public static int[] experimentInfoSetList = {7};
 
 	/** 比較実験のセットのリストから実行中の実験セットの"リスト"のindex．最初からやる場合は-1に設定*/
 	public static int experimentInfoSetListIndex = -1;
@@ -94,108 +92,95 @@ public class ExperimentInfo {
 		designedFuzzySet buf;
 		switch (index) {
 		case 0:
-			ExperimentInfo.setSaveDir("default_entropy_mixed" + sep + "multi");
-			ExperimentInfo.setFuzzySetType(99);
-			ExperimentInfo.setFuzzyTypeName("multi");
-			ExperimentInfo.FUZZY_SET_INITIALIZE = 2;
-			break;
-
-		case 1:
 			ExperimentInfo.setSaveDir("default" + sep + "triangle");
 			ExperimentInfo.setFuzzySetType(3);
 			ExperimentInfo.setFuzzyTypeName("triangle");
 			ExperimentInfo.FUZZY_SET_INITIALIZE = 0;
 			break;
 
+		case 1:
+			ExperimentInfo.setSaveDir("entropy" + sep + "triangle");
+			ExperimentInfo.setFuzzySetType(3);
+			ExperimentInfo.setFuzzyTypeName("triangle");
+			ExperimentInfo.FUZZY_SET_INITIALIZE = 2;
+			break;
+
 		case 2:
-			ExperimentInfo.setSaveDir("default" + sep + "gaussian");
-			ExperimentInfo.setFuzzySetType(4);
-			ExperimentInfo.setFuzzyTypeName("gaussian");
-			ExperimentInfo.FUZZY_SET_INITIALIZE = 0;
-			break;
-
-		case 3:
-			ExperimentInfo.setSaveDir("default" + sep + "trapezoid");
-			ExperimentInfo.setFuzzySetType(7);
-			ExperimentInfo.setFuzzyTypeName("trapezoid");
-			ExperimentInfo.FUZZY_SET_INITIALIZE = 0;
-			break;
-
-		case 4:
 			ExperimentInfo.setSaveDir("default" + sep + "rectangle");
 			ExperimentInfo.setFuzzySetType(9);
 			ExperimentInfo.setFuzzyTypeName("rectangle");
 			ExperimentInfo.FUZZY_SET_INITIALIZE = 0;
 			break;
 
-		//不均等分割ガウシアン: InhomoGaussian, FuzzyTermType.TYPE_gaussianShape
-		//不均等分割区間: InhomoInterval, FuzzyTermType.TYPE_rectangularShape
-		//不均等分割線形型ファジィ: InhomoFuzzy, FuzzyTermType.TYPE_trapezoidShape
-		//均等分割ガウシアンHomoGaussian, FuzzyTermType.TYPE_gaussianShape
-		//均等分割区間: HomoInterval, FuzzyTermType.TYPE_rectangularShape
-		//均等分割線形型: HomoFuzzy, FuzzyTermType.TYPE_triangularShape
-		case 5:
-			//Iris
-			ExperimentInfo.setSaveDir("designedFuzzySet" + sep + "samePartitionNum");
-			ExperimentInfo.FUZZY_SET_INITIALIZE = 3;
-			ExperimentInfo.setFuzzySetType(99);
-			ExperimentInfo.setFuzzyTypeName("samePartitionNum");
+		case 3:
+			ExperimentInfo.setSaveDir("entropy" + sep + "rectangle");
+			ExperimentInfo.setFuzzySetType(9);
+			ExperimentInfo.setFuzzyTypeName("rectangle");
+			ExperimentInfo.FUZZY_SET_INITIALIZE = 2;
+			break;
 
-			ExperimentInfo.designedFuzzySet = new ArrayList<designedFuzzySet>();
-			// dim: 0
-			buf = new designedFuzzySet(4);
-			buf.addDesignedFuzzySet("HomoGaussian", FuzzyTermType.TYPE_gaussianShape, new int[] {2, 3, 4, 5}, 0);
-			ExperimentInfo.designedFuzzySet.add(buf);
-			ExperimentInfo.FUZZY_SET_NUM.add(14);
-			// dim: 1
-			buf = new designedFuzzySet(4);
-			buf.addDesignedFuzzySet("HomoGaussian", FuzzyTermType.TYPE_gaussianShape, new int[] {2, 3, 4, 5}, 0);
-			ExperimentInfo.designedFuzzySet.add(buf);
-			ExperimentInfo.FUZZY_SET_NUM.add(14);
-			// dim: 2
-			buf = new designedFuzzySet(4);
-			buf.addDesignedFuzzySet("InhomoFuzzy", FuzzyTermType.TYPE_trapezoidShape, new int[] {2, 3, 4, 5}, 1);
-			ExperimentInfo.designedFuzzySet.add(buf);
-			ExperimentInfo.FUZZY_SET_NUM.add(14);
-			// dim: 3
-			buf = new designedFuzzySet(4);
-			buf.addDesignedFuzzySet("InhomoInterval", FuzzyTermType.TYPE_rectangularShape, new int[] {2, 3, 4, 5}, 1);
-			ExperimentInfo.designedFuzzySet.add(buf);
-			ExperimentInfo.FUZZY_SET_NUM.add(14);
+		case 4:
+			ExperimentInfo.setSaveDir("default" + sep + "gaussian");
+			ExperimentInfo.setFuzzySetType(4);
+			ExperimentInfo.setFuzzyTypeName("gaussian");
+			ExperimentInfo.FUZZY_SET_INITIALIZE = 0;
+			break;
+
+		case 5:
+			ExperimentInfo.setSaveDir("entropy" + sep + "gaussian");
+			ExperimentInfo.setFuzzySetType(4);
+			ExperimentInfo.setFuzzyTypeName("gaussian");
+			ExperimentInfo.FUZZY_SET_INITIALIZE = 2;
 			break;
 
 		case 6:
-			//Iris
-			ExperimentInfo.setSaveDir("designedFuzzySet" + sep + "diffPartitionNum");
-			ExperimentInfo.FUZZY_SET_INITIALIZE = 3;
+			ExperimentInfo.setSaveDir("default" + sep + "multi");
 			ExperimentInfo.setFuzzySetType(99);
-			ExperimentInfo.setFuzzyTypeName("samePartitionNum");
-
-			// dim: 0
-			buf = new designedFuzzySet(4);
-			buf.addDesignedFuzzySet("HomoGaussian", FuzzyTermType.TYPE_gaussianShape, new int[] {2, 3, 4, 5}, 0);
-			buf.addDesignedFuzzySet("InhomoGaussian", FuzzyTermType.TYPE_gaussianShape, new int[] {2, 3, 4, 5}, 1);
-			ExperimentInfo.designedFuzzySet.add(buf);
-			ExperimentInfo.FUZZY_SET_NUM.add(14);
-			// dim: 1
-			buf = new designedFuzzySet(4);
-			buf.addDesignedFuzzySet("HomoGaussian", FuzzyTermType.TYPE_gaussianShape, new int[] {2, 3, 4, 5}, 0);
-			buf.addDesignedFuzzySet("InhomoGaussian", FuzzyTermType.TYPE_gaussianShape, new int[] {2, 3, 4, 5}, 1);
-			ExperimentInfo.designedFuzzySet.add(buf);
-			ExperimentInfo.FUZZY_SET_NUM.add(14);
-			// dim: 2
-			buf = new designedFuzzySet(4);
-			buf.addDesignedFuzzySet("InhomoFuzzy", FuzzyTermType.TYPE_trapezoidShape, new int[] {2, 3, 4, 5}, 1);
-			buf.addDesignedFuzzySet("InhomoInterval", FuzzyTermType.TYPE_rectangularShape, new int[] {2, 3, 4, 5}, 1);
-			ExperimentInfo.designedFuzzySet.add(buf);
-			ExperimentInfo.FUZZY_SET_NUM.add(14);
-			// dim: 3
-			buf = new designedFuzzySet(4);
-			buf.addDesignedFuzzySet("InhomoInterval", FuzzyTermType.TYPE_rectangularShape, new int[] {2, 3, 4, 5}, 1);
-			buf.addDesignedFuzzySet("InhomoGaussian", FuzzyTermType.TYPE_gaussianShape, new int[] {2, 3, 4, 5}, 1);
-			ExperimentInfo.designedFuzzySet.add(buf);
-			ExperimentInfo.FUZZY_SET_NUM.add(14);
+			ExperimentInfo.setFuzzyTypeName("multi");
+			ExperimentInfo.FUZZY_SET_INITIALIZE = 0;
 			break;
+
+		case 7:
+			ExperimentInfo.setSaveDir("default_entropy_mixed" + sep + "multi");
+			ExperimentInfo.setFuzzySetType(99);
+			ExperimentInfo.setFuzzyTypeName("multi");
+			ExperimentInfo.FUZZY_SET_INITIALIZE = 2;
+			break;
+
+		case 8:
+			ExperimentInfo.setSaveDir("default_entropy_mixed" + sep + "triangle");
+			ExperimentInfo.setFuzzySetType(0);
+			ExperimentInfo.setFuzzyTypeName("multi");
+			ExperimentInfo.FUZZY_SET_INITIALIZE = 2;
+			break;
+
+//		case 2:
+//			ExperimentInfo.setSaveDir("default_entropy_mixed" + sep + "triangle");
+//			ExperimentInfo.setFuzzySetType(3);
+//			ExperimentInfo.setFuzzyTypeName("triangle");
+//			ExperimentInfo.FUZZY_SET_INITIALIZE = 2;
+//			break;
+//
+////		case 2:
+////			ExperimentInfo.setSaveDir("default" + sep + "gaussian");
+////			ExperimentInfo.setFuzzySetType(4);
+////			ExperimentInfo.setFuzzyTypeName("gaussian");
+////			ExperimentInfo.FUZZY_SET_INITIALIZE = 0;
+////			break;
+////
+//		case 3:
+//			ExperimentInfo.setSaveDir("default" + sep + "trapezoid");
+//			ExperimentInfo.setFuzzySetType(7);
+//			ExperimentInfo.setFuzzyTypeName("trapezoid");
+//			ExperimentInfo.FUZZY_SET_INITIALIZE = 0;
+//			break;
+//
+//		case 4:
+//			ExperimentInfo.setSaveDir("default" + sep + "rectangle");
+//			ExperimentInfo.setFuzzySetType(9);
+//			ExperimentInfo.setFuzzyTypeName("rectangle");
+//			ExperimentInfo.FUZZY_SET_INITIALIZE = 0;
+//			break;
 
 		//不均等分割ガウシアン: InhomoGaussian, FuzzyTermType.TYPE_gaussianShape
 		//不均等分割区間: InhomoInterval, FuzzyTermType.TYPE_rectangularShape
@@ -203,185 +188,254 @@ public class ExperimentInfo {
 		//均等分割ガウシアンHomoGaussian, FuzzyTermType.TYPE_gaussianShape
 		//均等分割区間: HomoInterval, FuzzyTermType.TYPE_rectangularShape
 		//均等分割線形型: HomoFuzzy, FuzzyTermType.TYPE_triangularShape
-		case 7:
-			//Phoneme
-			ExperimentInfo.setSaveDir("designedFuzzySet" + sep + "samePartitionNum");
-			ExperimentInfo.FUZZY_SET_INITIALIZE = 3;
-			ExperimentInfo.setFuzzySetType(99);
-			ExperimentInfo.setFuzzyTypeName("samePartitionNum");
-
-			// dim: 0
-			buf = new designedFuzzySet(5);
-			buf.addDesignedFuzzySet("InhomoFuzzy", FuzzyTermType.TYPE_trapezoidShape, new int[] {2, 3, 4, 5}, 1);
-			ExperimentInfo.designedFuzzySet.add(buf);
-			ExperimentInfo.FUZZY_SET_NUM.add(14);
-			// dim: 1
-			buf = new designedFuzzySet(5);
-			buf.addDesignedFuzzySet("InhomoGaussian", FuzzyTermType.TYPE_gaussianShape, new int[] {2, 3, 4, 5}, 1);
-			ExperimentInfo.designedFuzzySet.add(buf);
-			ExperimentInfo.FUZZY_SET_NUM.add(14);
-			// dim: 2
-			buf = new designedFuzzySet(5);
-			buf.addDesignedFuzzySet("HomoInterval", FuzzyTermType.TYPE_rectangularShape, new int[] {2, 3, 4, 5}, 0);
-			ExperimentInfo.designedFuzzySet.add(buf);
-			ExperimentInfo.FUZZY_SET_NUM.add(14);
-			// dim: 3
-			buf = new designedFuzzySet(5);
-			buf.addDesignedFuzzySet("InhomoGaussian", FuzzyTermType.TYPE_gaussianShape, new int[] {2, 3, 4, 5}, 1);
-			ExperimentInfo.designedFuzzySet.add(buf);
-			ExperimentInfo.FUZZY_SET_NUM.add(14);
-			// dim: 4
-			buf = new designedFuzzySet(5);
-			buf.addDesignedFuzzySet("HomoGaussian", FuzzyTermType.TYPE_gaussianShape, new int[] {2, 3, 4, 5}, 0);
-			ExperimentInfo.designedFuzzySet.add(buf);
-			ExperimentInfo.FUZZY_SET_NUM.add(14);
-			break;
-
-		case 8:
-			//Phoneme
-			ExperimentInfo.setSaveDir("designedFuzzySet" + sep + "diffPartitionNum");
-			ExperimentInfo.FUZZY_SET_INITIALIZE = 3;
-			ExperimentInfo.setFuzzySetType(99);
-			ExperimentInfo.setFuzzyTypeName("samePartitionNum");
-
-			// dim: 0
-			buf = new designedFuzzySet(5);
-			buf.addDesignedFuzzySet("InhomoInterval", FuzzyTermType.TYPE_rectangularShape, new int[] {2}, 1);
-			ExperimentInfo.FUZZY_SET_NUM.add(12);
-			ExperimentInfo.designedFuzzySet.add(buf);
-			// dim: 1
-			buf = new designedFuzzySet(5);
-			buf.addDesignedFuzzySet("InhomoInterval", FuzzyTermType.TYPE_rectangularShape, new int[] {3}, 1);
-			ExperimentInfo.designedFuzzySet.add(buf);
-			ExperimentInfo.FUZZY_SET_NUM.add(8);
-			// dim: 2
-			buf = new designedFuzzySet(5);
-			buf.addDesignedFuzzySet("HomoInterval", FuzzyTermType.TYPE_rectangularShape, new int[] {2}, 0);
-			ExperimentInfo.FUZZY_SET_NUM.add(12);
-			ExperimentInfo.designedFuzzySet.add(buf);
-			// dim: 3
-			buf = new designedFuzzySet(5);
-			buf.addDesignedFuzzySet("InhomoGaussian", FuzzyTermType.TYPE_gaussianShape, new int[] {2}, 1);
-			ExperimentInfo.FUZZY_SET_NUM.add(10);
-			ExperimentInfo.designedFuzzySet.add(buf);
-			// dim: 4
-			buf = new designedFuzzySet(5);
-			buf.addDesignedFuzzySet("HomoGaussian", FuzzyTermType.TYPE_gaussianShape, new int[] {2}, 0);
-			ExperimentInfo.FUZZY_SET_NUM.add(7);
-			ExperimentInfo.designedFuzzySet.add(buf);
-			break;
-
-		case 9:
-			//yeast
-			ExperimentInfo.setSaveDir("designedFuzzySet" + sep + "samePartitionNum");
-			ExperimentInfo.FUZZY_SET_INITIALIZE = 3;
-			ExperimentInfo.setFuzzySetType(99);
-			ExperimentInfo.setFuzzyTypeName("samePartitionNum");
-
-			// dim: 0
-			buf = new designedFuzzySet(5);
-			buf.addDesignedFuzzySet("HomoGaussian", FuzzyTermType.TYPE_gaussianShape, new int[] {2, 3, 4, 5}, 0);
-			ExperimentInfo.designedFuzzySet.add(buf);
-			ExperimentInfo.FUZZY_SET_NUM.add(14);
-			// dim: 1
-			buf = new designedFuzzySet(5);
-			buf.addDesignedFuzzySet("InhomoFuzzy", FuzzyTermType.TYPE_trapezoidShape, new int[] {2, 3, 4, 5}, 1);
-			ExperimentInfo.designedFuzzySet.add(buf);
-			ExperimentInfo.FUZZY_SET_NUM.add(14);
-			// dim: 2
-			buf = new designedFuzzySet(5);
-			buf.addDesignedFuzzySet("InhomoGaussian", FuzzyTermType.TYPE_gaussianShape, new int[] {2, 3, 4, 5}, 1);
-			ExperimentInfo.designedFuzzySet.add(buf);
-			ExperimentInfo.FUZZY_SET_NUM.add(14);
-			// dim: 3
-			buf = new designedFuzzySet(5);
-			buf.addDesignedFuzzySet("HomoGaussian", FuzzyTermType.TYPE_gaussianShape, new int[] {2, 3, 4, 5}, 0);
-			ExperimentInfo.designedFuzzySet.add(buf);
-			ExperimentInfo.FUZZY_SET_NUM.add(14);
-			// dim: 4
-			buf = new designedFuzzySet(5);
-			buf.addDesignedFuzzySet("InhomoFuzzy", FuzzyTermType.TYPE_trapezoidShape, new int[] {2, 3, 4, 5}, 1);
-			ExperimentInfo.designedFuzzySet.add(buf);
-			ExperimentInfo.FUZZY_SET_NUM.add(14);
-			// dim:5
-			buf = new designedFuzzySet(5);
-			buf.addDesignedFuzzySet("InhomoFuzzy", FuzzyTermType.TYPE_trapezoidShape, new int[] {2, 3, 4, 5}, 1);
-			ExperimentInfo.designedFuzzySet.add(buf);
-			ExperimentInfo.FUZZY_SET_NUM.add(14);
-			buf = new designedFuzzySet(5);
-			// dim:6
-			buf.addDesignedFuzzySet("HomoFuzzy", FuzzyTermType.TYPE_triangularShape, new int[] {2, 3, 4, 5}, 0);
-			ExperimentInfo.designedFuzzySet.add(buf);
-			ExperimentInfo.FUZZY_SET_NUM.add(14);
-			buf = new designedFuzzySet(5);
-			// dim:7
-			buf.addDesignedFuzzySet("HomoFuzzy", FuzzyTermType.TYPE_triangularShape, new int[] {2, 3, 4, 5}, 0);
-			ExperimentInfo.designedFuzzySet.add(buf);
-			ExperimentInfo.FUZZY_SET_NUM.add(14);
-			break;
-
-			//不均等分割ガウシアン: InhomoGaussian, FuzzyTermType.TYPE_gaussianShape
-			//不均等分割区間: InhomoInterval, FuzzyTermType.TYPE_rectangularShape
-			//不均等分割線形型ファジィ: InhomoFuzzy, FuzzyTermType.TYPE_trapezoidShape
-			//均等分割ガウシアンHomoGaussian, FuzzyTermType.TYPE_gaussianShape
-			//均等分割区間: HomoInterval, FuzzyTermType.TYPE_rectangularShape
-			//均等分割線形型: HomoFuzzy, FuzzyTermType.TYPE_triangularShape
-
-			//不均等分割ガウシアン: buf.addDesignedFuzzySet("InhomoGaussian", FuzzyTermType.TYPE_gaussianShape, new int[] {}, 1);
-			//不均等分割区間: buf.addDesignedFuzzySet("InhomoInterval", FuzzyTermType.TYPE_rectangularShape, new int[] {}, 1);
-			//不均等分割線形型ファジィ: buf.addDesignedFuzzySet("InhomoFuzzy", FuzzyTermType.TYPE_trapezoidShape, new int[] {}, 1);
-			//均等分割ガウシアン: buf.addDesignedFuzzySet("HomoGaussian", FuzzyTermType.TYPE_gaussianShape, new int[] {}, 0);
-			//均等分割区間: buf.addDesignedFuzzySet("HomoInterval", FuzzyTermType.TYPE_rectangularShape, new int[] {}, 0);
-			//均等分割線形型: buf.addDesignedFuzzySet("HomoFuzzy", FuzzyTermType.TYPE_triangularShape, new int[] {}, 0);
-
-		case 10:
-			//Yeast
-			ExperimentInfo.setSaveDir("designedFuzzySet" + sep + "diffPartitionNum");
-			ExperimentInfo.FUZZY_SET_INITIALIZE = 3;
-			ExperimentInfo.setFuzzySetType(99);
-			ExperimentInfo.setFuzzyTypeName("samePartitionNum");
-
-			// dim: 0
-			buf = new designedFuzzySet(5);
-			buf.addDesignedFuzzySet("HomoGaussian", FuzzyTermType.TYPE_gaussianShape, new int[] {2}, 0);
-			ExperimentInfo.FUZZY_SET_NUM.add(12);
-			ExperimentInfo.designedFuzzySet.add(buf);
-			// dim: 1
-			buf = new designedFuzzySet(5);
-			buf.addDesignedFuzzySet("InhomoGaussian", FuzzyTermType.TYPE_gaussianShape, new int[] {3}, 1);
-			ExperimentInfo.designedFuzzySet.add(buf);
-			ExperimentInfo.FUZZY_SET_NUM.add(8);
-			// dim: 2
-			buf = new designedFuzzySet(5);
-			buf.addDesignedFuzzySet("InhomoGaussian", FuzzyTermType.TYPE_gaussianShape, new int[] {4}, 1);
-			ExperimentInfo.FUZZY_SET_NUM.add(12);
-			ExperimentInfo.designedFuzzySet.add(buf);
-			// dim: 3
-			buf = new designedFuzzySet(5);
-			buf.addDesignedFuzzySet("HomoGaussian", FuzzyTermType.TYPE_gaussianShape, new int[] {3}, 0);
-			ExperimentInfo.FUZZY_SET_NUM.add(10);
-			ExperimentInfo.designedFuzzySet.add(buf);
-			// dim: 4
-			buf = new designedFuzzySet(5);
-			buf.addDesignedFuzzySet("InhomoFuzzy", FuzzyTermType.TYPE_trapezoidShape, new int[] {2}, 1);
-			ExperimentInfo.FUZZY_SET_NUM.add(7);
-			ExperimentInfo.designedFuzzySet.add(buf);
-			//dim: 5
-			buf = new designedFuzzySet(5);
-			buf.addDesignedFuzzySet("InhomoFuzzy", FuzzyTermType.TYPE_trapezoidShape, new int[] {3}, 1);
-			ExperimentInfo.FUZZY_SET_NUM.add(7);
-			ExperimentInfo.designedFuzzySet.add(buf);
-			//dim: 6
-			buf = new designedFuzzySet(5);
-			buf.addDesignedFuzzySet("HomoFuzzy", FuzzyTermType.TYPE_triangularShape, new int[] {3}, 0);
-			ExperimentInfo.FUZZY_SET_NUM.add(7);
-			ExperimentInfo.designedFuzzySet.add(buf);
-			//dim: 7
-			buf = new designedFuzzySet(5);
-			buf.addDesignedFuzzySet("HomoFuzzy", FuzzyTermType.TYPE_triangularShape, new int[] {4}, 0);
-			ExperimentInfo.FUZZY_SET_NUM.add(7);
-			ExperimentInfo.designedFuzzySet.add(buf);
-			break;
+//		case 5:
+//			//Iris
+//			ExperimentInfo.setSaveDir("designedFuzzySet" + sep + "samePartitionNum");
+//			ExperimentInfo.FUZZY_SET_INITIALIZE = 3;
+//			ExperimentInfo.setFuzzySetType(99);
+//			ExperimentInfo.setFuzzyTypeName("samePartitionNum");
+//
+//			ExperimentInfo.designedFuzzySet = new ArrayList<designedFuzzySet>();
+//			// dim: 0
+//			buf = new designedFuzzySet(4);
+//			buf.addDesignedFuzzySet("HomoGaussian", FuzzyTermType.TYPE_gaussianShape, new int[] {2, 3, 4, 5}, 0);
+//			ExperimentInfo.designedFuzzySet.add(buf);
+//			ExperimentInfo.FUZZY_SET_NUM.add(14);
+//			// dim: 1
+//			buf = new designedFuzzySet(4);
+//			buf.addDesignedFuzzySet("HomoGaussian", FuzzyTermType.TYPE_gaussianShape, new int[] {2, 3, 4, 5}, 0);
+//			ExperimentInfo.designedFuzzySet.add(buf);
+//			ExperimentInfo.FUZZY_SET_NUM.add(14);
+//			// dim: 2
+//			buf = new designedFuzzySet(4);
+//			buf.addDesignedFuzzySet("InhomoFuzzy", FuzzyTermType.TYPE_trapezoidShape, new int[] {2, 3, 4, 5}, 1);
+//			ExperimentInfo.designedFuzzySet.add(buf);
+//			ExperimentInfo.FUZZY_SET_NUM.add(14);
+//			// dim: 3
+//			buf = new designedFuzzySet(4);
+//			buf.addDesignedFuzzySet("InhomoInterval", FuzzyTermType.TYPE_rectangularShape, new int[] {2, 3, 4, 5}, 1);
+//			ExperimentInfo.designedFuzzySet.add(buf);
+//			ExperimentInfo.FUZZY_SET_NUM.add(14);
+//			break;
+//
+//		case 6:
+//			//Iris
+//			ExperimentInfo.setSaveDir("designedFuzzySet" + sep + "diffPartitionNum");
+//			ExperimentInfo.FUZZY_SET_INITIALIZE = 3;
+//			ExperimentInfo.setFuzzySetType(99);
+//			ExperimentInfo.setFuzzyTypeName("samePartitionNum");
+//
+//			// dim: 0
+//			buf = new designedFuzzySet(4);
+//			buf.addDesignedFuzzySet("HomoGaussian", FuzzyTermType.TYPE_gaussianShape, new int[] {2, 3, 4, 5}, 0);
+//			buf.addDesignedFuzzySet("InhomoGaussian", FuzzyTermType.TYPE_gaussianShape, new int[] {2, 3, 4, 5}, 1);
+//			ExperimentInfo.designedFuzzySet.add(buf);
+//			ExperimentInfo.FUZZY_SET_NUM.add(14);
+//			// dim: 1
+//			buf = new designedFuzzySet(4);
+//			buf.addDesignedFuzzySet("HomoGaussian", FuzzyTermType.TYPE_gaussianShape, new int[] {2, 3, 4, 5}, 0);
+//			buf.addDesignedFuzzySet("InhomoGaussian", FuzzyTermType.TYPE_gaussianShape, new int[] {2, 3, 4, 5}, 1);
+//			ExperimentInfo.designedFuzzySet.add(buf);
+//			ExperimentInfo.FUZZY_SET_NUM.add(14);
+//			// dim: 2
+//			buf = new designedFuzzySet(4);
+//			buf.addDesignedFuzzySet("InhomoFuzzy", FuzzyTermType.TYPE_trapezoidShape, new int[] {2, 3, 4, 5}, 1);
+//			buf.addDesignedFuzzySet("InhomoInterval", FuzzyTermType.TYPE_rectangularShape, new int[] {2, 3, 4, 5}, 1);
+//			ExperimentInfo.designedFuzzySet.add(buf);
+//			ExperimentInfo.FUZZY_SET_NUM.add(14);
+//			// dim: 3
+//			buf = new designedFuzzySet(4);
+//			buf.addDesignedFuzzySet("InhomoInterval", FuzzyTermType.TYPE_rectangularShape, new int[] {2, 3, 4, 5}, 1);
+//			buf.addDesignedFuzzySet("InhomoGaussian", FuzzyTermType.TYPE_gaussianShape, new int[] {2, 3, 4, 5}, 1);
+//			ExperimentInfo.designedFuzzySet.add(buf);
+//			ExperimentInfo.FUZZY_SET_NUM.add(14);
+//			break;
+//
+//		//不均等分割ガウシアン: InhomoGaussian, FuzzyTermType.TYPE_gaussianShape
+//		//不均等分割区間: InhomoInterval, FuzzyTermType.TYPE_rectangularShape
+//		//不均等分割線形型ファジィ: InhomoFuzzy, FuzzyTermType.TYPE_trapezoidShape
+//		//均等分割ガウシアンHomoGaussian, FuzzyTermType.TYPE_gaussianShape
+//		//均等分割区間: HomoInterval, FuzzyTermType.TYPE_rectangularShape
+//		//均等分割線形型: HomoFuzzy, FuzzyTermType.TYPE_triangularShape
+//		case 7:
+//			//Phoneme
+//			ExperimentInfo.setSaveDir("designedFuzzySet" + sep + "samePartitionNum");
+//			ExperimentInfo.FUZZY_SET_INITIALIZE = 3;
+//			ExperimentInfo.setFuzzySetType(99);
+//			ExperimentInfo.setFuzzyTypeName("samePartitionNum");
+//
+//			// dim: 0
+//			buf = new designedFuzzySet(5);
+//			buf.addDesignedFuzzySet("InhomoFuzzy", FuzzyTermType.TYPE_trapezoidShape, new int[] {2, 3, 4, 5}, 1);
+//			ExperimentInfo.designedFuzzySet.add(buf);
+//			ExperimentInfo.FUZZY_SET_NUM.add(14);
+//			// dim: 1
+//			buf = new designedFuzzySet(5);
+//			buf.addDesignedFuzzySet("InhomoGaussian", FuzzyTermType.TYPE_gaussianShape, new int[] {2, 3, 4, 5}, 1);
+//			ExperimentInfo.designedFuzzySet.add(buf);
+//			ExperimentInfo.FUZZY_SET_NUM.add(14);
+//			// dim: 2
+//			buf = new designedFuzzySet(5);
+//			buf.addDesignedFuzzySet("HomoInterval", FuzzyTermType.TYPE_rectangularShape, new int[] {2, 3, 4, 5}, 0);
+//			ExperimentInfo.designedFuzzySet.add(buf);
+//			ExperimentInfo.FUZZY_SET_NUM.add(14);
+//			// dim: 3
+//			buf = new designedFuzzySet(5);
+//			buf.addDesignedFuzzySet("InhomoGaussian", FuzzyTermType.TYPE_gaussianShape, new int[] {2, 3, 4, 5}, 1);
+//			ExperimentInfo.designedFuzzySet.add(buf);
+//			ExperimentInfo.FUZZY_SET_NUM.add(14);
+//			// dim: 4
+//			buf = new designedFuzzySet(5);
+//			buf.addDesignedFuzzySet("HomoGaussian", FuzzyTermType.TYPE_gaussianShape, new int[] {2, 3, 4, 5}, 0);
+//			ExperimentInfo.designedFuzzySet.add(buf);
+//			ExperimentInfo.FUZZY_SET_NUM.add(14);
+//			break;
+//
+//		case 8:
+//			//Phoneme
+//			ExperimentInfo.setSaveDir("designedFuzzySet" + sep + "diffPartitionNum");
+//			ExperimentInfo.FUZZY_SET_INITIALIZE = 3;
+//			ExperimentInfo.setFuzzySetType(99);
+//			ExperimentInfo.setFuzzyTypeName("samePartitionNum");
+//
+//			// dim: 0
+//			buf = new designedFuzzySet(5);
+//			buf.addDesignedFuzzySet("InhomoInterval", FuzzyTermType.TYPE_rectangularShape, new int[] {2}, 1);
+//			ExperimentInfo.FUZZY_SET_NUM.add(12);
+//			ExperimentInfo.designedFuzzySet.add(buf);
+//			// dim: 1
+//			buf = new designedFuzzySet(5);
+//			buf.addDesignedFuzzySet("InhomoInterval", FuzzyTermType.TYPE_rectangularShape, new int[] {3}, 1);
+//			ExperimentInfo.designedFuzzySet.add(buf);
+//			ExperimentInfo.FUZZY_SET_NUM.add(8);
+//			// dim: 2
+//			buf = new designedFuzzySet(5);
+//			buf.addDesignedFuzzySet("HomoInterval", FuzzyTermType.TYPE_rectangularShape, new int[] {2}, 0);
+//			ExperimentInfo.FUZZY_SET_NUM.add(12);
+//			ExperimentInfo.designedFuzzySet.add(buf);
+//			// dim: 3
+//			buf = new designedFuzzySet(5);
+//			buf.addDesignedFuzzySet("InhomoGaussian", FuzzyTermType.TYPE_gaussianShape, new int[] {2}, 1);
+//			ExperimentInfo.FUZZY_SET_NUM.add(10);
+//			ExperimentInfo.designedFuzzySet.add(buf);
+//			// dim: 4
+//			buf = new designedFuzzySet(5);
+//			buf.addDesignedFuzzySet("HomoGaussian", FuzzyTermType.TYPE_gaussianShape, new int[] {2}, 0);
+//			ExperimentInfo.FUZZY_SET_NUM.add(7);
+//			ExperimentInfo.designedFuzzySet.add(buf);
+//			break;
+//
+//		case 9:
+//			//yeast
+//			ExperimentInfo.setSaveDir("designedFuzzySet" + sep + "samePartitionNum");
+//			ExperimentInfo.FUZZY_SET_INITIALIZE = 3;
+//			ExperimentInfo.setFuzzySetType(99);
+//			ExperimentInfo.setFuzzyTypeName("samePartitionNum");
+//
+//			// dim: 0
+//			buf = new designedFuzzySet(5);
+//			buf.addDesignedFuzzySet("HomoGaussian", FuzzyTermType.TYPE_gaussianShape, new int[] {2, 3, 4, 5}, 0);
+//			ExperimentInfo.designedFuzzySet.add(buf);
+//			ExperimentInfo.FUZZY_SET_NUM.add(14);
+//			// dim: 1
+//			buf = new designedFuzzySet(5);
+//			buf.addDesignedFuzzySet("InhomoFuzzy", FuzzyTermType.TYPE_trapezoidShape, new int[] {2, 3, 4, 5}, 1);
+//			ExperimentInfo.designedFuzzySet.add(buf);
+//			ExperimentInfo.FUZZY_SET_NUM.add(14);
+//			// dim: 2
+//			buf = new designedFuzzySet(5);
+//			buf.addDesignedFuzzySet("InhomoGaussian", FuzzyTermType.TYPE_gaussianShape, new int[] {2, 3, 4, 5}, 1);
+//			ExperimentInfo.designedFuzzySet.add(buf);
+//			ExperimentInfo.FUZZY_SET_NUM.add(14);
+//			// dim: 3
+//			buf = new designedFuzzySet(5);
+//			buf.addDesignedFuzzySet("HomoGaussian", FuzzyTermType.TYPE_gaussianShape, new int[] {2, 3, 4, 5}, 0);
+//			ExperimentInfo.designedFuzzySet.add(buf);
+//			ExperimentInfo.FUZZY_SET_NUM.add(14);
+//			// dim: 4
+//			buf = new designedFuzzySet(5);
+//			buf.addDesignedFuzzySet("InhomoFuzzy", FuzzyTermType.TYPE_trapezoidShape, new int[] {2, 3, 4, 5}, 1);
+//			ExperimentInfo.designedFuzzySet.add(buf);
+//			ExperimentInfo.FUZZY_SET_NUM.add(14);
+//			// dim:5
+//			buf = new designedFuzzySet(5);
+//			buf.addDesignedFuzzySet("InhomoFuzzy", FuzzyTermType.TYPE_trapezoidShape, new int[] {2, 3, 4, 5}, 1);
+//			ExperimentInfo.designedFuzzySet.add(buf);
+//			ExperimentInfo.FUZZY_SET_NUM.add(14);
+//			buf = new designedFuzzySet(5);
+//			// dim:6
+//			buf.addDesignedFuzzySet("HomoFuzzy", FuzzyTermType.TYPE_triangularShape, new int[] {2, 3, 4, 5}, 0);
+//			ExperimentInfo.designedFuzzySet.add(buf);
+//			ExperimentInfo.FUZZY_SET_NUM.add(14);
+//			buf = new designedFuzzySet(5);
+//			// dim:7
+//			buf.addDesignedFuzzySet("HomoFuzzy", FuzzyTermType.TYPE_triangularShape, new int[] {2, 3, 4, 5}, 0);
+//			ExperimentInfo.designedFuzzySet.add(buf);
+//			ExperimentInfo.FUZZY_SET_NUM.add(14);
+//			break;
+//
+//			//不均等分割ガウシアン: InhomoGaussian, FuzzyTermType.TYPE_gaussianShape
+//			//不均等分割区間: InhomoInterval, FuzzyTermType.TYPE_rectangularShape
+//			//不均等分割線形型ファジィ: InhomoFuzzy, FuzzyTermType.TYPE_trapezoidShape
+//			//均等分割ガウシアンHomoGaussian, FuzzyTermType.TYPE_gaussianShape
+//			//均等分割区間: HomoInterval, FuzzyTermType.TYPE_rectangularShape
+//			//均等分割線形型: HomoFuzzy, FuzzyTermType.TYPE_triangularShape
+//
+//			//不均等分割ガウシアン: buf.addDesignedFuzzySet("InhomoGaussian", FuzzyTermType.TYPE_gaussianShape, new int[] {}, 1);
+//			//不均等分割区間: buf.addDesignedFuzzySet("InhomoInterval", FuzzyTermType.TYPE_rectangularShape, new int[] {}, 1);
+//			//不均等分割線形型ファジィ: buf.addDesignedFuzzySet("InhomoFuzzy", FuzzyTermType.TYPE_trapezoidShape, new int[] {}, 1);
+//			//均等分割ガウシアン: buf.addDesignedFuzzySet("HomoGaussian", FuzzyTermType.TYPE_gaussianShape, new int[] {}, 0);
+//			//均等分割区間: buf.addDesignedFuzzySet("HomoInterval", FuzzyTermType.TYPE_rectangularShape, new int[] {}, 0);
+//			//均等分割線形型: buf.addDesignedFuzzySet("HomoFuzzy", FuzzyTermType.TYPE_triangularShape, new int[] {}, 0);
+//
+//		case 10:
+//			//Yeast
+//			ExperimentInfo.setSaveDir("designedFuzzySet" + sep + "diffPartitionNum");
+//			ExperimentInfo.FUZZY_SET_INITIALIZE = 3;
+//			ExperimentInfo.setFuzzySetType(99);
+//			ExperimentInfo.setFuzzyTypeName("samePartitionNum");
+//
+//			// dim: 0
+//			buf = new designedFuzzySet(5);
+//			buf.addDesignedFuzzySet("HomoGaussian", FuzzyTermType.TYPE_gaussianShape, new int[] {2}, 0);
+//			ExperimentInfo.FUZZY_SET_NUM.add(12);
+//			ExperimentInfo.designedFuzzySet.add(buf);
+//			// dim: 1
+//			buf = new designedFuzzySet(5);
+//			buf.addDesignedFuzzySet("InhomoGaussian", FuzzyTermType.TYPE_gaussianShape, new int[] {3}, 1);
+//			ExperimentInfo.designedFuzzySet.add(buf);
+//			ExperimentInfo.FUZZY_SET_NUM.add(8);
+//			// dim: 2
+//			buf = new designedFuzzySet(5);
+//			buf.addDesignedFuzzySet("InhomoGaussian", FuzzyTermType.TYPE_gaussianShape, new int[] {4}, 1);
+//			ExperimentInfo.FUZZY_SET_NUM.add(12);
+//			ExperimentInfo.designedFuzzySet.add(buf);
+//			// dim: 3
+//			buf = new designedFuzzySet(5);
+//			buf.addDesignedFuzzySet("HomoGaussian", FuzzyTermType.TYPE_gaussianShape, new int[] {3}, 0);
+//			ExperimentInfo.FUZZY_SET_NUM.add(10);
+//			ExperimentInfo.designedFuzzySet.add(buf);
+//			// dim: 4
+//			buf = new designedFuzzySet(5);
+//			buf.addDesignedFuzzySet("InhomoFuzzy", FuzzyTermType.TYPE_trapezoidShape, new int[] {2}, 1);
+//			ExperimentInfo.FUZZY_SET_NUM.add(7);
+//			ExperimentInfo.designedFuzzySet.add(buf);
+//			//dim: 5
+//			buf = new designedFuzzySet(5);
+//			buf.addDesignedFuzzySet("InhomoFuzzy", FuzzyTermType.TYPE_trapezoidShape, new int[] {3}, 1);
+//			ExperimentInfo.FUZZY_SET_NUM.add(7);
+//			ExperimentInfo.designedFuzzySet.add(buf);
+//			//dim: 6
+//			buf = new designedFuzzySet(5);
+//			buf.addDesignedFuzzySet("HomoFuzzy", FuzzyTermType.TYPE_triangularShape, new int[] {3}, 0);
+//			ExperimentInfo.FUZZY_SET_NUM.add(7);
+//			ExperimentInfo.designedFuzzySet.add(buf);
+//			//dim: 7
+//			buf = new designedFuzzySet(5);
+//			buf.addDesignedFuzzySet("HomoFuzzy", FuzzyTermType.TYPE_triangularShape, new int[] {4}, 0);
+//			ExperimentInfo.FUZZY_SET_NUM.add(7);
+//			ExperimentInfo.designedFuzzySet.add(buf);
+//			break;
 		}
 	}
 

@@ -67,6 +67,10 @@ public class StaticFuzzyFunc {
 					kb = new KB();
 					kb.classEntropyRectangleInit((SingleDataSetInfo)Dtra, Setting.PatitionNumSet);
 					break;
+				case 0:
+					kb = new KB();
+					kb.classDefaultEntropyTriangleInit((SingleDataSetInfo)Dtra, Setting.PatitionNumSet, Consts.FUZZY_GRADE);
+					break;
 			}
 		} else if(ExperimentInfo.FUZZY_SET_INITIALIZE == 3) {
 			kb = new KB();
@@ -453,39 +457,3 @@ public class StaticFuzzyFunc {
 	}
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

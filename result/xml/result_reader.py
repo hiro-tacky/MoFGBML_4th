@@ -40,6 +40,7 @@ default_alpha = 0.01
 #figureの基本設定
 default_figsize = (16, 9)
 default_titlesize = 18
+colorList = ["r", "b", "m", "g"]
 ###############################################################################
 
 lim = lambda s, g: int((g-s)/10) if int((g-s)/10) != 0 else 1
@@ -58,7 +59,7 @@ def singleFig_set(title = None):
         入力:ファイル名
         返り値:figureオブジェクト"""
         fig = plt.figure(figsize = default_figsize)
-        fig.subplots_adjust(left=0.08, right=0.95, bottom=0.1, top=0.92)
+        fig.subplots_adjust(left=0.11, right=0.95, bottom=0.15, top=0.92)
         ax = fig.add_subplot(1, 1, 1)
         if title is not None:
             fig.suptitle(title, size = default_titlesize)        
@@ -226,7 +227,7 @@ class resultXML(XML):
                     ave[buf['f1']] = [buf[y_ax], 1]
         x = [ruleNum for ruleNum, average in ave.items() if average[1] > trial_num/2]
         y = [average[0]/average[1] for average in ave.values() if average[1] > trial_num/2]
-        ax.scatter(x, y, label = label_name, marker = marker)
+        ax.scatter(x, y, label = label_name, marker = marker, s=60)
         ax.grid(True)
         if title is not None:
             ax.set_title(title)
@@ -256,7 +257,7 @@ class resultXML(XML):
             del best_individuals
         x = [ruleNum for ruleNum, average in best.items() if average[1] > trial_num/2]
         y = [average[0]/average[1] for average in best.values() if average[1] > trial_num/2]
-        ax.scatter(x, y, label = label_name, marker = marker)
+        ax.scatter(x, y, label = label_name, marker = marker, s=100)
         ax.grid(True)
         if title is not None:
             ax.set_title(title)
@@ -310,18 +311,21 @@ class Result():
         print("RESULT\n dataset name:")
         self.datasetName = input()
         self.resultObj_set = {} #[FuzzyTypeList][folderList] = RuleSetXMLオブジェクト
-        self.FuzzyTypeList = ["default", "default_entropy_mixed", "samePartitionNum", "diffPartitionNum"]#["triangle", "rectangle", "trapezoid", "gaussian", "multi"] #比較されるファジィタイプ"multi"
-        self.folderList = ["designedFuzzySet"]#["default", "default_entropy_mixed", "designedFuzzySet"] #比較するxmlファイルが存在するフォルダ
-        self.savePath = "result/" + self.datasetName + "/result/" #変更忘れるな 
+        self.experimentTittle = "FSS2021"#["samePartitionNum", "diffPartitionNum"]#["rectangular", "trapezoid", "gaussian", "triangle", "multi"]
+        self.antecedentTypeList = ["default", "entropy", "default_entropy_mixed"]#["default", "default_entropy_mixed"]
+        self.FuzzyTypeList = ["default", "entropy", "default_entropy_mixed"] #["triangle", "rectangle", "trapezoid", "gaussian", "multi"] #比較されるファジィタイプ"multi"
+        self.folderList = [ "triangle", "multi"]#["default", "default_entropy_mixed", "designedFuzzySet"] #比較するxmlファイルが存在するフォルダ
+        self.savePath = "result/" + self.experimentTittle + "/" + self.datasetName + "/result/" #変更忘れるな 
         label_name = "             "
         for fuzzyType in self.FuzzyTypeList:
             for folderName in self.folderList:
                 self.fileName = self.datasetName + "_result.xml"
-                self.pathList = glob.glob("xml/" + self.datasetName + "/" + folderName + "/" + fuzzyType + "/" + self.datasetName + "*/" + self.fileName)
+                self.pathList = glob.glob("xml/" + self.experimentTittle + "/" + self.datasetName + "/" + fuzzyType + "/" + folderName + "/" + self.datasetName + "*/" + self.fileName)
+                print(self.pathList)
                 ############################################
                 #ラベルネーム変更忘れるな
-                ExperimentName = folderName   #比較される(同一画像に描写される)xmlファイルのネームラベル
-                label_name = fuzzyType  #生成される複数の画像のネームラベル
+                ExperimentName = "FSS2021" + self.datasetName   #比較される(同一画像に描写される)xmlファイルのネームラベル
+                label_name = fuzzyType + "_" + folderName #生成される複数の画像のネームラベル
                 ############################################
                 for path in self.pathList:
                     print(path)
@@ -333,8 +337,8 @@ class Result():
                         self.resultObj_set[ExperimentName] = {label_name: tmp}
         
         # (Dtst or Dtrs) or (Ave or Best)の4つの場合でメソッドを実行
-        for tmp in [[True, True], [False, True], [True, False], [False, False]]:
-            self.plot_result(isDtst = tmp[0], isAve = tmp[1])
+        for tmp in [[True, False], [False, False]]:
+            self.plot_result(gen = 10000, isDtst = tmp[0], isAve = tmp[1])
         
     def down(self, x):
         i = 0
@@ -363,7 +367,6 @@ class Result():
     def plot_result(self, gen = gen_list, isDtst = True, isAve = True, title = None, filename = None, isDtraBest = False):
         gen_tmp = [gen] if type(gen) is int else gen
         d_today = datetime.date.today()
-        
         for ExperimentName, resultObj_dict in self.resultObj_set.items():
             
             savepath = self.savePath + "{0:%Y%m%d}".format(d_today)+ "/"
@@ -397,25 +400,31 @@ class Result():
             
             x_lim,y_lim  = [1000, -1], [1000, -1]
             for gen_buf in gen_tmp:
-                fig =  singleFig_set(fig_title)
+                # fig =  singleFig_set(fig_title)
+                fig =  singleFig_set()
                 ax = fig.gca()
+                i = 0
                 if not isDtraBest:
                     if isAve:
                         for label_name, resultObj in resultObj_dict.items():
                             resultObj.setplotGenAve(gen_buf, ax, label_name = label_name, title = "gen:" + str(gen_buf), isDtst = isDtst) 
                     elif not isAve:
                         for label_name, resultObj in resultObj_dict.items():
-                            resultObj.setplotGenBest(gen_buf, ax, label_name = label_name, title = "gen:" + str(gen_buf), isDtst = isDtst)                  
+                            # resultObj.setplotGenBest(gen_buf, ax, label_name = label_name, title = "gen:" + str(gen_buf), isDtst = isDtst)                  
+                            resultObj.setplotGenBest(gen_buf, ax, label_name = label_name, isDtst = isDtst)                 
+                            i += 1
                 elif isDtraBest:
                         for label_name, resultObj in resultObj_dict.items():
-                            resultObj.setPlotDtraBest(gen_buf, ax, label_name = label_name, title = "gen:" + str(gen_buf), isDtst = isDtst)                  
+                            # resultObj.setPlotDtraBest(gen_buf, ax, label_name = label_name, title = "gen:" + str(gen_buf), isDtst = isDtst)                  
+                            resultObj.setPlotDtraBest(gen_buf, ax, label_name = label_name, isDtst = isDtst)   
+                            i += 1
                 ax.legend(loc='upper right', fontsize='xx-large')
                 buf_x, buf_y = ax.get_xlim(), ax.get_ylim()
                 if buf_x[0] < x_lim[0]: x_lim[0] = buf_x[0] 
                 if buf_x[1] > x_lim[1]: x_lim[1] = buf_x[1]
                 if buf_y[0] < y_lim[0]: y_lim[0] = buf_y[0]
                 if buf_y[1] > y_lim[1]: y_lim[1] = buf_y[1]
-                
+            i += 1
             fignums = plt.get_fignums()
             for i, fignum in enumerate(fignums):
                 plt.figure(fignum)
@@ -424,10 +433,10 @@ class Result():
                 ax.set_xlim(x_lim)
                 ax.set_ylim(y_lim)
                 ax.set_xticks(range(2, int(x_lim[1])+1, lim(x_lim[0], x_lim[1]+1)))
-                ax.tick_params(axis="x", labelsize=16)
-                ax.tick_params(axis="y", labelsize=16)
-                ax.set_xlabel("number of rule", fontsize = 20)
-                ax.set_ylabel("error rate[%]", fontsize = 20)
+                ax.tick_params(axis="x", labelsize=30)
+                ax.tick_params(axis="y", labelsize=30)
+                ax.set_xlabel("ルール数", fontsize = 40,  fontname="MS Gothic")
+                ax.set_ylabel("誤識別率[%]", fontsize = 40,  fontname="MS Gothic")
                 SaveFig(fig, savepath + ExperimentName + "/", filename + str(i).zfill(3))
             print(savepath + ExperimentName)
             plt.close('all')
@@ -469,7 +478,7 @@ class Result():
                 ax.tick_params(axis="x", labelsize=24)
                 ax.tick_params(axis="y", labelsize=24)
                 ax.set_xlabel("number of rule", fontsize = 36)
-                ax.set_ylabel("error rate[%]", fontsize = 36)
+                ax.set_ylabel("error rate[％]", fontsize = 36)
                 SaveFig(fig, savepath + ExperimentName + "/", filename + str(i).zfill(3))
             plt.close('all')
         print("fin")

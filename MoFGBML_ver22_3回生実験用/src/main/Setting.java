@@ -51,7 +51,7 @@ public class Setting {
 	/** 99:multi 3:triangular 4:gaussian 7:trapezoid 9:rectangular */
 	public static int FuzzySetType = 99;
     /** #of Inhomogeneous Partitions */
-    public static int[] PatitionNumSet = {2, 3, 4, 5};
+    public static int[] PatitionNumSet = {4,5,6,7};
 
 	/** Termination Criteria (true: generation, false: evaluation) */
 	public static boolean terminationCriteria = true;

@@ -68,6 +68,47 @@ public class KB {
 			}
 		}
 	}
+
+	public void classDefaultEntropyTriangleInit(SingleDataSetInfo tra, int[] K, double F) {
+		Partitions partitions = new Partitions(tra.getNdim());
+		partitions.makePartition(tra, K);
+
+		Partitions partitions_homo = new Partitions(tra.getNdim());
+		partitions_homo.makeHomePartition(K);
+
+		this.Ndim = partitions.getNdim();
+
+		FSs = new FuzzySet[Ndim][];
+		float[] dontCare = new float[] {0f, 1f};
+
+		float[][][][] params = new float[2][][][];
+		params[0] = FuzzyPartitioning.startPartition(tra, K, F);
+		params[1] = partitions_homo.triangle();
+
+		for(int dim_i = 0; dim_i < Ndim; dim_i++) {
+			int FuzzySetSize = 0;
+			for(float buf[][][] : params) {
+				FuzzySetSize += buf[dim_i].length;
+			}
+
+			FuzzySetSize++;
+			FSs[dim_i] = new FuzzySet[FuzzySetSize];
+			FSs[dim_i][0] = new FuzzySet("DontCare", FuzzyTermType.TYPE_rectangularShape, dontCare, 0);
+			FSs[dim_i][0].setShapeType(Consts.DONT_CARE_SHAPE_TYPE_ID);
+
+			int tmp = 1;
+
+			for(int k=0; k<params[0][dim_i].length; k++) {
+				FSs[dim_i][tmp] = new FuzzySet("InhomoFuzzy_" + String.valueOf(k), FuzzyTermType.TYPE_trapezoidShape, params[0][dim_i][k], getPartitonNum(k, K));
+				tmp++;
+			}
+			for(int k=0; k<params[1][dim_i].length; k++) {
+				FSs[dim_i][tmp] = new FuzzySet( "HomoFuzzy_" + String.valueOf(k), FuzzyTermType.TYPE_triangularShape, params[1][dim_i][k], getPartitonNum(k, K));
+				tmp++;
+			}
+		}
+	}
+
 	/**
 	 * エントロピーに基づいたガウシアン型ファジィ集合の生成
 	 *
@@ -429,9 +470,8 @@ public class KB {
 		float[] dontCare = new float[] {0f, 1f};
 		float[][][] params_triangle = partitions_homo.triangle();
 		float[][][] params_gaussian = partitions_homo.gaussian();
-		float[][][] params_trapezoid = partitions_homo.trapezoid();
 		float[][][] params_rectangle = partitions_homo.rectangle(K);
-		int FuzzySetNum = params_triangle.length + params_gaussian.length + params_trapezoid.length + params_rectangle.length;
+		int FuzzySetNum = params_triangle.length + params_gaussian.length + params_rectangle.length;
 		for(int i = 0; i < Ndim; i++) {
 			FSs[i] = new FuzzySet[FuzzySetNum + 1];
 			//Don't Care
@@ -448,10 +488,6 @@ public class KB {
 				FSs[i][k+j+1] = new FuzzySet(String.valueOf(j+1), FuzzyTermType.TYPE_gaussianShape, params_gaussian[i][j], getPartitonNum(k, K));
 			}
 			k += params_gaussian.length;
-			for(int j = 0; j < params_trapezoid.length; j++) {
-				FSs[i][k+j+1] = new FuzzySet(String.valueOf(j+1), FuzzyTermType.TYPE_trapezoidShape, params_trapezoid[i][j], getPartitonNum(k, K));
-			}
-			k += params_trapezoid.length;
 			for(int j = 0; j < params_rectangle.length; j++) {
 				FSs[i][k+j+1] = new FuzzySet(String.valueOf(j+1), FuzzyTermType.TYPE_rectangularShape, params_rectangle[i][j], getPartitonNum(k, K));
 			}
