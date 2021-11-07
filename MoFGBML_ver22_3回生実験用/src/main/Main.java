@@ -18,8 +18,8 @@ import fgbml.subdivision_ver2.Subdivision_ver2;
 import main.ExperimentInfo.ExperimentInfo;
 import method.MersenneTwisterFast;
 import method.Output;
-import output.toXML;
-import output.result.Result_MoFGBML;
+import xml.toXML;
+import xml.result.Result_MoFGBML;
 
 
 /**

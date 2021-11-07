@@ -16,8 +16,8 @@ import main.Experiment;
 import main.Setting;
 import method.MersenneTwisterFast;
 import method.Output;
-import output.result.Result_MoFGBML;
 import time.TimeWatcher;
+import xml.result.Result_MoFGBML;
 
 /**
  * @version 2.0

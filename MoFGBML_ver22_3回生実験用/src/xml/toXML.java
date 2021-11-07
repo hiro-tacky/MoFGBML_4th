@@ -1,4 +1,4 @@
-package output;
+package xml;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -30,11 +30,11 @@ import fuzzy.SingleRuleSet;
 import fuzzy.fml.FuzzySet;
 import fuzzy.fml.KB;
 import jfml.term.FuzzyTermType;
-import output.result.Result_MoFGBML;
-import output.result.Result_dataset;
-import output.result.Result_individual;
-import output.result.Result_population;
-import output.result.Result_trial;
+import xml.result.Result_MoFGBML;
+import xml.result.Result_dataset;
+import xml.result.Result_individual;
+import xml.result.Result_population;
+import xml.result.Result_trial;
 
 public class toXML {
 	DocumentBuilderFactory factory;
@@ -368,8 +368,6 @@ public class toXML {
 
 				FuzzySet[][] FSs = kb.getFSs();
 				Element fss = addChildNode("KnowledgeBase", pop);
-				fss.setAttribute("generation", String.valueOf(Pop.getGen()));
-				fss.setAttribute("trial", String.valueOf(Trial.getTrial()));
 
 				for(int FuzzySetDim_k=0; FuzzySetDim_k<FSs.length; FuzzySetDim_k++) {
 					FuzzySet FS[] = FSs[FuzzySetDim_k];
@@ -377,7 +375,6 @@ public class toXML {
 					fs.setAttribute("dimension", String.valueOf(FuzzySetDim_k));
 					for(int FuzzySet_l=0; FuzzySet_l<FS.length; FuzzySet_l++) {
 						Element ft = addChildNode("FuzzyTerm", fs);
-						ft.setAttribute("ID", String.valueOf(FuzzySet_l));
 						FuzzySet vv = FSs[FuzzySetDim_k][FuzzySet_l];
 						//name_fuzzytermtype
 						addChildNode_value("name", ft, vv.getName());
@@ -428,8 +425,6 @@ public class toXML {
 					SinglePittsburgh singlePittsburg = Individual.getRule();
 
 					Element individual = addChildNode("individual", pop);
-					individual.setAttribute("generation", String.valueOf(Pop.getGen()));
-					individual.setAttribute("trial", String.valueOf(Trial.getTrial()));
 					individual.setAttribute("ruleNum", String.valueOf(singlePittsburg.getRuleNum()));
 
 					for(int l=0; l<Individual.getF().size(); l++) {
@@ -459,7 +454,7 @@ public class toXML {
 						Element rule = addChildNode("rule", singlerule);
 						for(int m=0; m<Rule.length; m++) {
 							Element element = addChildNode_value("element", rule, String.valueOf(Rule[m]));
-							element.setAttribute("ID", String.valueOf(m));
+							element.setAttribute("dimension", String.valueOf(m));
 						}
 
 						//conclusion

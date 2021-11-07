@@ -20,8 +20,8 @@ import main.ExperimentInfo.ExperimentInfo;
 import method.MersenneTwisterFast;
 import method.Sort;
 import method.StaticFunction;
-import output.result.Result_MoFGBML;
 import time.TimeWatcher;
+import xml.result.Result_MoFGBML;
 
 /**
  * NSGA2クラスを継承してselectionCriteria()メソッドをオーバーライドすれば，

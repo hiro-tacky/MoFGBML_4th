@@ -17,6 +17,7 @@ public abstract class Rule {
 	protected int ncp = 0;		//#of Correct Patterns
 	protected int nmp = 0;		//#of Miss Patterns
 	protected double fitness = 0.0;	//Count of Win
+	protected int Nwin = 0;		// 勝利回数
 
 	// ************************************************************
 
@@ -114,7 +115,19 @@ public abstract class Rule {
 	public void clearFitness() {
 		this.fitness = 0.0;
 	}
+	
+	public void clearNwin() {
+		this.Nwin = 0;
+	}
 
+	public void addNwin() {
+		this.Nwin++;
+	}
+
+	public int getNwin() {
+		return this.Nwin;
+	}
+	
 	public int getRuleLength() {
 		return this.ruleLength;
 	}
