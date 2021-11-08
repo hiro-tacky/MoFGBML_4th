@@ -52,30 +52,26 @@ public class StaticFuzzyFunc {
 			switch(ExperimentInfo.FuzzySetType) {
 				case 99:
 					kb = new KB();
-					kb.classEntropyMultiInit((SingleDataSetInfo)Dtra, Setting.PatitionNumSet, Consts.FUZZY_GRADE);
+					kb.MultiEntropyInit((SingleDataSetInfo)Dtra, Setting.PatitionNumSet, Consts.FUZZY_GRADE);
 					break;
 				case 3:
 				case 7:
-					//Inhomogeneous
-					classEntropyInit((SingleDataSetInfo)Dtra, Setting.PatitionNumSet, Consts.FUZZY_GRADE);
-					break;
 				case 4:
-					kb = new KB();
-					kb.classEntropyGaussianInit((SingleDataSetInfo)Dtra, Setting.PatitionNumSet);
-					break;
 				case 9:
 					kb = new KB();
-					kb.classEntropyRectangleInit((SingleDataSetInfo)Dtra, Setting.PatitionNumSet);
-					break;
-				case 0:
-					kb = new KB();
-					kb.classDefaultEntropyTriangleInit((SingleDataSetInfo)Dtra, Setting.PatitionNumSet, Consts.FUZZY_GRADE);
+					kb.singleFuzzySetInit((SingleDataSetInfo)Dtra, Setting.PatitionNumSet, Consts.FUZZY_GRADE
+							, ExperimentInfo.FUZZY_SET_INITIALIZE, ExperimentInfo.FuzzySetType);
 					break;
 			}
-		} else if(ExperimentInfo.FUZZY_SET_INITIALIZE == 3) {
-			kb = new KB();
-			kb.designedInit((SingleDataSetInfo)Dtra, Consts.FUZZY_GRADE);
+		}else if(ExperimentInfo.FUZZY_SET_INITIALIZE == 3) {
+			switch(ExperimentInfo.FuzzySetType) {
+				case 99:
+					kb = new KB();
+					kb.MultiMixedInit((SingleDataSetInfo)Dtra, Setting.PatitionNumSet, Consts.FUZZY_GRADE);
+			}
 		}
+
+
 		ExperimentInfo.FUZZY_SET_NUM = new ArrayList<Integer>();
 		for(int dim_i=0; dim_i<kb.getNdim(); dim_i++) {
 			ExperimentInfo.FUZZY_SET_NUM.add(kb.getFSs(dim_i).length - 1);

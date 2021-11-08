@@ -19,13 +19,6 @@ public class FuzzySet {
 	float[] params;
 
 	// ************************************************************
-	public FuzzySet(String name, int shapeType, float[] params, int partitonNum) {
-		this.name = name;
-		this.shapeType = shapeType;
-		this.params = params.clone();
-		this.partitonNum = partitonNum;
-		make();
-	}
 
 	public FuzzySet(String name, int shapeType, float[] params) {
 		this.name = name;

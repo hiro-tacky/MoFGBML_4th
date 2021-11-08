@@ -1,7 +1,7 @@
 package main;
 
 import method.MersenneTwisterFast;
-import output.result.Result_MoFGBML;
+import xml.result.Result_MoFGBML;
 
 public interface Experiment {
 

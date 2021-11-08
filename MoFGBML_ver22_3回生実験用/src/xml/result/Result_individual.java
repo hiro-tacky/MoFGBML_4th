@@ -1,4 +1,4 @@
-package output.result;
+package xml.result;
 
 import java.util.ArrayList;
 
