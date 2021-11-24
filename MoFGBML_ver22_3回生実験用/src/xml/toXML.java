@@ -376,6 +376,7 @@ public class toXML {
 					for(int FuzzySet_l=0; FuzzySet_l<FS.length; FuzzySet_l++) {
 						Element ft = addChildNode("FuzzyTerm", fs);
 						FuzzySet vv = FSs[FuzzySetDim_k][FuzzySet_l];
+						ft.setAttribute("ID", String.valueOf(FuzzySet_l));
 						//name_fuzzytermtype
 						addChildNode_value("name", ft, vv.getName());
 						//type

@@ -289,6 +289,10 @@ public class KB {
 		fuzzySetInit_auto("HomoInterval", FuzzyTermType.TYPE_rectangularShape, params_rectangle_home, K);
 	}
 
+	public void updateKB() {
+
+	}
+
 	/**
 	 * kがK分割の集合のうち，何番目の分割数の集合に属するかを返す．
 	 * ex) k=7, K={2, 3, 4, 5}の場合，kの分割数は4．
