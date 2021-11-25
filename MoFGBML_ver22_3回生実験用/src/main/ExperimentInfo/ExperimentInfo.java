@@ -61,7 +61,7 @@ public class ExperimentInfo {
 	public static int FUZZY_SET_INITIALIZE = 0;
 
 	/** 比較実験のセットのリスト．experimentInfoSet()のswitch関数のindexに対応 */
-	public static int[] experimentInfoSetList = {7};
+	public static int[] experimentInfoSetList = {6};
 
 	/** 比較実験のセットのリストから実行中の実験セットの"リスト"のindex．最初からやる場合は-1に設定*/
 	public static int experimentInfoSetListIndex = -1;
@@ -140,14 +140,14 @@ public class ExperimentInfo {
 			ExperimentInfo.setSaveDir("default_entropy_mixed" + sep + "multi");
 			ExperimentInfo.setFuzzySetType(99);
 			ExperimentInfo.setFuzzyTypeName("multi");
-			ExperimentInfo.FUZZY_SET_INITIALIZE = 2;
+			ExperimentInfo.FUZZY_SET_INITIALIZE = 3;
 			break;
 
 		case 8:
 			ExperimentInfo.setSaveDir("default_entropy_mixed" + sep + "triangle");
 			ExperimentInfo.setFuzzySetType(0);
 			ExperimentInfo.setFuzzyTypeName("multi");
-			ExperimentInfo.FUZZY_SET_INITIALIZE = 2;
+			ExperimentInfo.FUZZY_SET_INITIALIZE = 3;
 			break;
 
 //		case 2:

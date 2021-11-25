@@ -712,8 +712,8 @@ class RuleSet:
         self.datasetName = input()
         self.detaset_df = detaset_df(self.datasetName)
         self.experimentTittle = "FSS2021"#["samePartitionNum", "diffPartitionNum"]#["rectangular", "trapezoid", "gaussian", "triangle", "multi"]
-        self.antecedentTypeList = ["default_entropy_mixed"]#["default", "default_entropy_mixed"]
-        self.ComparativeExperimentList = ["multi"]#["rectangular", "trapezoid", "gaussian", "triangle", "multi"]
+        self.antecedentTypeList = ["default"]#["default", "default_entropy_mixed"]
+        self.ComparativeExperimentList = ["triangle"]#["rectangular", "trapezoid", "gaussian", "triangle", "multi"]
         self.RuleSetObj = {} #[antecedentTypeList][ComparativeExperimentList] = RuleSetXMLオブジェクト
         self.RuleSetObj_ClassifyResult = {} #[antecedentTypeList][ComparativeExperimentList] = RuleSetXMLオブジェクト
         dirPath = "xml/" + self.experimentTittle + "/" + self.datasetName + "/"

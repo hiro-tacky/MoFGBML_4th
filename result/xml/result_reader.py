@@ -311,26 +311,25 @@ class Result():
         print("RESULT\n dataset name:")
         self.datasetName = input()
         self.resultObj_set = {} #[FuzzyTypeList][folderList] = RuleSetXMLオブジェクト
-        self.experimentTittle = "FSS2021"#["samePartitionNum", "diffPartitionNum"]#["rectangular", "trapezoid", "gaussian", "triangle", "multi"]
-        self.antecedentTypeList = ["default", "entropy", "default_entropy_mixed"]#["default", "default_entropy_mixed"]
-        self.FuzzyTypeList = ["default", "entropy", "default_entropy_mixed"] #["triangle", "rectangle", "trapezoid", "gaussian", "multi"] #比較されるファジィタイプ"multi"
-        self.folderList = [ "triangle", "multi"]#["default", "default_entropy_mixed", "designedFuzzySet"] #比較するxmlファイルが存在するフォルダ
-        self.savePath = "result/" + self.experimentTittle + "/" + self.datasetName + "/result/" #変更忘れるな 
-        label_name = "             "
-        for fuzzyType in self.FuzzyTypeList:
-            for folderName in self.folderList:
+        self.saveFolderPath = "FSS2021_Nwin"#["samePartitionNum", "diffPartitionNum"]#["rectangular", "trapezoid", "gaussian", "triangle", "multi"]
+        self.experimentTittleList = ["FSS2021", "Nwin"]#["default", "default_entropy_mixed"]
+        self.ReslutFolderList = ["default/triangle", "entropy/triangle", "default_entropy_mixed/triangle", "default_entropy_mixed/multi"] #["triangle", "rectangle", "trapezoid", "gaussian", "multi"] #比較されるファジィタイプ"multi"
+        self.savePath = "result/" + self.saveFolderPath + "/" + self.datasetName + "/result" #変更忘れるな
+        # label_name = "             "
+        for experimentTittle in self.experimentTittleList:
+            for ResultFolder in self.ReslutFolderList:
                 self.fileName = self.datasetName + "_result.xml"
-                self.pathList = glob.glob("xml/" + self.experimentTittle + "/" + self.datasetName + "/" + fuzzyType + "/" + folderName + "/" + self.datasetName + "*/" + self.fileName)
-                print(self.pathList)
+                self.pathList = glob.glob("xml/" + experimentTittle + "/" + self.datasetName + "*/" + ResultFolder + "/" + self.datasetName + "*/" + self.fileName)
                 ############################################
                 #ラベルネーム変更忘れるな
-                ExperimentName = "FSS2021" + self.datasetName   #比較される(同一画像に描写される)xmlファイルのネームラベル
-                label_name = fuzzyType + "_" + folderName #生成される複数の画像のネームラベル
+                ExperimentName = ResultFolder.replace('/', '_')    #比較される(同一画像に描写される)xmlファイルのネームラベル    
+                label_name = experimentTittle#生成される複数の画像のネームラベル
                 ############################################
                 for path in self.pathList:
                     print(path)
                     print(ExperimentName, label_name)
-                    tmp = resultXML(path, self.savePath + label_name + "/")
+                    tmp = resultXML(path, self.savePath + "/" + label_name)
+
                     try:
                         self.resultObj_set[ExperimentName][label_name] = tmp
                     except:
@@ -368,35 +367,34 @@ class Result():
         gen_tmp = [gen] if type(gen) is int else gen
         d_today = datetime.date.today()
         for ExperimentName, resultObj_dict in self.resultObj_set.items():
-            
-            savepath = self.savePath + "{0:%Y%m%d}".format(d_today)+ "/"
+            savepath = self.savePath + "/{0:%Y%m%d}".format(d_today)+ "/"
             if not isDtraBest:
                 if isDtst and isAve:
                     fig_title = self.datasetName + ": " + ExperimentName + " Dtst's average"
                     filename = self.datasetName + "_" + ExperimentName + "_Result_Ave_Dtst"
-                    savepath = savepath + "AveDtst/"
+                    savepath = savepath + "/AveDtst"
                 elif not isDtst and isAve:
                     fig_title = self.datasetName + ": " + ExperimentName + " Dtra's average"
                     filename = self.datasetName + "_" + ExperimentName + "_Result_Ave_Dtra"
-                    savepath = savepath + "AveDtra/"
+                    savepath = savepath + "/AveDtra"
                 elif isDtst and not isAve:
                     fig_title = self.datasetName + ": " + ExperimentName + " Dtst's average of PF"
                     filename = self.datasetName + "_" + ExperimentName + "_Result_Best_Dtst"
-                    savepath = savepath + "BestDtst/"
+                    savepath = savepath + "/BestDtst"
                 elif not isDtst and not isAve:
                     fig_title = self.datasetName + ": " + ExperimentName + " Dtra's average of PF"
                     filename = self.datasetName + "_" + ExperimentName + "_Result_Best_Dtra"   
-                    savepath = savepath + "BestDtra/"
+                    savepath = savepath + "/BestDtra"
             elif isDtraBest:
                 if isDtst:
                     fig_title = self.datasetName + ": " + ExperimentName + " Dtst's average of Dtra Best"
                     filename = self.datasetName + "_" + ExperimentName + "_Result_DtraBest_Dtst"
-                    savepath = savepath + "BestDtst/"
+                    savepath = savepath + "/BestDtst"
                 elif not isDtst:
                     fig_title = self.datasetName + ": " + ExperimentName + " Dtra's average of Dtra vest"
                     filename = self.datasetName + "_" + ExperimentName + "_Result_DtraBest_Dtra"   
-                    savepath = savepath + "BestDtra/"
-                
+                    savepath = savepath + "/BestDtra"
+            os.makedirs(self.savePath, exist_ok=True)
             
             x_lim,y_lim  = [1000, -1], [1000, -1]
             for gen_buf in gen_tmp:
@@ -437,7 +435,9 @@ class Result():
                 ax.tick_params(axis="y", labelsize=30)
                 ax.set_xlabel("ルール数", fontsize = 40,  fontname="MS Gothic")
                 ax.set_ylabel("誤識別率[%]", fontsize = 40,  fontname="MS Gothic")
-                SaveFig(fig, savepath + ExperimentName + "/", filename + str(i).zfill(3))
+                print(savepath + "/" + ExperimentName + "/")
+                print(filename + str(i).zfill(3))
+                SaveFig(fig, savepath + "/" + ExperimentName + "/", filename + str(i).zfill(3))
             print(savepath + ExperimentName)
             plt.close('all')
         print("fin")

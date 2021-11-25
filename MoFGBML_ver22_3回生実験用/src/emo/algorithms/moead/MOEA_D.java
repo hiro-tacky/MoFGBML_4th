@@ -17,8 +17,8 @@ import main.Setting;
 import method.MersenneTwisterFast;
 import method.Output;
 import method.StaticFunction;
-import output.result.Result_MoFGBML;
 import time.TimeWatcher;
+import xml.result.Result_MoFGBML;
 
 @SuppressWarnings("rawtypes")
 public class MOEA_D<T extends Pittsburgh> extends Algorithm<T>{

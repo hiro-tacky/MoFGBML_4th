@@ -3,8 +3,8 @@ package emo.algorithms;
 import fgbml.Pittsburgh;
 import fgbml.problem.FGBML;
 import method.MersenneTwisterFast;
-import output.result.Result_MoFGBML;
 import time.TimeWatcher;
+import xml.result.Result_MoFGBML;
 
 @SuppressWarnings("rawtypes")
 public abstract class Algorithm<T extends Pittsburgh> {
