@@ -73,10 +73,6 @@ public class Main {
 			Setting.forkJoinPool = new ForkJoinPool(Setting.parallelCores);
 		}
 
-		/**一時的**/
-		ExperimentInfo.rep_i = Integer.valueOf(args[7]);
-		ExperimentInfo.cv_i = Integer.valueOf(args[8]);
-
 		/* ********************************************************* */
 		//基本データ出力
 		System.out.println("Processors: " + Runtime.getRuntime().availableProcessors() + " ");
@@ -157,8 +153,7 @@ public class Main {
 
 		//ファイル名構築
 		/** 一時的**/
-		String resultRoot = dir_path + sep + ExperimentInfo.saveDir + sep + Setting.dataName + "_"  + sep + "trial_" + ExperimentInfo.rep_i + ExperimentInfo.cv_i;
-//		String resultRoot = dir_path + sep + ExperimentInfo.saveDir + sep + Setting.dataName + "_" + id;
+		String resultRoot = dir_path + sep + ExperimentInfo.saveDir + sep + Setting.dataName + "_" + id;
 		Output.mkdirs(resultRoot);
 		/** 一時的 **/
 //		ExperimentInfo.setResultRoot(resultRoot);
@@ -188,9 +183,6 @@ public class Main {
 		for(int rep_i = 0; rep_i < Setting.repeatTimes; rep_i++) {
 			for(int cv_i = 0; cv_i < Setting.crossValidationNum; cv_i++) {
 				//make now trial Directory
-
-				rep_i = ExperimentInfo.rep_i;
-				cv_i = ExperimentInfo.cv_i;
 
 				master.setNowRep(rep_i);
 				master.setNowCV(cv_i);

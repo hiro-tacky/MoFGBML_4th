@@ -533,9 +533,9 @@ class RuleSetXML(XML):
                 # print(trialKey, dim, partitionNum_buf)
                 
                 usedFuzzyTermRank_name[trialKey][dim] = {key : rank for rank, key in enumerate(sorted(name_buf, key = name_buf.get, reverse = True), 1)}
-                PM_tmp_2 = {key : rank for rank, key in enumerate(sorted(partitionNum_buf, key = partitionNum_buf.get, reverse = True), 1)}
-                PM_tmp = {k: PM_tmp_2[v] for k,v in partitionNum_buf.items()}
-                print(PM_tmp)
+                print(usedFuzzyTermRank_name[trialKey][dim])
+                PM_tmp = {key : rank for rank, key in enumerate(sorted(partitionNum_buf, key = partitionNum_buf.get, reverse = True), 1)}
+                # print(PM_tmp)
                 buf = {}
                 for key, rank in PM_tmp.items():
                     if key[0] in buf:

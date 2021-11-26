@@ -52,10 +52,6 @@ public class ExperimentInfo {
 	/** num of experimentInfoSet */
 	public static int experimentInfoSetNum = 5;
 
-	/** 一時的 */
-	public static int rep_i = 0;
-
-	public static int cv_i = 2;
     /**
      * <h1>ファジィ集合の初期化方法</h1>
      * 0: 2-5分割 homogeneous triangle fuzzy partitions.<br>
@@ -605,20 +601,5 @@ public class ExperimentInfo {
 		ExperimentInfo.resultRoot = resultRoot;
 	}
 
-	public static int getRep_i() {
-		return rep_i;
-	}
-
-	public static void setRep_i(int rep_i) {
-		ExperimentInfo.rep_i = rep_i;
-	}
-
-	public static int getCv_i() {
-		return cv_i;
-	}
-
-	public static void setCv_i(int cv_i) {
-		ExperimentInfo.cv_i = cv_i;
-	}
 
 }
