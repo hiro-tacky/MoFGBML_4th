@@ -9,3 +9,5 @@ dataset_viewer/*
 !dataset_viewer/*py
 result/xml/*
 !result/xml/*.py
+長期間実行用/
+
