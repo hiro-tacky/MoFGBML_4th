@@ -198,9 +198,7 @@ public class Main {
 									 rnd, master);
 
 				System.out.println();
-				break;
 			}
-			break;
 		}
 		/* ********************************************************* */
 		//Output Times
