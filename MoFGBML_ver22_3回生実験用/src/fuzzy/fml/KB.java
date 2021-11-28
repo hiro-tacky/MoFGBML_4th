@@ -277,7 +277,6 @@ public class KB {
 
 		ReadingUsedMenbershipDataRankXML rankData = null;
 		try {
-			System.out.println(XML_path);
 			rankData = new ReadingUsedMenbershipDataRankXML(XML_path);
 		} catch (Exception e) {
 			// TODO 自動生成された catch ブロック

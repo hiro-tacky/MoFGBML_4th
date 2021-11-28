@@ -25,7 +25,6 @@ public class ReadingUsedMenbershipDataRankXML {
 	public ArrayList<ArrayList<HashMap<String, HashMap<Integer, Integer>>>> rank_partitionNum = new ArrayList<ArrayList<HashMap<String, HashMap<Integer, Integer>>>>();
 
 	public ReadingUsedMenbershipDataRankXML(String xmlPath) throws Exception {
-		System.out.println(xmlPath);
 		// 1. DocumentBuilderFactoryのインスタンスを取得する
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		// 2. DocumentBuilderのインスタンスを取得する
@@ -75,7 +74,6 @@ public class ReadingUsedMenbershipDataRankXML {
 						int rankPartitionNum_tmp = Integer.parseInt(fuzzyTerm_partitionNum.getAttribute("rank"));
 						rank_partitionNum.get(trial_id).get(dimension_id).get(name_tmp).put(partitionNum_tmp, rankPartitionNum_tmp);
 					}
-					System.out.println("");
 				}
 			}
 		}
