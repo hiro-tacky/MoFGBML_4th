@@ -807,8 +807,8 @@ class RuleSet:
         print("RULESET\n dataset name:")
         self.datasetName = input()
         self.detaset_df = detaset_df(self.datasetName)
-        self.experimentTittle = "test"#["samePartitionNum", "diffPartitionNum"]#["rectangular", "trapezoid", "gaussian", "triangle", "multi"]
-        self.FolderList = ["default/multi"]#["default", "default_entropy_mixed"]
+        self.experimentTittle = "FSS2021"#["samePartitionNum", "diffPartitionNum"]#["rectangular", "trapezoid", "gaussian", "triangle", "multi"]
+        self.FolderList = ["default_entropy_mixed/multi"]#["default", "default_entropy_mixed"]
         self.RuleSetObj = {} #[antecedentTypeList][ComparativeExperimentList] = RuleSetXMLオブジェクト
         self.RuleSetObj_ClassifyResult = {} #[antecedentTypeList][ComparativeExperimentList] = RuleSetXMLオブジェクト
         dirPath = "xml/" + self.experimentTittle + "/" + self.datasetName + "/"

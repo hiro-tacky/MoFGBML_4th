@@ -14,6 +14,7 @@ import jfml.term.FuzzyTermType;
 import main.Setting;
 import main.ExperimentInfo.ExperimentInfo;
 import xml.result.ReadingUsedMenbershipDataRankXML;
+import xml.result.ReadingUsedMenbershipDataRankXML.nameAndPartitionNum_struct;
 import xml.result.Result_MoFGBML;
 
 /**
@@ -87,7 +88,7 @@ public class KB {
 		Partitions partitions_homo = new Partitions(tra.getNdim());
 		partitions_homo.makeHomePartition(K);
 
-		float[][][] params_triangle_inhome = FuzzyPartitioning.startPartition(tra, K, F);
+		float[][][] params_triangle_inhome = partitions.triangleInhome(F);
 		float[][][] params_gaussian_inhome = partitions.gaussian();
 		float[][][] params_rectangle_inhome = partitions.rectangle();
 
@@ -195,7 +196,7 @@ public class KB {
 		Partitions partitions = new Partitions(tra.getNdim());
 		partitions.makePartition(tra, K);
 
-		float[][][] params_triangle_inhome = FuzzyPartitioning.startPartition(tra, K, F);
+		float[][][] params_triangle_inhome = partitions.triangleInhome(F);
 		float[][][] params_gaussian_inhome = partitions.gaussian();
 		float[][][] params_rectangle_inhome = partitions.rectangle();
 		float[][][] params_triangle_home = partitions_homo.triangle();
@@ -289,7 +290,7 @@ public class KB {
 		Partitions partitions = new Partitions(tra.getNdim());
 		partitions.makePartition(tra, K);
 
-		float[][][] params_triangle_inhome = FuzzyPartitioning.startPartition(tra, K, F);
+		float[][][] params_triangle_inhome = partitions.triangleInhome(F);
 		float[][][] params_gaussian_inhome = partitions.gaussian();
 		float[][][] params_rectangle_inhome = partitions.rectangle();
 		float[][][] params_triangle_home = partitions_homo.triangle();
@@ -356,6 +357,94 @@ public class KB {
 		}
 	}
 
+	/**
+	 *
+	 *
+	 * @param tra
+	 * @param K
+	 * @param F
+	 * @param FUZZY_SET_INITIALIZE [次元][FSs_num]
+	 * @param FuzzySetType [次元][FSs_num]
+	 * @param FSsNum
+	 */
+	public void DesignedFuzzySetInitByXML_partitionNum(SingleDataSetInfo tra, int[] K, double F, String XML_path) {
+
+		this.Ndim = tra.getNdim();
+		FSs = new FuzzySet[Ndim][];
+
+		ReadingUsedMenbershipDataRankXML rankData = null;
+		try {
+			rankData = new ReadingUsedMenbershipDataRankXML(XML_path);
+		} catch (Exception e) {
+			// TODO 自動生成された catch ブロック
+			e.printStackTrace();
+		}
+
+		Partitions partitions_homo = new Partitions(tra.getNdim());
+		partitions_homo.makeHomePartition(K);
+
+		Partitions partitions = new Partitions(tra.getNdim());
+		partitions.makePartition(tra, K);
+
+		for(int dim_i=0; dim_i<this.Ndim; dim_i++) {
+			ArrayList<nameAndPartitionNum_struct> rankData_tmp = rankData.getRankTop_partitionNum(Result_MoFGBML.nowTrial, dim_i, ExperimentInfo.dataRankNum);
+
+			ArrayList<String> fuzzyTermName = new ArrayList<String>();
+			ArrayList<Integer> FuzzyTermTypeID = new ArrayList<Integer>();
+			ArrayList<float[][]> params = new ArrayList<float[][]>();
+
+			for(nameAndPartitionNum_struct rankData_i: rankData_tmp) {
+				switch(rankData_i.getName()) {
+					case "HomoFuzzy":
+						params.add(partitions_homo.triangle(dim_i, rankData_i.getPartitionNum()));
+						fuzzyTermName.add("HomoFuzzy");
+						FuzzyTermTypeID.add(FuzzyTermType.TYPE_triangularShape);
+						break;
+					case "HomoGaussian":
+						params.add(partitions_homo.gaussian(dim_i, rankData_i.getPartitionNum()));
+						fuzzyTermName.add("HomoGaussian");
+						FuzzyTermTypeID.add(FuzzyTermType.TYPE_gaussianShape);
+						break;
+					case "HomoTrapezoid":
+						params.add(partitions_homo.trapezoid(dim_i, rankData_i.getPartitionNum()));
+						fuzzyTermName.add("HomoTrapezoid");
+						FuzzyTermTypeID.add(FuzzyTermType.TYPE_trapezoidShape);
+						break;
+					case "HomoInterval":
+						params.add(partitions_homo.rectangle(dim_i, rankData_i.getPartitionNum()));
+						fuzzyTermName.add("HomoInterval");
+						FuzzyTermTypeID.add(FuzzyTermType.TYPE_rectangularShape);
+						break;
+					case "InhomoFuzzy":
+						params.add(partitions.triangleInhome(dim_i, rankData_i.getPartitionNum(), F));
+						fuzzyTermName.add("InhomoFuzzy");
+						FuzzyTermTypeID.add(FuzzyTermType.TYPE_trapezoidShape);
+						break;
+					case "InhomoGaussian":
+						params.add(partitions.gaussian(dim_i, rankData_i.getPartitionNum()));
+						fuzzyTermName.add("InhomoGaussian");
+						FuzzyTermTypeID.add(FuzzyTermType.TYPE_gaussianShape);
+						break;
+					case "InhomoInterval":
+						params.add(partitions.rectangle(dim_i, rankData_i.getPartitionNum()));
+						fuzzyTermName.add("InhomoInterval");
+						FuzzyTermTypeID.add(FuzzyTermType.TYPE_rectangularShape);
+						break;
+				}
+			}
+			int cnt = 0;
+			for(float[][] tmp : params) {
+				cnt += tmp.length;
+			}
+			FSs[dim_i] = new FuzzySet[cnt+1];
+
+			this.setDontCare(dim_i);
+			for(int i=0; i<params.size(); i++) {
+				fuzzySetInit_auto(fuzzyTermName.get(i), FuzzyTermTypeID.get(i), params.get(i), K, dim_i);
+			}
+		}
+	}
+
 	public void MultiMixedInit(SingleDataSetInfo tra, int[] K, double F) {
 		this.Ndim = tra.getNdim();
 
@@ -365,7 +454,7 @@ public class KB {
 		Partitions partitions_homo = new Partitions(tra.getNdim());
 		partitions_homo.makeHomePartition(K);
 
-		float[][][] params_triangle_inhome = FuzzyPartitioning.startPartition(tra, K, F);
+		float[][][] params_triangle_inhome = partitions.triangleInhome(F);
 		float[][][] params_gaussian_inhome = partitions.gaussian();
 		float[][][] params_rectangle_inhome = partitions.rectangle();
 		float[][][] params_triangle_home = partitions_homo.triangle();
