@@ -62,7 +62,7 @@ public class ExperimentInfo {
 	public static int FUZZY_SET_INITIALIZE = 0;
 
 	/** 比較実験のセットのリスト．experimentInfoSet()のswitch関数のindexに対応 */
-	public static int[] experimentInfoSetList = {9};
+	public static int[] experimentInfoSetList = {7};
 
 	/** 比較実験のセットのリストから実行中の実験セットの"リスト"のindex．最初からやる場合は-1に設定*/
 	public static int experimentInfoSetListIndex = -1;
