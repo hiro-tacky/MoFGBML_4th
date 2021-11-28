@@ -75,6 +75,8 @@ public class Partitions {
 		return numPartitions;
 	}
 
+
+
 	/**
 	 * ガウシアン型のパラメータを生成する．
 	 *
@@ -104,6 +106,30 @@ public class Partitions {
 	}
 
 	/**
+	 * ガウシアン型のパラメータを生成する．
+	 *
+	 * @return パラメータ[ファジイセット][パラメータ]
+	 */
+	public float[][] gaussian(int dim, int k){
+		float[][] params = new float[k][2];
+		for(ArrayList<Double> partition_list: this.partitions.get(dim)) {
+			if(partition_list.size() != k+1) {continue;}
+			for(int i=0; i<k; i++) {
+				//最初と最後だけ頂点が区間端になるようにする．
+				if(i == 0){
+					params[i] = calcGaussParam(0, (float)(double)partition_list.get(i+1), 0.5f);
+				}else if(i == partition_list.size()-2) {
+					params[i] = calcGaussParam(1, (float)(double)partition_list.get(i), 0.5f);
+				}else {
+					double left = partition_list.get(i), right = partition_list.get(i+1);
+					params[i] = calcGaussParam((float)(left + right)/2, (float)(double)partition_list.get(i), 0.5f);
+				}
+			}
+		}
+		return params;
+	}
+
+	/**
 	 * 区間型のパラメータを生成する．
 	 *
 	 * @return パラメータ[次元][ファジイセット][パラメータ]
@@ -118,6 +144,22 @@ public class Partitions {
 					params[dim_i][tmp+i] = new float[] {(float)(double)partition_list.get(i), (float)(double)partition_list.get(i+1)};
 				}
 				tmp += partition_list.size()-1;
+			}
+		}
+		return params;
+	}
+
+	/**
+	 * 区間型のパラメータを生成する．
+	 *
+	 * @return パラメータ[ファジイセット][パラメータ]
+	 */
+	public float[][] rectangle(int dim, int k){
+		float[][] params = new float[k][2];
+		for(ArrayList<Double> partition_list: this.partitions.get(dim)) {
+			if(partition_list.size() != k+1) {continue;}
+			for(int i=0; i<k; i++) {
+				params[i] = new float[] {(float)(double)partition_list.get(i), (float)(double)partition_list.get(i+1)};
 			}
 		}
 		return params;
@@ -197,6 +239,77 @@ public class Partitions {
 	}
 
 	/**
+	 * 三角形型のパラメータを生成する．
+	 *
+	 * @return パラメータ[ファジイセット][パラメータ]
+	 */
+	public float[][] triangle(int dim, int k){
+		float[][] params = new float[k][3];
+		for(ArrayList<Double> partition_list: this.partitions.get(dim)) {
+			for(int i=0; i<k; i++) {
+				if(partition_list.size() != k+1) {continue;}
+				if(i == 0) {
+					params[i] = new float[] {0f, 0f, 2*(float)(double)partition_list.get(i+1)};
+				}else if(i == partition_list.size()-2) {
+					params[i] = new float[] {2*(float)(double)partition_list.get(i) - 1f, 1f, 1f};
+				}else {
+					float left = (float)(double)partition_list.get(i), right = (float)(double)partition_list.get(i+1);
+					params[i] = new float[] {left*3f/2f - right/2f, (left+right)/2f, right*3f/2f - left/2f};
+				}
+			}
+		}
+		return params;
+	}
+
+	/**
+	 * 三角形型のパラメータを生成する．
+	 *
+	 * @return パラメータ[次元][ファジイセット][パラメータ]
+	 */
+	public float[][][] triangleInhome(double F){
+		float[][][] trapezoids = new float[this.Ndim][][];
+
+		for(int dim_i = 0; dim_i < this.partitions.size(); dim_i++) {
+			trapezoids[dim_i] = new float[this.numPartitions[dim_i]][4];
+			int cnt = 0;
+			for(ArrayList<Double> partition_list: this.partitions.get(dim_i)) {
+
+				//Fuzzify partitions
+				ArrayList<double[]> tmp = FuzzyPartitioning.makeTrapezoids(partition_list, F);
+				for(int partiton_i=0; partiton_i<tmp.size(); partiton_i++) {
+					for(int point_i=0; point_i<tmp.get(partiton_i).length; point_i++) {
+						trapezoids[dim_i][cnt + partiton_i][point_i] = (float)tmp.get(partiton_i)[point_i];
+					}
+				}
+				cnt += partition_list.size()-1;
+			}
+		}
+		return trapezoids;
+	}
+
+	/**
+	 * 三角形型のパラメータを生成する．
+	 *
+	 * @return パラメータ[ファジイセット][パラメータ]
+	 */
+	public float[][] triangleInhome(int dim, int k, double F){
+		float[][] trapezoids = new float[k][4];
+
+		for(ArrayList<Double> partition_list: this.partitions.get(dim)) {
+			if(partition_list.size() != k+1) {continue;}
+
+			//Fuzzify partitions
+			ArrayList<double[]> tmp = FuzzyPartitioning.makeTrapezoids(partition_list, F);
+			for(int partiton_i=0; partiton_i<tmp.size(); partiton_i++) {
+				for(int point_i=0; point_i<tmp.get(partiton_i).length; point_i++) {
+					trapezoids[partiton_i][point_i] = (float)tmp.get(partiton_i)[point_i];
+				}
+			}
+		}
+		return trapezoids;
+	}
+
+	/**
 	 * 台形型のパラメータを生成する．
 	 *
 	 * @return パラメータ[次元][ファジイセット][パラメータ]
@@ -218,6 +331,29 @@ public class Partitions {
 					}
 				}
 				tmp += partition_list.size()-1;
+			}
+		}
+		return params;
+	}
+
+	/**
+	 * 台形型のパラメータを生成する．
+	 *
+	 * @return パラメータ[ファジイセット][パラメータ]
+	 */
+	public float[][] trapezoid(int dim, int k){
+		float[][] params = new float[k][4];
+		for(ArrayList<Double> partition_list: this.partitions.get(dim)) {
+			if(partition_list.size() != k+1) {continue;}
+			for(int i=0; i<k; i++) {
+				if(i == 0) {
+					params[i] = new float[] {0f, 0f, (float)0.5*(float)(double)partition_list.get(i+1), (float)1.5*(float)(double)partition_list.get(i+1)};
+				}else if(i == partition_list.size()-2) {
+					params[i] = new float[] {(float)1.5*(float)(double)partition_list.get(i) - 0.5f, (float)0.5*(float)(double)partition_list.get(i) + 0.5f, 1f, 1f};
+				}else {
+					float left = (float)(double)partition_list.get(i), right = (float)(double)partition_list.get(i+1);
+					params[i] = new float[] {left*5f/4f - right/4f, left*3f/4f + right/4f, right*3f/4f + left/4f, right*5f/4f - left/4f};
+				}
 			}
 		}
 		return params;

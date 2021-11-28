@@ -68,10 +68,19 @@ public class StaticFuzzyFunc {
 				case 99:
 					kb = new KB();
 					kb.MultiMixedInit((SingleDataSetInfo)Dtra, Setting.PatitionNumSet, Consts.FUZZY_GRADE);
+					break;
 			}
 		}else if(ExperimentInfo.FUZZY_SET_INITIALIZE == 4) {
-			kb = new KB();
-			kb.DesignedFuzzySetInitByXML_name((SingleDataSetInfo)Dtra, Setting.PatitionNumSet, Consts.FUZZY_GRADE, ExperimentInfo.XML_path);
+			switch(ExperimentInfo.FuzzySetType) {
+			case 1:
+				kb = new KB();
+				kb.DesignedFuzzySetInitByXML_name((SingleDataSetInfo)Dtra, Setting.PatitionNumSet, Consts.FUZZY_GRADE, ExperimentInfo.XML_path);
+				break;
+			case 2:
+				kb = new KB();
+				kb.DesignedFuzzySetInitByXML_partitionNum((SingleDataSetInfo)Dtra, Setting.PatitionNumSet, Consts.FUZZY_GRADE, ExperimentInfo.XML_path);
+				break;
+			}
 		}
 
 

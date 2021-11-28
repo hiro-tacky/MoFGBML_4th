@@ -18,13 +18,14 @@ public class FuzzyPartitioning {
 	// ************************************************************
 
 	/**
-	 * エントロピーに基づいた境界を返す．
+	 * エントロピーに基づいた境界を返す．(非推奨)
 	 *
 	 * @param tra データセット
 	 * @param K 分割数の配列
 	 * @param F ファジィ度合
 	 * @return boundaries[属性値][分割数][境界値]
 	 */
+	@Deprecated
 	public static float[][][] startPartition(SingleDataSetInfo tra, int[] K, double F){
 		int K_sum = 0;
 		for(int k:K){K_sum += k;}
@@ -113,6 +114,7 @@ public class FuzzyPartitioning {
 		}
 		return boundaries;
 	}
+
 
 	/**
 	 * <h1>Class-entropy based searching optimal-partitionings</h1>

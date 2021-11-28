@@ -30,7 +30,6 @@ public class ReadingUsedMenbershipDataRankXML {
 		// 2. DocumentBuilderのインスタンスを取得する
 		DocumentBuilder builder = factory.newDocumentBuilder();
 		// 3. DocumentBuilderにXMLを読み込ませ、Documentを作る
-		System.out.println(Paths.get(xmlPath).toFile());
 		Document document = builder.parse(Paths.get(xmlPath).toFile());
 		// 4. Documentから、ルート要素を取得する
 		Element root = document.getDocumentElement();
@@ -111,7 +110,7 @@ public class ReadingUsedMenbershipDataRankXML {
 		return buf;
 	}
 
-	final class nameAndPartitionNum_struct{
+	public class nameAndPartitionNum_struct{
 		public String name;
 		public int partitionNum;
 		nameAndPartitionNum_struct(String name, int partitionNum){
@@ -125,4 +124,5 @@ public class ReadingUsedMenbershipDataRankXML {
 			return partitionNum;
 		}
 	}
+
 }

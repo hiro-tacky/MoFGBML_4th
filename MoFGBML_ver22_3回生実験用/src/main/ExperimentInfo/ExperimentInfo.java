@@ -62,7 +62,7 @@ public class ExperimentInfo {
 	public static int FUZZY_SET_INITIALIZE = 0;
 
 	/** 比較実験のセットのリスト．experimentInfoSet()のswitch関数のindexに対応 */
-	public static int[] experimentInfoSetList = {9};
+	public static int[] experimentInfoSetList = {10};
 
 	/** 比較実験のセットのリストから実行中の実験セットの"リスト"のindex．最初からやる場合は-1に設定*/
 	public static int experimentInfoSetListIndex = -1;
@@ -154,10 +154,18 @@ public class ExperimentInfo {
 			break;
 
 		case 9:
-			ExperimentInfo.setSaveDir("designedFuzzySet" + sep + "triangle");
-			ExperimentInfo.setFuzzySetType(0);
+			ExperimentInfo.setSaveDir("designedFuzzySet" + sep + "name");
 			ExperimentInfo.setXML_path(Paths.get("").toAbsolutePath() + "/usedMenbershipDataRank" + "/test/wine/default/multi/wine_UsedMenbershipDataRank.xml");
 			ExperimentInfo.FUZZY_SET_INITIALIZE = 4;
+			ExperimentInfo.setFuzzySetType(1);
+			ExperimentInfo.dataRankNum = 3;
+			break;
+
+		case 10:
+			ExperimentInfo.setSaveDir("designedFuzzySet" + sep + "partitionNum");
+			ExperimentInfo.setXML_path(Paths.get("").toAbsolutePath() + "/usedMenbershipDataRank" + "/test/wine/default/multi/wine_UsedMenbershipDataRank.xml");
+			ExperimentInfo.FUZZY_SET_INITIALIZE = 4;
+			ExperimentInfo.setFuzzySetType(2);
 			ExperimentInfo.dataRankNum = 3;
 			break;
 
