@@ -408,6 +408,7 @@ class RuleSetXML(XML):
         self.attributeNum = DatasetList[self.datasetName]["Attribute"]
         self.classNum = DatasetList[self.datasetName]["Class"]
         self.savePath = savePath
+        os.makedirs(self.savePath, exist_ok=True)
         super().__init__(path)
         self.ruleset = {}
         for i, trial in enumerate(self.rootNode.findall('trial')):
@@ -552,20 +553,33 @@ class RuleSetXML(XML):
                 # print(trialKey, dim, partitionNum_buf)
                 
                 # buf = {key : rank for rank, key in enumerate(sorted(name_buf, key = name_buf.get, reverse = True), 1)}
-                buf_PM = {key : rank for rank, key in enumerate(sorted(set(partitionNum_buf.values()), reverse = True), 1)}
                 buf_NM = {key : rank for rank, key in enumerate(sorted(set(name_buf.values()), reverse = True), 1)}
+                buf_PM = {key : rank for rank, key in enumerate(sorted(set(partitionNum_buf.values()), reverse = True), 1)}
                 for name, rank in {key : buf_NM[value] for key, value in name_buf.items()}.items():
                     usedFuzzyTermRank_name[trialKey][dim][name] = rank
                 for key, rank in {key : buf_PM[value] for key, value in partitionNum_buf.items()}.items():
                     usedFuzzyTermRank_partitionNum[trialKey][dim][key[0]][key[1]] = rank
         # print(usedFuzzyTermCat)
-        print(usedFuzzyTermRank_name)
-        print(usedFuzzyTermRank_partitionNum)
         return usedFuzzyTermRank_name, usedFuzzyTermRank_partitionNum
     
     def UsedMenbershipDataRankOutput(self, outputType = "xml", gen = gen_plot, includeDontCare = False, isCoverAllClasses = False):
-        rankName, rankPartitionNum = self.UsedMenbershipDataRank(self, gen = gen, includeDontCare = includeDontCare, isCoverAllClasses = isCoverAllClasses)
-        if outputType = "xml":
+        rankName, rankPartitionNum = self.UsedMenbershipDataRank(gen = gen, includeDontCare = includeDontCare, isCoverAllClasses = isCoverAllClasses)
+        label = self.fuzzyTermslabel(categorizeType = "partitionNum", initializationValue = None, gen = gen, includeDontCare = includeDontCare)
+        if outputType == "xml":
+            root = ET.Element("UsedMenbershipDataRank")
+            for trialKey, trial in enumerate(label):
+                trial_ET = ET.SubElement(root, "trial", {"ID" : str(trialKey)})
+                for dim, trial_dim in enumerate(trial):
+                    trialDim_ET = ET.SubElement(trial_ET, "dimension", {"dimension" : str(dim)})
+                    for name, trial_NM in trial_dim.items():
+                        trialNM_ET = ET.SubElement(trialDim_ET, "name", {"name" : name, "rank" : str(rankName[trialKey][dim][name])})
+                        for partitionNum in trial_NM.keys():
+                            ET.SubElement(trialNM_ET, "partitionNum", {"partitionNum" : str(partitionNum), "rank" : str(rankPartitionNum[trialKey][dim][name][partitionNum])})
+            ET.dump(root)
+            tree = ET.ElementTree(root)
+            filename = self.savePath + self.datasetName + "_UsedMenbershipDataRank.xml"
+            print(filename)
+            tree.write(filename)
             
                     
         #         kb = self.ruleset[trial_i][gen_plot].kb
@@ -855,4 +869,4 @@ class RuleSet:
 
     def UsedMenbershipRatePlot(self, isCoverAllClasses = False):
         for folderName, RuleSetObj in self.RuleSetObj.items():
-                RuleSetObj.UsedMenbershipCatData(gen = self.gen_num, isCoverAllClasses = isCoverAllClasses)
+                RuleSetObj.UsedMenbershipDataRankOutput(gen = self.gen_num, isCoverAllClasses = isCoverAllClasses)

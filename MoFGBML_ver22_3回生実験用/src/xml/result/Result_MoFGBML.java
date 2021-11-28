@@ -19,9 +19,9 @@ public class Result_MoFGBML {
 	String id;
 	String trialRoot;
 	String tstFile;
-	int nowCV;
-	int nowRep;
-	int nowTrial;
+	public static int nowCV;
+	public static int nowRep;
+	public static int nowTrial;
 
 	public Result_dataset resultDataset;
 	public ArrayList<Double> times = new ArrayList<Double>();

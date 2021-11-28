@@ -5,6 +5,7 @@ import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -61,7 +62,7 @@ public class ExperimentInfo {
 	public static int FUZZY_SET_INITIALIZE = 0;
 
 	/** 比較実験のセットのリスト．experimentInfoSet()のswitch関数のindexに対応 */
-	public static int[] experimentInfoSetList = {6};
+	public static int[] experimentInfoSetList = {9};
 
 	/** 比較実験のセットのリストから実行中の実験セットの"リスト"のindex．最初からやる場合は-1に設定*/
 	public static int experimentInfoSetListIndex = -1;
@@ -75,7 +76,9 @@ public class ExperimentInfo {
 
 	public static ArrayList<Integer> FUZZY_SET_NUM = new ArrayList<Integer>();			//ファジィ集合の種類数
 
+	public static String XML_path;
 
+	public static int dataRankNum;
 	// ************************************************************
 
 
@@ -148,6 +151,14 @@ public class ExperimentInfo {
 			ExperimentInfo.setFuzzySetType(0);
 			ExperimentInfo.setFuzzyTypeName("multi");
 			ExperimentInfo.FUZZY_SET_INITIALIZE = 3;
+			break;
+
+		case 9:
+			ExperimentInfo.setSaveDir("designedFuzzySet" + sep + "triangle");
+			ExperimentInfo.setFuzzySetType(0);
+			ExperimentInfo.setXML_path(Paths.get("").toAbsolutePath() + "/usedMenbershipDataRank" + "/test/wine/default/multi/wine_UsedMenbershipDataRank.xml");
+			ExperimentInfo.FUZZY_SET_INITIALIZE = 4;
+			ExperimentInfo.dataRankNum = 3;
 			break;
 
 //		case 2:
@@ -599,6 +610,14 @@ public class ExperimentInfo {
 
 	public static void setResultRoot(String resultRoot) {
 		ExperimentInfo.resultRoot = resultRoot;
+	}
+
+	public static String getXML_path() {
+		return XML_path;
+	}
+
+	public static void setXML_path(String xML_path) {
+		XML_path = xML_path;
 	}
 
 

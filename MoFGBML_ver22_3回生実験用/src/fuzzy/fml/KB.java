@@ -1,6 +1,7 @@
 package fuzzy.fml;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Objects;
 
 import data.SingleDataSetInfo;
@@ -11,6 +12,9 @@ import jfml.knowledgebase.KnowledgeBaseType;
 import jfml.knowledgebase.variable.FuzzyVariableType;
 import jfml.term.FuzzyTermType;
 import main.Setting;
+import main.ExperimentInfo.ExperimentInfo;
+import xml.result.ReadingUsedMenbershipDataRankXML;
+import xml.result.Result_MoFGBML;
 
 /**
  * Fuzzy Markup LanguageのKnowledgeBaseを扱うクラス
@@ -256,6 +260,102 @@ public class KB {
 		}
 	}
 
+	/**
+	 *
+	 *
+	 * @param tra
+	 * @param K
+	 * @param F
+	 * @param FUZZY_SET_INITIALIZE [次元][FSs_num]
+	 * @param FuzzySetType [次元][FSs_num]
+	 * @param FSsNum
+	 */
+	public void DesignedFuzzySetInitByXML_name(SingleDataSetInfo tra, int[] K, double F, String XML_path) {
+
+		this.Ndim = tra.getNdim();
+		FSs = new FuzzySet[Ndim][];
+
+		ReadingUsedMenbershipDataRankXML rankData = null;
+		try {
+			System.out.println(XML_path);
+			rankData = new ReadingUsedMenbershipDataRankXML(XML_path);
+		} catch (Exception e) {
+			// TODO 自動生成された catch ブロック
+			e.printStackTrace();
+		}
+
+		Partitions partitions_homo = new Partitions(tra.getNdim());
+		partitions_homo.makeHomePartition(K);
+
+		Partitions partitions = new Partitions(tra.getNdim());
+		partitions.makePartition(tra, K);
+
+		float[][][] params_triangle_inhome = FuzzyPartitioning.startPartition(tra, K, F);
+		float[][][] params_gaussian_inhome = partitions.gaussian();
+		float[][][] params_rectangle_inhome = partitions.rectangle();
+		float[][][] params_triangle_home = partitions_homo.triangle();
+		float[][][] params_trapezoid_home = partitions_homo.trapezoid();
+		float[][][] params_gaussian_home = partitions_homo.gaussian();
+		float[][][] params_rectangle_home = partitions_homo.rectangle(K);
+
+		for(int dim_i=0; dim_i<this.Ndim; dim_i++) {
+			ArrayList<String> rankData_tmp = rankData.getRankTop_name(Result_MoFGBML.nowTrial, dim_i, ExperimentInfo.dataRankNum);
+
+			ArrayList<String> fuzzyTermName = new ArrayList<String>();
+			ArrayList<Integer> FuzzyTermTypeID = new ArrayList<Integer>();
+			ArrayList<float[][]> params = new ArrayList<float[][]>();
+
+			for(String name: rankData_tmp) {
+				switch(name) {
+					case "HomoFuzzy":
+						params.add(params_triangle_home[dim_i]);
+						fuzzyTermName.add("HomoFuzzy");
+						FuzzyTermTypeID.add(FuzzyTermType.TYPE_triangularShape);
+						break;
+					case "HomoGaussian":
+						params.add(params_gaussian_home[dim_i]);
+						fuzzyTermName.add("HomoGaussian");
+						FuzzyTermTypeID.add(FuzzyTermType.TYPE_gaussianShape);
+						break;
+					case "HomoTrapezoid":
+						params.add(params_trapezoid_home[dim_i]);
+						fuzzyTermName.add("HomoTrapezoid");
+						FuzzyTermTypeID.add(FuzzyTermType.TYPE_trapezoidShape);
+						break;
+					case "HomoInterval":
+						params.add(params_rectangle_home[dim_i]);
+						fuzzyTermName.add("HomoInterval");
+						FuzzyTermTypeID.add(FuzzyTermType.TYPE_rectangularShape);
+						break;
+					case "InhomoFuzzy":
+						params.add(params_triangle_inhome[dim_i]);
+						fuzzyTermName.add("InhomoFuzzy");
+						FuzzyTermTypeID.add(FuzzyTermType.TYPE_trapezoidShape);
+						break;
+					case "InhomoGaussian":
+						params.add(params_gaussian_inhome[dim_i]);
+						fuzzyTermName.add("InhomoGaussian");
+						FuzzyTermTypeID.add(FuzzyTermType.TYPE_gaussianShape);
+						break;
+					case "InhomoInterval":
+						params.add(params_rectangle_inhome[dim_i]);
+						fuzzyTermName.add("InhomoInterval");
+						FuzzyTermTypeID.add(FuzzyTermType.TYPE_rectangularShape);
+						break;
+				}
+			}
+			int cnt = 0;
+			for(float[][] tmp : params) {
+				cnt += tmp.length;
+			}
+			FSs[dim_i] = new FuzzySet[cnt+1];
+
+			this.setDontCare(dim_i);
+			for(int i=0; i<params.size(); i++) {
+				fuzzySetInit_auto(fuzzyTermName.get(i), FuzzyTermTypeID.get(i), params.get(i), K, dim_i);
+			}
+		}
+	}
 
 	public void MultiMixedInit(SingleDataSetInfo tra, int[] K, double F) {
 		this.Ndim = tra.getNdim();
