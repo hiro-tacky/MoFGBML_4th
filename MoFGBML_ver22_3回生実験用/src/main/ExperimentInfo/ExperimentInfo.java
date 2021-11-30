@@ -154,16 +154,16 @@ public class ExperimentInfo {
 			break;
 
 		case 9:
-			ExperimentInfo.setSaveDir("designedFuzzySet" + sep + "name");
-			ExperimentInfo.setXML_path(Paths.get("").toAbsolutePath() + "/usedMenbershipDataRank" + "/test/phoneme/default_entropy_mixed/multi/phoneme_UsedMenbershipDataRank.xml");
+			ExperimentInfo.setSaveDir("partitionNumRank3" + sep + "name");
+			ExperimentInfo.setXML_path(Paths.get("").toAbsolutePath() + "/usedMenbershipDataRank" + "/test/bupa/default_entropy_mixed/multi/bupa_UsedMenbershipDataRank.xml");
 			ExperimentInfo.FUZZY_SET_INITIALIZE = 4;
 			ExperimentInfo.setFuzzySetType(1);
 			ExperimentInfo.dataRankNum = 3;
 			break;
 
 		case 10:
-			ExperimentInfo.setSaveDir("designedFuzzySet" + sep + "partitionNum");
-			ExperimentInfo.setXML_path(Paths.get("").toAbsolutePath() + "/usedMenbershipDataRank" + "/test/phoneme/default_entropy_mixed/multi/phoneme_UsedMenbershipDataRank.xml");
+			ExperimentInfo.setSaveDir("partitionNumRank5" + sep + "partitionNum");
+			ExperimentInfo.setXML_path(Paths.get("").toAbsolutePath() + "/usedMenbershipDataRank" + "/test/bupa/default_entropy_mixed/multi/bupa_UsedMenbershipDataRank.xml");
 			ExperimentInfo.FUZZY_SET_INITIALIZE = 4;
 			ExperimentInfo.setFuzzySetType(2);
 			ExperimentInfo.dataRankNum = 5;

@@ -524,7 +524,7 @@ class RuleSetXML(XML):
         
         usedFuzzyTerm = self.UsedMenbershipData(gen, includeDontCare, isCoverAllClasses)
         
-        usedFuzzyTermCat = self.fuzzyTermslabel(categorizeType = "partitionNum", gen = gen, includeDontCare = includeDontCare)
+        usedFuzzyTermCat = self.fuzzyTermslabel(categorizeType = "partitionNum", initializationValue = 0, gen = gen, includeDontCare = includeDontCare)
         usedFuzzyTermRank_name = self.fuzzyTermslabel(categorizeType = "name", gen = gen_plot, includeDontCare = includeDontCare)
         usedFuzzyTermRank_partitionNum = self.fuzzyTermslabel(categorizeType = "partitionNum", gen = gen_plot, includeDontCare = includeDontCare)
         for trialKey, trial in self.ruleset.items():                              
@@ -538,7 +538,7 @@ class RuleSetXML(XML):
                     else:
                         name = kb.fuzzySets[dim][fuzzyTermID].name.split('_')[0]
                         partitionNum = kb.fuzzySets[dim][fuzzyTermID].PartitionNum
-                        usedFuzzyTermCat[trialKey][dim][name][partitionNum] = usedNum
+                        usedFuzzyTermCat[trialKey][dim][name][partitionNum] += usedNum
                         if name in name_buf:
                             name_buf[name] += usedNum
                         else:
@@ -552,7 +552,6 @@ class RuleSetXML(XML):
                 # print(trialKey, dim, name_buf)
                 # print(trialKey, dim, partitionNum_buf)
                 
-                # buf = {key : rank for rank, key in enumerate(sorted(name_buf, key = name_buf.get, reverse = True), 1)}
                 buf_NM = {key : rank for rank, key in enumerate(sorted(set(name_buf.values()), reverse = True), 1)}
                 buf_PM = {key : rank for rank, key in enumerate(sorted(set(partitionNum_buf.values()), reverse = True), 1)}
                 for name, rank in {key : buf_NM[value] for key, value in name_buf.items()}.items():
@@ -560,10 +559,10 @@ class RuleSetXML(XML):
                 for key, rank in {key : buf_PM[value] for key, value in partitionNum_buf.items()}.items():
                     usedFuzzyTermRank_partitionNum[trialKey][dim][key[0]][key[1]] = rank
         # print(usedFuzzyTermCat)
-        return usedFuzzyTermRank_name, usedFuzzyTermRank_partitionNum
+        return usedFuzzyTermRank_name, usedFuzzyTermRank_partitionNum, usedFuzzyTermCat
     
     def UsedMenbershipDataRankOutput(self, outputType = "xml", gen = gen_plot, includeDontCare = False, isCoverAllClasses = False):
-        rankName, rankPartitionNum = self.UsedMenbershipDataRank(gen = gen, includeDontCare = includeDontCare, isCoverAllClasses = isCoverAllClasses)
+        rankName, rankPartitionNum, usedFuzzyTermCat = self.UsedMenbershipDataRank(gen = gen, includeDontCare = includeDontCare, isCoverAllClasses = isCoverAllClasses)
         label = self.fuzzyTermslabel(categorizeType = "partitionNum", initializationValue = None, gen = gen, includeDontCare = includeDontCare)
         if outputType == "xml":
             root = ET.Element("UsedMenbershipDataRank")
@@ -581,6 +580,38 @@ class RuleSetXML(XML):
             print(filename)
             tree.write(filename)
             
+        elif outputType == "csv":
+            usedFuzzyTerm_csv_Matrix = [[] for i in  range(len(label[0]))]
+            for trialKey, usedFuzzyTerm_trial in enumerate(usedFuzzyTermCat):
+                for dim_i, usedFuzzyTerm_dim in enumerate(usedFuzzyTerm_trial):
+                    usedFuzzyTerm_csv = [trialKey]
+                    for name_i, usedFuzzyTerm_name in usedFuzzyTerm_dim.items():
+                        for partitionNum_i, usedFuzzyTerm_partitionNum in usedFuzzyTerm_name.items():
+                            #データ入力
+                            usedFuzzyTerm_csv.append(usedFuzzyTerm_partitionNum)
+                    usedFuzzyTerm_csv_Matrix[dim_i].append(usedFuzzyTerm_csv)
+                     
+            for dim_i in range(len(label[0])):
+                #ヘッダ生成
+                header_1, header_2 = ["name"], ["partitionNum"]
+                for name, label_name in label[0][dim_i].items():
+                    check = True
+                    for partitionNum in label_name.keys():
+                        if check:
+                            header_1.append(name)
+                            check = False
+                        else:
+                            header_1.append("")
+                        header_2.append(partitionNum)
+                            
+                savePath = self.savePath
+                os.makedirs(savePath, exist_ok=True)
+                with open(savePath +'dim_' + str(dim_i) + '.csv', 'w', newline="") as f:
+                    print(savePath +'dim_' + str(dim_i) + '.csv')
+                    writer = csv.writer(f)
+                    writer.writerow(header_1)
+                    writer.writerow(header_2)
+                    writer.writerows(usedFuzzyTerm_csv_Matrix[dim_i])
                     
         #         kb = self.ruleset[trial_i][gen_plot].kb
         #         # fig = singleFig_set(self.datasetName + " dim:" + str(dim) + " trial:" + str(trial_i) + " used menbership rate (cover all classes)")
@@ -807,7 +838,7 @@ class RuleSet:
         print("RULESET\n dataset name:")
         self.datasetName = input()
         self.detaset_df = detaset_df(self.datasetName)
-        self.experimentTittle = "FSS2021"#["samePartitionNum", "diffPartitionNum"]#["rectangular", "trapezoid", "gaussian", "triangle", "multi"]
+        self.experimentTittle = "PartitionNumRank"#["samePartitionNum", "diffPartitionNum"]#["rectangular", "trapezoid", "gaussian", "triangle", "multi"]
         self.FolderList = ["default_entropy_mixed/multi"]#["default", "default_entropy_mixed"]
         self.RuleSetObj = {} #[antecedentTypeList][ComparativeExperimentList] = RuleSetXMLオブジェクト
         self.RuleSetObj_ClassifyResult = {} #[antecedentTypeList][ComparativeExperimentList] = RuleSetXMLオブジェクト
@@ -867,6 +898,6 @@ class RuleSet:
             for folderName, RuleSet in RuleSetObj_dict.items():
                 RuleSet.UsedMenbership(gen = self.gen_num, df = self.detaset_df, isCoverAllClasses = isCoverAllClasses)
 
-    def UsedMenbershipRatePlot(self, isCoverAllClasses = False):
+    def UsedMenbershipRatePlot(self, isCoverAllClasses = False, outputType = "xml"):
         for folderName, RuleSetObj in self.RuleSetObj.items():
-                RuleSetObj.UsedMenbershipDataRankOutput(gen = self.gen_num, isCoverAllClasses = isCoverAllClasses)
+                RuleSetObj.UsedMenbershipDataRankOutput(outputType = outputType, gen = self.gen_num, isCoverAllClasses = isCoverAllClasses)
